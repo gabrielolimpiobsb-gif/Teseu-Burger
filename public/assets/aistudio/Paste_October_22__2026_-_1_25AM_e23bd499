@@ -1,0 +1,1201 @@
+Aqui está o planejamento completo para transformar essa referência visual em um site real de alta conversão, com cardápio interativo e sistema completo de pedidos.
+
+Leitura Técnica e Visual da Imagem (Análise de UI/UX)
+A imagem apresenta uma estética "Modern Retro Smash Diner" (uma mistura de lanchonete americana clássica dos anos 50/60 com a pegada agressiva e urbana das smash burgers modernas):
+
+Paleta de Cores Extraída:
+
+Vermelho Sangue / Crimson (#D91E18 a #E6241B): Usado no fundo do Hero, nos detalhes dos cards e em banners de destaque para estimular o apetite e urgência.
+
+Preto Carvão (#121212 a #181818): Fundo principal do corpo do site, garantindo alto contraste para que as fotos dos lanches "saltem" da tela.
+
+Creme / Off-White (#F5EFE6 a #FFF8E7): Usado na tipografia principal e no fundo dos cards de produtos e avaliações, quebrando a frieza do branco puro e trazendo o ar retrô.
+
+Tipografia: Títulos em fonte Sans-Serif Condensada, Ultra-Bold e em Caixa Alta (estilo Impact, Bebas Neue ou Anton) com leve efeito de relevo/sombra no topo, combinada com uma fonte limpa de apoio (como Inter ou Plus Jakarta Sans) para textos corridos.
+
+Elementos Gráficos de Identidade: Faixas quadriculadas (checkerboard) nas laterais do topo e no rodapé, bordas inferiores serrilhadas nos depoimentos (imitando comandas de papel/nota fiscal) e elementos flutuantes (hambúrgueres, batatas fritas voando e respingos de molho).
+
+Wireframe / Esqueleto do Site (Adaptado para Cardápio + Pedidos)
+Para que o site não seja apenas uma página institucional e funcione como uma máquina de vendas própria (sem taxas de aplicativos), estruturamos o esqueleto mantendo 100% do layout da imagem, mas injetando as funções de e-commerce gastronômico nos pontos certos:
+================================================================================
+[ BARRA DE TOPO FIXA (PILL NAVBAR) ]
+
+Esquerda: [LOGO PROVISÓRIA] + Badge de Status ("🟢 Aberto • 35-45 min")
+
+Centro: Links de Âncora (Destaques | Cardápio | Diferenciais | Avaliações)
+
+Direita: Botão [ 🛒 Seu Pedido (R$ 0,00) ] (Substitui o "Book a Reservation")
+================================================================================
+
+[ SEÇÃO 1: HERO SECTION (IMPACTO INICIAL) ]
+
+Laterais: Faixas verticais quadriculadas (vermelho e creme).
+
+Fundo: Vermelho vibrante com silhueta sutil de chamas ao fundo.
+
+Coluna Esquerda (60%):
+
+Headline Gigante: "HAMBÚRGUERES FEITOS PARA CAUSAR UMA REVOLUÇÃO"
+
+Subtexto curto alinhado ao lado da última palavra + Botão CTA "VER CARDÁPIO COMPLETO".
+
+Coluna Direita (40%):
+
+3 Hambúrgueres flutuando em diagonal, invadindo a borda da seção preta abaixo.
+
+[ SEÇÃO 2: OS LENDÁRIOS + CARDÁPIO COMPLETO INTERATIVO ]
+
+Fundo: Preto Carvão (#121212) com detalhe gráfico de pimenta/molho no canto esquerdo.
+
+Título Central: "CONHEÇA AS LENDAS" + Subtítulo descritivo.
+
+Parte A (Destaque idêntico à imagem):
+
+Grid de 3 Cards Creme com fotos recortadas projetando sombra e caixa vermelha na base ("Clássico da Casa", "Fúria Verde", "Melt Supremo") + Botão de "Adicionar Rápido (+)".
+
+Parte B (Expansão Funcional - O Cardápio):
+
+Barra de Abas (Tabs): [ 🔥 Mais Vendidos ] [ 🍔 Smash Burgers ] [ 🍟 Combos & Fritas ] [ 🥤 Bebidas ] [ 🍫 Sobremesas ]
+
+Grid de Produtos com Preço, Descrição de Ingredientes e Botão "Pedir Agora" (que abre o Modal de Personalização do Lanche).
+
+[ SEÇÃO 3: POR QUE ESCOLHER A GENTE? (PROVA DE QUALIDADE) ]
+
+Título Central: "POR QUE NOS ESCOLHER?"
+
+Grid de 4 Cards Verticais (Fotos reais de bastidores com overlay escuro na base):
+
+Card 1: Carne prensada na chapa ("SMASH FRESCO TODO DIA")
+
+Card 2: Molho sendo servido ("MOLHOS ARTESANAIS DA CASA")
+
+Card 3: Sacola lacrada sendo entregue ("ENTREGA RÁPIDA E QUENTE")
+
+Card 4: Finalização do lanche ("INGREDIENTES SELECIONADOS")
+
+[ SEÇÃO 4: ANATOMIA DO HAMBÚRGUER (INTERATIVO / SCROLL) ]
+
+Título na Esquerda: "O QUE TORNA NOSSO BURGER TÃO ESPECIAL?"
+
+Centro: Hambúrguer "explodido" em camadas (Pão brioche, bacon crocante, tomate, blend bovino com queijo, alface, base do pão).
+
+Laterais (Hotspots): Caixas conectadas por linhas brancas finas a cada ingrediente, mostrando foto em miniatura e explicação técnica de cada camada.
+
+[ SEÇÃO 5: BANNER DIVIDIDO (LIFESTYLE & SAZONAIS) ]
+
+Grid 50/50 sem espaçamento:
+
+Esquerda: Foto close-up de cliente mordendo o lanche + Texto "SEMPRE SUCULENTO".
+
+Direita: Fundo vermelho, foto de calda/queijo caindo no burger + Texto "EDIÇÕES LIMITADAS & EXPERIMENTOS DE SABOR" + Botão "Pedir o Lanche do Mês".
+
+[ SEÇÃO 6: PROVA SOCIAL (AVALIAÇÕES ESTILO COMANDA) ]
+
+Título: "QUEM PROVA NÃO GUARDA SEGREDO — COMENTA."
+
+Carrossel Horizontal (< >) com 4 Cards cor creme:
+
+Foto do cliente, Nome, 5 Estrelas vermelhas, comentário real e borda inferior serrilhada/quadriculada imitando cupom fiscal.
+
+[ SEÇÃO 7: MANIFESTO DE QUALIDADE (BANNER DUPLO) ]
+
+Esquerda (Fundo Vermelho Escuro): "GRANDES BURGERS NÃO ACONTECEM POR ACASO. SEM ATALHOS. SEM CONSERVANTES."
+
+Direita: Foto macro de um burger duplo derretendo.
+
+[ SEÇÃO 8: CLUBE VIP / CUPOM DE DESCONTO (GAMIFICADO) ]
+
+Centro: Um hambúrguer gigante onde o pão de cima se abre revelando um campo de input: "DIGITE SEU WHATSAPP E GANHE 10% OFF NO 1º PEDIDO".
+
+Ao redor: Batatas fritas e respingos de ketchup flutuando em gravidade zero.
+
+[ SEÇÃO 9: RODAPÉ (FOOTER) ]
+
+Divisória Superior: Faixa horizontal quadriculada (preto e branco).
+
+Centro: Nome provisório da marca em tamanho gigante ("BURGER RIOT" / "[SEU NOME]").
+
+Laterais: Horário de funcionamento, Endereço/Mapa, Links para Instagram/WhatsApp.
+
+================================================================================
+[ ELEMENTOS FLUTUANTES DO SISTEMA DE PEDIDOS (OVERLAYS) ]
+
+MODAL DE PERSONALIZAÇÃO DO PRODUTO: Escolher ponto da carne, turbinar com adicionais pagos (Extra Bacon, Cheddar, Dobro de Carne), observações ("Sem cebola") e opção de "Transformar em Combo (+ Batata e Bebida)".
+
+GAVETA DO CARRINHO (SLIDE-OVER CART): Abre na lateral direita. Mostra itens, campo de Cupom, seletor [ Entrega vs Retirada ], cálculo de taxa por bairro/CEP, escolha de pagamento (Pix com QR Code/Copia e Cola, Cartão na Entrega, Dinheiro com troco) e botão "Finalizar Pedido".
+================================================================================
+
+Super Prompt Extremamente Detalhado (Para Gerar o Site)
+Você pode copiar e colar o prompt abaixo diretamente no Google AI Studio (Build Mode), Cursor, Lovable, Bolt.new ou v0.dev para gerar a aplicação completa:
+Atue como um Engenheiro Front-end Sênior e Especialista em UI/UX Design. Crie uma aplicação web completa, responsiva e de alta conversão para uma Hamburgueria Artesanal (use o nome provisório "STACKRIOT BURGERS", mas deixe fácil de alterar via variáveis de configuração).
+
+1. DIREÇÃO DE ARTE E ESTILO VISUAL (ESTRITAMENTE FIEL AO DESIGN)
+Estética: Retro American Smash Diner misturado com Street Food moderno.
+
+Paleta de Cores:
+
+Fundo Principal (Dark): #121212 e #181818
+
+Vermelho Destaque (Brand Primary): #D91E18 e #B81410
+
+Creme / Off-White (Textos de destaque e fundo de cards): #F5EFE6
+
+Branco Puro: #FFFFFF (para a navbar flutuante e textos de apoio)
+
+Tipografia (Google Fonts):
+
+Títulos (font-display): 'Anton' ou 'Bebas Neue' (Sempre uppercase, tracking estreito, line-height 0.95).
+
+Corpo (font-sans): 'Plus Jakarta Sans' ou 'Inter'.
+
+Detalhes Visuais Obrigatórios:
+
+Padrão quadriculado (checkerboard pattern via CSS repeating-conic-gradient) nas bordas laterais da Hero Section (vermelho e creme) e na divisória do Footer (preto e creme).
+
+Efeito de borda serrilhada/zig-zag na base dos cards de depoimentos (imitando nota fiscal).
+
+2. ESTRUTURA DE SEÇÕES (LAYOUT EXATO)
+Floating Pill Navbar: Barra fixa no topo centralizada, fundo branco (#FFFFFF), bordas totalmente arredondadas (rounded-full). Esquerda: Logo em vermelho + indicador pulsante "Aberto Agora". Centro: Links (Início, Lendas, Cardápio, Anatomia, Avaliações). Direita: Botão vermelho com ícone de sacola, contador de itens e valor total que abre o Carrinho Lateral.
+
+Hero Section: Fundo vermelho #D91E18 com faixas quadriculadas verticais nas extremidades esquerda e direita. Na esquerda, título gigante em cor creme (#F5EFE6) com sombra sólida sutil: "BURGERS FEITOS PARA CAUSAR UMA REVOLUÇÃO", acompanhado de um parágrafo curto e botão CTA. Na direita, composição de 3 hambúrgueres flutuantes com sombras realistas que transbordam (overlap) para a seção escura abaixo.
+
+Seção "Conheça as Lendas" (Destaques) + Cardápio Completo:
+
+Fundo #121212. Título centralizado em creme + subtítulo.
+
+Destaques: Grid de 3 cards com fundo creme (#F5EFE6), imagem do hambúrguer no topo e um bloco vermelho (#D91E18) na parte inferior interna do card contendo título, descrição curta, preço e botão "+".
+
+Cardápio Interativo (Logo abaixo): Filtro por categorias em abas (Smash Burgers, Artesanais, Combos, Fritas & Sides, Bebidas, Sobremesas) + Barra de busca rápida. Ao clicar em qualquer produto, abre o Modal de Personalização.
+
+Seção "Por Que Nos Escolher?": Grid de 4 cards verticais com fotos de processo (Carne prensada na chapa, Molhos da casa, Entrega rápida, Ingredientes frescos). Cada card tem gradiente escuro na base, uma tag branca arredondada com o título em preto e texto descritivo abaixo.
+
+Seção "O Que Torna Nosso Burger Tão Especial?" (Exploded Burger View):
+
+Fundo #121212. Título à esquerda.
+
+No centro, uma visualização vertical "explodida" em 6 camadas separadas de um hambúrguer (Pão topo, Bacon, Tomate, Blend + Queijo, Alface, Pão base).
+
+Nas laterais esquerda e direita, caixas de informação (callouts) conectadas a cada camada por linhas finas brancas com um ponto circular na ponta. Cada caixa contém miniatura da foto, badge branco de título e texto explicativo.
+
+Seção Split Banner (50/50):
+
+Coluna Esquerda: Foto lifestyle de pessoa comendo hambúrguer com texto centralizado "SEMPRE SUCULENTO".
+
+Coluna Direita: Fundo vermelho #D91E18, imagem de burger com cheddar escorrendo, título "DROPS SAZONAIS & EXPERIMENTOS DE SABOR" e botão para pedir o lanche exclusivo do mês.
+
+Seção de Avaliações ("Quem Prova Não Guarda Segredo - Comenta"):
+
+Carrossel de 4 cards cor creme (#F5EFE6), cada um com foto do cliente, nome, 5 estrelas vermelhas, comentário e base com padrão quadriculado/serrilhado de recibo. Setas de navegação nas laterais.
+
+Banner Manifesto: Layout horizontal dividido. Esquerda com fundo vermelho escuro e texto "GRANDES BURGERS NÃO ACONTECEM POR ACASO. SEM ATALHOS. SEM ENROLAÇÃO." Direita com foto close-up do lanche.
+
+Seção Clube VIP (Burger Input): Um hambúrguer central dividido ao meio; entre o pão superior e a carne há um campo de input e botão "DESBLOQUEAR CUPOM SECRETO", cercado por batatas fritas flutuantes nas laterais.
+
+Footer: Divisória superior quadriculada em largura total. Nome da marca gigante no centro em cor creme (text-[12vw]), ladeado por informações de horário, endereço e redes sociais.
+
+3. FUNCIONALIDADES DO SISTEMA DE PEDIDOS (OBRIGATÓRIO)
+Modal de Personalização do Lanche:
+
+Seleção obrigatória do ponto da carne (Ao ponto, Bem passado, Mal passado) para hambúrgueres.
+
+Lista de Adicionais com checkboxes e soma automática de preço (+ Bacon R
+ 4, + Carne Extra R
+ 4).
+
+Opção "Turbine para Combo" (+ Batata + Lata por R$ 14,90).
+
+Campo de observações (ex: "Tirar picles").
+
+Controle de quantidade (- / +) e botão "Adicionar ao Pedido • R$ XX,XX".
+
+Carrinho Lateral (Slide-over Drawer):
+
+Lista de itens adicionados com seus adicionais detalhados, botão para alterar quantidade ou remover.
+
+Campo de Cupom de Desconto (ex: testar cupom RIOT10 para 10% de desconto).
+
+Alternador entre Delivery (Entrega) e Retirada no Balcão.
+
+Formulário enxuto de Checkout: Nome, Telefone, Endereço (rua, número, bairro com seleção de taxa de entrega dinâmica) e Forma de Pagamento (Pix, Cartão na Entrega, Dinheiro com campo para troco).
+
+Finalização Dupla: Ao clicar em "Enviar Pedido", exiba um resumo visual com código Pix Copia e Cola simulado E gere automaticamente um link formatado para o WhatsApp (wa.me) com toda a comanda organizada em tópicos claros.
+
+Código Base para as Animações (HTML + CSS + JS)
+Abaixo está o código estrutural focado nas 4 animações e efeitos visuais mais marcantes da sua imagem: as faixas quadriculadas via CSS puro, a flutuação dos hambúrgueres no topo, a abertura das camadas do hambúrguer conforme a rolagem da tela (Scroll-driven Exploded View) e a revelação suave dos cards:
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animações Base - Hamburgueria</title>
+<!-- Fonte Condensada Estilo Imagem -->
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- GSAP + ScrollTrigger para animações de rolagem profissionais -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root {
+--bg-dark: #121212;
+--red-primary: #D91E18;
+--cream: #F5EFE6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+background-color: var(--bg-dark);
+color: var(--cream);
+font-family: 'Plus Jakarta Sans', sans-serif;
+overflow-x: hidden;
+}
+
+h1, h2, .font-display {
+font-family: 'Anton', sans-serif;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+/* 1. PADRÃO QUADRICULADO (CHECKERBOARD) EM CSS PURO */
+.checkerboard-vertical {
+width: 32px;
+background-image: repeating-conic-gradient(var(--cream) 0% 25%, var(--red-primary) 0% 50%);
+background-size: 32px 32px;
+}
+
+.checkerboard-horizontal {
+height: 28px;
+width: 100%;
+background-image: repeating-conic-gradient(var(--cream) 0% 25%, var(--bg-dark) 0% 50%);
+background-size: 28px 28px;
+}
+
+/* 2. EFEITO FLUTUANTE CONTÍNUO NOS BURGERS DO HERO */
+@keyframes floatBurger {
+0%, 100% { transform: translateY(0px) rotate(0deg); }
+50% { transform: translateY(-14px) rotate(1.5deg); }
+}
+
+.hero-burger-1 { animation: floatBurger 4s ease-in-out infinite; }
+.hero-burger-2 { animation: floatBurger 4.5s ease-in-out infinite 0.6s; }
+.hero-burger-3 { animation: floatBurger 5s ease-in-out infinite 1.2s; }
+
+/* 3. ESTRUTURA DO HAMBÚRGUER EXPLODIDO (SEÇÃO 4) */
+.exploded-section {
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+position: relative;
+padding: 80px 20px;
+}
+
+.burger-stack-container {
+position: relative;
+width: 320px;
+height: 520px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+}
+
+.burger-layer {
+position: relative;
+width: 240px;
+transition: filter 0.3s ease;
+filter: drop-shadow(0 15px 20px rgba(0,0,0,0.65));
+z-index: 2;
+}
+
+.burger-layer:hover {
+filter: drop-shadow(0 0 18px rgba(217, 30, 24, 0.8));
+}
+
+/* Caixas de Callout (Linhas e Explicações das Camadas) */
+.callout-box {
+position: absolute;
+width: 260px;
+background: rgba(255, 255, 255, 0.06);
+backdrop-filter: blur(8px);
+border: 1px solid rgba(255, 255, 255, 0.2);
+border-radius: 8px;
+padding: 12px;
+opacity: 0; /* Animado via GSAP */
+}
+
+.callout-right { right: -270px; }
+.callout-left { left: -270px; }
+
+.callout-badge {
+display: inline-block;
+background: #fff;
+color: #000;
+font-weight: 800;
+font-size: 11px;
+padding: 3px 8px;
+border-radius: 4px;
+text-transform: uppercase;
+margin-bottom: 6px;
+}
+
+/* 4. BORDA SERRILHADA DE COMANDA (CARDS DE DEPOIMENTO) */
+.receipt-card {
+background: var(--cream);
+color: #121212;
+padding: 24px;
+position: relative;
+border-radius: 8px 8px 0 0;
+}
+.receipt-card::after {
+content: "";
+position: absolute;
+bottom: -12px;
+left: 0;
+width: 100%;
+height: 12px;
+background: linear-gradient(-45deg, transparent 8px, var(--cream) 0),
+linear-gradient(45deg, transparent 8px, var(--cream) 0);
+background-size: 16px 12px;
+background-repeat: repeat-x;
+}
+</style>
+</head>
+<body>
+<section class="exploded-section" id="anatomia">
+<h2 style="font-size: 3rem; margin-bottom: 40px; text-align: center;">
+O QUE TORNA NOSSO BURGER TÃO ESPECIAL?
+</h2>
+code
+Code
+<div class="burger-stack-container">
+  <!-- Camada 1: Pão Topo -->
+  <div class="burger-layer layer-top-bun">
+    <div class="callout-box callout-right">
+      <span class="callout-badge">Pão Brioche Selado</span>
+      <p style="font-size: 12px; color: #ccc;">Tostado na manteiga clarificada para nunca amolecer com o molho.</p>
+    </div>
+  </div>
+
+  <!-- Camada 2: Bacon -->
+  <div class="burger-layer layer-bacon">
+    <div class="callout-box callout-left">
+      <span class="callout-badge">Bacon Defumado em Lenha</span>
+      <p style="font-size: 12px; color: #ccc;">Fatias grossas assadas lentamente até atingirem crocância de vidro.</p>
+    </div>
+  </div>
+
+  <!-- Camada 3: Carne Smash + Queijo -->
+  <div class="burger-layer layer-patty">
+    <div class="callout-box callout-right">
+      <span class="callout-badge">Smash Bovino 100g</span>
+      <p style="font-size: 12px; color: #ccc;">Prensado na chapa a 230°C para criar a crosta perfeita de Maillard.</p>
+    </div>
+  </div>
+
+  <!-- Camada 4: Pão Base -->
+  <div class="burger-layer layer-bottom-bun"></div>
+</div>
+</section>
+<div class="checkerboard-horizontal"></div>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// Animação de "Explosão/Separação" das camadas do hambúrguer ao rolar a página
+const tl = gsap.timeline({
+scrollTrigger: {
+trigger: "#anatomia",
+start: "top 60%",
+end: "bottom 70%",
+scrub: 1.2, // Suaviza o movimento atrelado ao scroll
+}
+});
+
+// As camadas começam juntas (hambúrguer fechado) e se afastam verticalmente
+tl.fromTo(".layer-top-bun", { y: 90 }, { y: -60 }, 0)
+.fromTo(".layer-bacon", { y: 40 }, { y: -15 }, 0)
+.fromTo(".layer-patty", { y: -10 }, { y: 30 }, 0)
+.fromTo(".layer-bottom-bun", { y: -60 }, { y: 80 }, 0)
+// Revela os textos explicativos (callouts) quando o hambúrguer se abre
+.to(".callout-box", { opacity: 1, y: -10, stagger: 0.15, duration: 0.4 }, 0.3);
+</script>
+</body>
+</html>
+Prompt Exclusivo para Refinar as Animações (Framer Motion / GSAP)
+Depois que a IA gerar a primeira versão do site com o Super Prompt da Etapa 3, envie este segundo prompt para deixar o site com nível de agência premiada:
+Agora vamos elevar o nível das animações e micro-interações do site usando Framer Motion (ou GSAP) e CSS avançado, mantendo 60fps no desktop e no celular:
+
+Hero Section (Entrada Dramática + Parallax):
+
+Faça o título gigante "BURGERS FEITOS PARA CAUSAR UMA REVOLUÇÃO" entrar palavra por palavra com um efeito de Mask Reveal vindo de baixo (y: "100%" para y: "0%") e leve inclinação.
+
+Aplique um efeito de flutuação contínua com física de mola (spring) desalinhada nos 3 hambúrgueres da direita, além de um leve efeito Parallax que reage ao movimento do mouse no Desktop.
+
+Animação Interativa do "Hambúrguer Explodido" (Seção 4):
+
+As camadas do hambúrguer (Pão topo, Bacon, Tomate, Blend com Queijo, Alface, Pão base) devem iniciar empilhadas como um hambúrguer fechado.
+
+Conforme o usuário rola a página até a seção, as camadas devem se afastar verticalmente no eixo Y (efeito Exploded View).
+
+Assim que as camadas se abrirem, desenhe as linhas conectoras brancas (usando stroke-dashoffset ou scaleX) e faça um fade-in nos cards explicativos laterais.
+
+Adicione interação de hover: ao passar o mouse sobre um card explicativo, destaque a camada correspondente do hambúrguer com um brilho suave e escureça levemente as outras camadas.
+
+Seção Clube VIP (Pão que Abre no Scroll/Hover):
+
+Na penúltima seção ("Unlock Exclusive Drops"), faça o pão superior do hambúrguer levantar no eixo Y quando a seção entrar na tela, revelando o input de WhatsApp/E-mail no meio do lanche, enquanto as batatas fritas laterais se espalham para fora com leve rotação.
+
+Micro-interações de Compra (Feedback Tátil):
+
+Nos cards de "Conheça as Lendas" e do Cardápio, ao passar o mouse, a imagem recortada do hambúrguer deve dar um zoom de scale(1.08) e subir -8px, aumentando a sombra projetada.
+
+Quando o usuário adicionar um item ao carrinho, dispare uma animação rápida de shake/pulse no botão vermelho do carrinho lá na Navbar flutuante e exiba um toast estilizado nas cores da marca.
+
+Adicione também um contador dinâmico no ícone que atualiza conforme os itens são inseridos.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 2400" width="100%" height="100%" style="background:#0c0d10; font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<defs>
+<!-- Marcador de Flecha para cotas e fluxos -->
+<marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M 0 0 L 10 5 L 0 10 z" fill="#00e5ff"/>
+</marker>
+<!-- Padrão Quadriculado (Checkerboard) do Hero e Footer -->
+<pattern id="checker" width="20" height="20" patternUnits="userSpaceOnUse">
+<rect width="10" height="10" fill="#2a2e39"/>
+<rect x="10" width="10" height="10" fill="#181a20"/>
+<rect y="10" width="10" height="10" fill="#181a20"/>
+<rect x="10" y="10" width="10" height="10" fill="#2a2e39"/>
+</pattern>
+<!-- Padrão de Linhas Wireframe para Imagens (Placeholder) -->
+<pattern id="diagWire" width="16" height="16" patternUnits="userSpaceOnUse">
+<path d="M0 16 L16 0 M0 0 L16 16" stroke="#252a36" stroke-width="1.2"/>
+</pattern>
+</defs>
+<style>
+.section-bg { fill: #13151b; stroke: #2a3142; stroke-width: 1.5; }
+.hero-bg { fill: #1a151b; stroke: #ff3b30; stroke-width: 2; }
+.wire-box { fill: #1c202a; stroke: #3b4459; stroke-width: 1.5; stroke-dasharray: 4 2; }
+.wire-box-solid { fill: #1c202a; stroke: #4e5a77; stroke-width: 1.5; }
+.img-box { fill: url(#diagWire); stroke: #48546f; stroke-width: 1.5; }
+.highlight-red { fill: #2c1418; stroke: #ff3b30; stroke-width: 1.5; }
+.tag-title { font-size: 13px; font-weight: 800; fill: #00e5ff; letter-spacing: 1.5px; text-transform: uppercase; }
+.section-title { font-size: 18px; font-weight: 800; fill: #ffffff; letter-spacing: 1px; }
+.label-text { font-size: 12px; fill: #8f9cae; font-weight: 500; }
+.sub-text { font-size: 11px; fill: #637085; }
+.wire-btn { fill: #ff3b30; rx: 4px; }
+.btn-text { font-size: 11px; font-weight: bold; fill: #ffffff; text-anchor: middle; }
+.spec-line { stroke: #00e5ff; stroke-width: 1.2; stroke-dasharray: 3 3; }
+</style>
+<g transform="translate(60, 40)">
+<text class="tag-title">ARCHITECTURE BLUEPRINT // UX WIREFRAME</text>
+<text y="28" font-size="24" font-weight="900" fill="#ffffff" letter-spacing="0.5px">ESQUELETO ORGANIZACIONAL • HAMBURGUERIA</text>
+<text y="50" class="label-text">Hierarquia visual, zonas de conversão, anatomia de camadas e componentes de pedido</text>
+</g>
+<g transform="translate(770, 40)">
+<rect width="170" height="75" rx="6" fill="#161b26" stroke="#00e5ff" stroke-width="1.2"/>
+<text x="12" y="22" font-size="11" font-weight="bold" fill="#00e5ff">ECOMMERCE CORE</text>
+<text x="12" y="40" class="sub-text">• Modal de Customização</text>
+<text x="12" y="55" class="sub-text">• Carrinho Lateral (Slide-over)</text>
+<text x="12" y="70" class="sub-text">• Checkout WhatsApp / Pix</text>
+</g>
+<g id="navbar" transform="translate(140, 140)">
+<rect width="720" height="46" rx="23" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<!-- Logo -->
+<rect x="25" y="14" width="70" height="18" rx="4" fill="#ff3b30"/>
+<text x="60" y="27" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle">LOGO/NOME</text>
+<!-- Links -->
+<text x="210" y="28" font-size="11" font-weight="700" fill="#334155">INÍCIO</text>
+<text x="270" y="28" font-size="11" font-weight="700" fill="#334155">LENDAS</text>
+<text x="340" y="28" font-size="11" font-weight="700" fill="#334155">DIFERENCIAIS</text>
+<text x="440" y="28" font-size="11" font-weight="700" fill="#334155">ANATOMIA</text>
+<text x="530" y="28" font-size="11" font-weight="700" fill="#334155">AVALIAÇÕES</text>
+<!-- Botão Pedido -->
+<rect x="615" y="8" width="90" height="30" rx="15" fill="#ff3b30"/>
+<text x="660" y="27" class="btn-text">PEDIR (0)</text>
+</g>
+<g id="main-layout" transform="translate(140, 205)">
+code
+Code
+<!-- ========================================== -->
+<!-- 1. HERO SECTION (BANNER VERMELHO)          -->
+<!-- ========================================== -->
+<g id="sec-hero">
+  <rect width="720" height="360" class="hero-bg"/>
+  <!-- Faixas Laterais Quadriculadas -->
+  <rect x="0" y="0" width="28" height="360" fill="url(#checker)" opacity="0.6"/>
+  <rect x="692" y="0" width="28" height="360" fill="url(#checker)" opacity="0.6"/>
+
+  <!-- Coluna Esquerda: Textos Hero -->
+  <text x="50" y="65" class="tag-title" fill="#ff7b72">ZONA 01 // HERO IMPACT</text>
+  <!-- Headline Representada -->
+  <rect x="50" y="85" width="310" height="38" rx="4" fill="#ffffff" opacity="0.9"/>
+  <text x="60" y="110" font-size="18" font-weight="900" fill="#121212">BURGERS BUILT TO</text>
+  <rect x="50" y="130" width="260" height="38" rx="4" fill="#ffffff" opacity="0.9"/>
+  <text x="60" y="155" font-size="18" font-weight="900" fill="#121212">START A RIOT.</text>
+
+  <!-- Subtexto e CTA -->
+  <line x1="50" y1="190" x2="280" y2="190" stroke="#8f9cae" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="202" x2="240" y2="202" stroke="#8f9cae" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="214" x2="190" y2="214" stroke="#8f9cae" stroke-width="3" stroke-linecap="round"/>
+
+  <rect x="50" y="240" width="160" height="42" class="wire-btn"/>
+  <text x="130" y="265" class="btn-text">EXPLORAR CARDÁPIO</text>
+
+  <!-- Coluna Direita: Hambúrgueres Flutuantes -->
+  <g transform="translate(390, 45)">
+    <!-- Burger 1 Principal -->
+    <circle cx="210" cy="90" r="65" class="img-box"/>
+    <text x="210" y="94" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">[IMG: BURGER HERO]</text>
+    <!-- Burger 2 Secundário -->
+    <circle cx="100" cy="190" r="55" class="img-box"/>
+    <text x="100" y="194" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">[IMG: SMASH 2]</text>
+    <!-- Burger 3 Secundário -->
+    <circle cx="230" cy="225" r="50" class="img-box"/>
+    <text x="230" y="229" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">[IMG: SMASH 3]</text>
+  </g>
+</g>
+
+<!-- ========================================== -->
+<!-- 2. MEET THE LEGENDS (CARDS DESTAQUES)      -->
+<!-- ========================================== -->
+<g id="sec-legends" transform="translate(0, 360)">
+  <rect width="720" height="340" class="section-bg"/>
+  
+  <!-- Cabeçalho da Seção -->
+  <text x="360" y="40" class="tag-title" text-anchor="middle">ZONA 02 // OS LENDÁRIOS</text>
+  <text x="360" y="65" class="section-title" text-anchor="middle">MEET THE LEGENDS (DESTAQUES DO CHEF)</text>
+  <text x="360" y="85" class="sub-text" text-anchor="middle">Linha de frente artesanal • Seleção mais pedida da casa</text>
+
+  <!-- 3 Cards de Produto -->
+  <!-- Card 1 -->
+  <g transform="translate(50, 110)">
+    <rect width="190" height="195" rx="10" fill="#f5efe6" stroke="#d5cdbf" stroke-width="1.5"/>
+    <circle cx="95" cy="65" r="48" class="img-box"/>
+    <text x="95" y="68" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">[IMG RECORTADA]</text>
+    <!-- Bloco de Preço/Ação Vermelho na Base -->
+    <rect x="0" y="130" width="190" height="65" rx="0 0 10 10" fill="#d91e18"/>
+    <text x="15" y="152" font-size="12" font-weight="900" fill="#ffffff">THE RIOT CLASSIC</text>
+    <text x="15" y="168" font-size="10" fill="#ffd2d0">Smash duplo 160g + cheddar</text>
+    <text x="15" y="185" font-size="12" font-weight="900" fill="#ffffff">R$ 34,90</text>
+    <circle cx="165" cy="165" r="14" fill="#ffffff"/>
+    <text x="165" y="170" font-size="15" font-weight="bold" fill="#d91e18" text-anchor="middle">+</text>
+  </g>
+
+  <!-- Card 2 -->
+  <g transform="translate(265, 110)">
+    <rect width="190" height="195" rx="10" fill="#f5efe6" stroke="#d5cdbf" stroke-width="1.5"/>
+    <circle cx="95" cy="65" r="48" class="img-box"/>
+    <text x="95" y="68" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">[IMG RECORTADA]</text>
+    <rect x="0" y="130" width="190" height="65" rx="0 0 10 10" fill="#d91e18"/>
+    <text x="15" y="152" font-size="12" font-weight="900" fill="#ffffff">GREEN FURY</text>
+    <text x="15" y="168" font-size="10" fill="#ffd2d0">Molho verde especial + bacon</text>
+    <text x="15" y="185" font-size="12" font-weight="900" fill="#ffffff">R$ 38,90</text>
+    <circle cx="165" cy="165" r="14" fill="#ffffff"/>
+    <text x="165" y="170" font-size="15" font-weight="bold" fill="#d91e18" text-anchor="middle">+</text>
+  </g>
+
+  <!-- Card 3 -->
+  <g transform="translate(480, 110)">
+    <rect width="190" height="195" rx="10" fill="#f5efe6" stroke="#d5cdbf" stroke-width="1.5"/>
+    <circle cx="95" cy="65" r="48" class="img-box"/>
+    <text x="95" y="68" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">[IMG RECORTADA]</text>
+    <rect x="0" y="130" width="190" height="65" rx="0 0 10 10" fill="#d91e18"/>
+    <text x="15" y="152" font-size="12" font-weight="900" fill="#ffffff">MOLTEN MELT</text>
+    <text x="15" y="168" font-size="10" fill="#ffd2d0">Piscina de cheddar cremoso</text>
+    <text x="15" y="185" font-size="12" font-weight="900" fill="#ffffff">R$ 41,90</text>
+    <circle cx="165" cy="165" r="14" fill="#ffffff"/>
+    <text x="165" y="170" font-size="15" font-weight="bold" fill="#d91e18" text-anchor="middle">+</text>
+  </g>
+</g>
+
+<!-- ========================================== -->
+<!-- 3. WHY CHOOSE US? (PILARES DE QUALIDADE)   -->
+<!-- ========================================== -->
+<g id="sec-pillars" transform="translate(0, 700)">
+  <rect width="720" height="290" class="section-bg"/>
+  <text x="360" y="38" class="tag-title" text-anchor="middle">ZONA 03 // PROVA TÉCNICA</text>
+  <text x="360" y="60" class="section-title" text-anchor="middle">WHY CHOOSE US? (NOSSOS PILARES)</text>
+
+  <!-- 4 Cards Verticais de Processo -->
+  <!-- Pillar 1 -->
+  <g transform="translate(40, 85)">
+    <rect width="145" height="175" rx="8" class="img-box"/>
+    <rect x="8" y="115" width="129" height="52" rx="6" fill="#12141a" opacity="0.9"/>
+    <rect x="15" y="123" width="70" height="14" rx="3" fill="#ffffff"/>
+    <text x="50" y="134" font-size="8" font-weight="bold" fill="#121212" text-anchor="middle">SMASH FRESCO</text>
+    <text x="15" y="150" font-size="8" fill="#8f9cae">Carne fresca prensada</text>
+    <text x="15" y="160" font-size="8" fill="#8f9cae">na chapa ultra quente.</text>
+  </g>
+
+  <!-- Pillar 2 -->
+  <g transform="translate(200, 85)">
+    <rect width="145" height="175" rx="8" class="img-box"/>
+    <rect x="8" y="115" width="129" height="52" rx="6" fill="#12141a" opacity="0.9"/>
+    <rect x="15" y="123" width="75" height="14" rx="3" fill="#ffffff"/>
+    <text x="52" y="134" font-size="8" font-weight="bold" fill="#121212" text-anchor="middle">MOLHOS PRÓPRIOS</text>
+    <text x="15" y="150" font-size="8" fill="#8f9cae">Receitas autorais e</text>
+    <text x="15" y="160" font-size="8" fill="#8f9cae">emulsões artesanais.</text>
+  </g>
+
+  <!-- Pillar 3 -->
+  <g transform="translate(360, 85)">
+    <rect width="145" height="175" rx="8" class="img-box"/>
+    <rect x="8" y="115" width="129" height="52" rx="6" fill="#12141a" opacity="0.9"/>
+    <rect x="15" y="123" width="80" height="14" rx="3" fill="#ffffff"/>
+    <text x="55" y="134" font-size="8" font-weight="bold" fill="#121212" text-anchor="middle">ENTREGA RÁPIDA</text>
+    <text x="15" y="150" font-size="8" fill="#8f9cae">Embalagem térmica que</text>
+    <text x="15" y="160" font-size="8" fill="#8f9cae">mantém o crocante.</text>
+  </g>
+
+  <!-- Pillar 4 -->
+  <g transform="translate(520, 85)">
+    <rect width="145" height="175" rx="8" class="img-box"/>
+    <rect x="8" y="115" width="129" height="52" rx="6" fill="#12141a" opacity="0.9"/>
+    <rect x="15" y="123" width="80" height="14" rx="3" fill="#ffffff"/>
+    <text x="55" y="134" font-size="8" font-weight="bold" fill="#121212" text-anchor="middle">TRANSPARÊNCIA</text>
+    <text x="15" y="150" font-size="8" fill="#8f9cae">Ingredientes 100%</text>
+    <text x="15" y="160" font-size="8" fill="#8f9cae">limpos e selecionados.</text>
+  </g>
+</g>
+
+<!-- ========================================== -->
+<!-- 4. ANATOMIA / EXPLODED VIEW (INTERATIVO)   -->
+<!-- ========================================== -->
+<g id="sec-exploded" transform="translate(0, 990)">
+  <rect width="720" height="420" class="section-bg"/>
+  
+  <!-- Texto Esquerda -->
+  <text x="50" y="60" class="tag-title">ZONA 04 // ANATOMIA & ENGENHARIA</text>
+  <text x="50" y="85" class="section-title">WHAT MAKES OUR</text>
+  <text x="50" y="107" class="section-title">BURGER SO SPECIAL?</text>
+
+  <!-- Callout Box Esquerda (Bacon) -->
+  <g transform="translate(50, 160)">
+    <rect width="160" height="55" rx="6" class="wire-box-solid"/>
+    <rect x="10" y="10" width="35" height="35" rx="4" class="img-box"/>
+    <text x="55" y="24" font-size="9" font-weight="bold" fill="#ffffff">BACON DEFUMADO</text>
+    <text x="55" y="38" font-size="8" fill="#8f9cae">Cura lenta de 7 dias</text>
+    <polyline points="160,28 275,185" fill="none" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Callout Box Esquerda (Pão Base) -->
+  <g transform="translate(50, 290)">
+    <rect width="160" height="55" rx="6" class="wire-box-solid"/>
+    <rect x="10" y="10" width="35" height="35" rx="4" class="img-box"/>
+    <text x="55" y="24" font-size="9" font-weight="bold" fill="#ffffff">BRIOCHE SELADO</text>
+    <text x="55" y="38" font-size="8" fill="#8f9cae">Tostado na manteiga</text>
+    <polyline points="160,28 275,340" fill="none" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Centro: Camadas do Burger Explodido -->
+  <g transform="translate(285, 95)">
+    <!-- Pão Topo -->
+    <ellipse cx="75" cy="30" rx="70" ry="25" class="wire-box-solid" fill="#2d3342"/>
+    <text x="75" y="34" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">PÃO TOPO</text>
+    
+    <!-- Bacon Crocante -->
+    <ellipse cx="75" cy="85" rx="68" ry="14" class="highlight-red"/>
+    <text x="75" y="88" font-size="8" font-weight="bold" fill="#ff7b72" text-anchor="middle">BACON ARTESANAL</text>
+    
+    <!-- Tomate -->
+    <ellipse cx="75" cy="130" rx="65" ry="12" class="highlight-red"/>
+    <text x="75" y="133" font-size="8" font-weight="bold" fill="#ff7b72" text-anchor="middle">RODELAS DE TOMATE</text>
+    
+    <!-- Blend Smash + Queijo -->
+    <ellipse cx="75" cy="180" rx="72" ry="22" class="wire-box-solid" fill="#3b2b23"/>
+    <text x="75" y="184" font-size="9" font-weight="bold" fill="#ffb86c" text-anchor="middle">SMASH PATTY + CHEDDAR</text>
+    
+    <!-- Alface Lisa -->
+    <ellipse cx="75" cy="225" rx="65" ry="10" fill="#1b3323" stroke="#50fa7b" stroke-width="1"/>
+    <text x="75" y="228" font-size="8" font-weight="bold" fill="#50fa7b" text-anchor="middle">ALFACE AMERICANA</text>
+    
+    <!-- Pão Base -->
+    <ellipse cx="75" cy="265" rx="68" ry="18" class="wire-box-solid" fill="#2d3342"/>
+    <text x="75" y="269" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">PÃO BASE</text>
+  </g>
+
+  <!-- Callout Box Direita (Smash Patty) -->
+  <g transform="translate(500, 200)">
+    <rect width="170" height="55" rx="6" class="wire-box-solid"/>
+    <rect x="10" y="10" width="35" height="35" rx="4" class="img-box"/>
+    <text x="55" y="24" font-size="9" font-weight="bold" fill="#ffffff">SMASH PATTY 100G</text>
+    <text x="55" y="38" font-size="8" fill="#8f9cae">Crosta de Maillard perfeita</text>
+    <polyline points="0,28 -70,75" fill="none" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+  </g>
+</g>
+
+<!-- ========================================== -->
+<!-- 5. SPLIT BANNER (LIFESTYLE & SAZONAIS)     -->
+<!-- ========================================== -->
+<g id="sec-split" transform="translate(0, 1410)">
+  <!-- Lado Esquerdo: Imagem Lifestyle -->
+  <g>
+    <rect width="360" height="220" class="img-box"/>
+    <rect width="360" height="220" fill="#000000" opacity="0.4"/>
+    <text x="180" y="115" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle">ALWAYS TASTY</text>
+    <text x="180" y="135" font-size="11" fill="#cbd5e1" text-anchor="middle">A experiência que vicia do 1º ao último pedaço</text>
+  </g>
+  <!-- Lado Direito: Banner Vermelho Sazonais -->
+  <g transform="translate(360, 0)">
+    <rect width="360" height="220" fill="#d91e18"/>
+    <circle cx="180" cy="55" r="30" class="img-box"/>
+    <text x="180" y="110" font-size="14" font-weight="900" fill="#ffffff" text-anchor="middle">SEASONAL DROPS &amp; FLAVOR</text>
+    <text x="180" y="128" font-size="14" font-weight="900" fill="#ffffff" text-anchor="middle">EXPERIMENTS</text>
+    <rect x="110" y="148" width="140" height="32" rx="4" fill="#ffffff"/>
+    <text x="180" y="168" font-size="10" font-weight="bold" fill="#d91e18" text-anchor="middle">PROVAR EDIÇÃO DO MÊS</text>
+  </g>
+</g>
+
+<!-- ========================================== -->
+<!-- 6. AVALIAÇÕES / SOCIAL PROOF (NOTAS)       -->
+<!-- ========================================== -->
+<g id="sec-reviews" transform="translate(0, 1630)">
+  <rect width="720" height="210" class="section-bg"/>
+  <text x="360" y="32" class="tag-title" text-anchor="middle">ZONA 05 // PROVA SOCIAL</text>
+  <text x="360" y="54" class="section-title" text-anchor="middle">PEOPLE DON'T WHISPER ABOUT GOOD FOOD — THEY TALK.</text>
+
+  <!-- 4 Recibos / Cartões Estilo Comanda -->
+  <g transform="translate(45, 75)">
+    <rect width="140" height="105" rx="4" fill="#f5efe6"/>
+    <circle cx="25" cy="25" r="12" class="img-box"/>
+    <text x="45" y="24" font-size="9" font-weight="bold" fill="#121212">ANDRÉ S.</text>
+    <text x="45" y="35" font-size="8" fill="#d91e18">★★★★★</text>
+    <line x1="15" y1="50" x2="125" y2="50" stroke="#d5cdbf" stroke-width="1"/>
+    <text x="15" y="65" font-size="8" fill="#444">"Melhor smash da cidade.</text>
+    <text x="15" y="77" font-size="8" fill="#444">O queijo derretido é</text>
+    <text x="15" y="89" font-size="8" fill="#444">outro patamar!"</text>
+  </g>
+
+  <g transform="translate(200, 75)">
+    <rect width="140" height="105" rx="4" fill="#f5efe6"/>
+    <circle cx="25" cy="25" r="12" class="img-box"/>
+    <text x="45" y="24" font-size="9" font-weight="bold" fill="#121212">CAMILA M.</text>
+    <text x="45" y="35" font-size="8" fill="#d91e18">★★★★★</text>
+    <line x1="15" y1="50" x2="125" y2="50" stroke="#d5cdbf" stroke-width="1"/>
+    <text x="15" y="65" font-size="8" fill="#444">"Entrega rápida e chegou</text>
+    <text x="15" y="77" font-size="8" fill="#444">muito quente. Bacon</text>
+    <text x="15" y="89" font-size="8" fill="#444">super crocante."</text>
+  </g>
+
+  <g transform="translate(355, 75)">
+    <rect width="140" height="105" rx="4" fill="#f5efe6"/>
+    <circle cx="25" cy="25" r="12" class="img-box"/>
+    <text x="45" y="24" font-size="9" font-weight="bold" fill="#121212">LUCAS R.</text>
+    <text x="45" y="35" font-size="8" fill="#d91e18">★★★★★</text>
+    <line x1="15" y1="50" x2="125" y2="50" stroke="#d5cdbf" stroke-width="1"/>
+    <text x="15" y="65" font-size="8" fill="#444">"O molho da casa vicia.</text>
+    <text x="15" y="77" font-size="8" fill="#444">Já é o terceiro pedido</text>
+    <text x="15" y="89" font-size="8" fill="#444">dessa semana."</text>
+  </g>
+
+  <g transform="translate(510, 75)">
+    <rect width="140" height="105" rx="4" fill="#f5efe6"/>
+    <circle cx="25" cy="25" r="12" class="img-box"/>
+    <text x="45" y="24" font-size="9" font-weight="bold" fill="#121212">MARIANA T.</text>
+    <text x="45" y="35" font-size="8" fill="#d91e18">★★★★★</text>
+    <line x1="15" y1="50" x2="125" y2="50" stroke="#d5cdbf" stroke-width="1"/>
+    <text x="15" y="65" font-size="8" fill="#444">"Pão brioche impecável,</text>
+    <text x="15" y="77" font-size="8" fill="#444">não desmancha nem</text>
+    <text x="15" y="89" font-size="8" fill="#444">fica encharcado."</text>
+  </g>
+</g>
+
+<!-- ========================================== -->
+<!-- 7. MANIFESTO & CLUBE VIP (BANNER DUPLO)   -->
+<!-- ========================================== -->
+<g id="sec-manifesto" transform="translate(0, 1840)">
+  <!-- Banner Manifesto -->
+  <g>
+    <rect width="470" height="100" fill="#991512"/>
+    <text x="35" y="45" font-size="14" font-weight="900" fill="#ffffff">GREAT BURGERS DON'T HAPPEN BY ACCIDENT.</text>
+    <text x="35" y="68" font-size="9" font-weight="bold" fill="#ffd2d0" letter-spacing="1">NO SHORTCUTS. NO FILLERS. NO FLAWED DELIVERIES.</text>
+    <rect x="470" y="0" width="250" height="100" class="img-box"/>
+  </g>
+
+  <!-- Banner Clube VIP / Cupom (Unlock Exclusive Drops) -->
+  <g transform="translate(0, 100)">
+    <rect width="720" height="130" class="section-bg"/>
+    <!-- Batatas Fritas Flutuantes Esquerda -->
+    <path d="M 60 70 L 110 30 M 80 85 L 130 45 M 50 100 L 100 60" stroke="#f1c40f" stroke-width="5" stroke-linecap="round"/>
+    <text x="90" y="115" font-size="8" fill="#8f9cae" text-anchor="middle">[BATATAS FLUTUANTES]</text>
+
+    <!-- Burger Central com Input -->
+    <g transform="translate(250, 20)">
+      <rect width="220" height="24" rx="12" fill="#d91e18"/>
+      <text x="110" y="16" class="btn-text">UNLOCK EXCLUSIVE DROPS</text>
+      
+      <rect y="35" width="220" height="34" rx="4" fill="#ffffff"/>
+      <text x="15" y="56" font-size="10" fill="#777">Seu WhatsApp para 10% OFF...</text>
+      <rect x="155" y="39" width="60" height="26" rx="3" fill="#121212"/>
+      <text x="185" y="55" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">QUERO</text>
+
+      <ellipse cx="110" cy="85" rx="80" ry="14" class="wire-box-solid"/>
+    </g>
+
+    <!-- Batatas Fritas Flutuantes Direita -->
+    <path d="M 610 35 L 660 75 M 590 55 L 640 95 M 625 25 L 675 65" stroke="#f1c40f" stroke-width="5" stroke-linecap="round"/>
+    <text x="635" y="115" font-size="8" fill="#8f9cae" text-anchor="middle">[BATATAS FLUTUANTES]</text>
+  </g>
+</g>
+
+<!-- ========================================== -->
+<!-- 8. FOOTER / RODAPÉ GIGANTE                 -->
+<!-- ========================================== -->
+<g id="sec-footer" transform="translate(0, 2070)">
+  <!-- Faixa Quadriculada Topo do Footer -->
+  <rect width="720" height="18" fill="url(#checker)"/>
+  <rect y="18" width="720" height="100" fill="#0d0e12"/>
+  
+  <!-- Nome / Marca Gigante Central -->
+  <text x="360" y="85" font-size="46" font-weight="900" fill="#f5efe6" text-anchor="middle" letter-spacing="4">STACKRIOT</text>
+  
+  <!-- Links Laterais Inferiores -->
+  <text x="35" y="102" font-size="9" fill="#637085">HORÁRIO: TER A DOM • 18H ÀS 23H30</text>
+  <text x="685" y="102" font-size="9" fill="#637085" text-anchor="end">INSTAGRAM • WHATSAPP • IFood</text>
+</g>
+</g>
+<g id="specs" transform="translate(885, 205)">
+<!-- Cota Hero -->
+<line x1="0" y1
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 3800" width="100%" height="100%" style="background:#0c0d10; font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<defs>
+<!-- Marcador de Flecha -->
+<marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+<path d="M 0 0 L 10 5 L 0 10 z" fill="#00e5ff"/>
+</marker>
+<!-- Padrão Quadriculado (Checkerboard) -->
+<pattern id="checker" width="20" height="20" patternUnits="userSpaceOnUse">
+<rect width="10" height="10" fill="#2a2e39"/>
+<rect x="10" width="10" height="10" fill="#181a20"/>
+<rect y="10" width="10" height="10" fill="#181a20"/>
+<rect x="10" y="10" width="10" height="10" fill="#2a2e39"/>
+</pattern>
+<!-- Padrão de Linhas (Placeholder Imagens) -->
+<pattern id="diagWire" width="16" height="16" patternUnits="userSpaceOnUse">
+<path d="M0 16 L16 0 M0 0 L16 16" stroke="#252a36" stroke-width="1.2"/>
+</pattern>
+</defs>
+<style>
+.section-bg { fill: #13151b; stroke: #2a3142; stroke-width: 1.5; }
+.hero-bg { fill: #1a151b; stroke: #ff3b30; stroke-width: 2; }
+.wire-box { fill: #1c202a; stroke: #3b4459; stroke-width: 1.5; stroke-dasharray: 4 2; }
+.wire-box-solid { fill: #1c202a; stroke: #4e5a77; stroke-width: 1.5; }
+.img-box { fill: url(#diagWire); stroke: #48546f; stroke-width: 1.5; }
+.highlight-red { fill: #2c1418; stroke: #ff3b30; stroke-width: 1.5; }
+.tag-title { font-size: 11px; font-weight: 800; fill: #00e5ff; letter-spacing: 1.5px; text-transform: uppercase; }
+.section-title { font-size: 16px; font-weight: 800; fill: #ffffff; letter-spacing: 0.5px; }
+.label-text { font-size: 12px; fill: #8f9cae; font-weight: 500; }
+.sub-text { font-size: 11px; fill: #637085; }
+.wire-btn { fill: #ff3b30; rx: 6px; }
+.btn-text { font-size: 12px; font-weight: bold; fill: #ffffff; text-anchor: middle; }
+.spec-line { stroke: #00e5ff; stroke-width: 1.2; stroke-dasharray: 3 3; }
+</style>
+<g transform="translate(25, 30)">
+<text class="tag-title">MOBILE ARCHITECTURE // UX WIREFRAME</text>
+<text y="24" font-size="20" font-weight="900" fill="#ffffff" letter-spacing="0.5px">STACKRIOT • MOBILE VIEW</text>
+<text y="42" font-size="10" fill="#8f9cae">Proporção ajustada para viewport de celular (390px - 430px)</text>
+</g>
+<g id="navbar-mobile" transform="translate(25, 90)">
+<rect width="400" height="56" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+code
+Code
+<!-- Logo Esquerda -->
+<rect x="20" y="16" width="80" height="24" rx="4" fill="#ff3b30"/>
+<text x="60" y="32" font-size="10" font-weight="900" fill="#ffffff" text-anchor="middle">LOGO</text>
+
+<!-- Menu Hambúrguer (Centro) -->
+<line x1="190" y1="22" x2="210" y2="22" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="190" y1="28" x2="210" y2="28" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="190" y1="34" x2="210" y2="34" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+
+<!-- Botão Pedido Direita -->
+<rect x="300" y="10" width="85" height="36" rx="18" fill="#ff3b30"/>
+<text x="342" y="32" class="btn-text" font-size="11">PEDIR (0)</text>
+</g>
+<g id="sec-hero" transform="translate(25, 170)">
+<rect width="400" height="520" class="hero-bg"/>
+code
+Code
+<!-- Faixas Laterais Quadriculadas -->
+<rect x="0" y="0" width="18" height="520" fill="url(#checker)" opacity="0.6"/>
+<rect x="382" y="0" width="18" height="520" fill="url(#checker)" opacity="0.6"/>
+
+<text x="35" y="45" class="tag-title" fill="#ff7b72">ZONA 01 // HERO IMPACT</text>
+
+<!-- Textos Headline (Adaptado para Mobile) -->
+<rect x="35" y="65" width="280" height="42" rx="4" fill="#ffffff" opacity="0.9"/>
+<text x="45" y="93" font-size="20" font-weight="900" fill="#121212">BURGERS BUILT TO</text>
+
+<rect x="35" y="115" width="230" height="42" rx="4" fill="#ffffff" opacity="0.9"/>
+<text x="45" y="143" font-size="20" font-weight="900" fill="#121212">START A RIOT.</text>
+
+<!-- Subtexto -->
+<line x1="35" y1="180" x2="300" y2="180" stroke="#8f9cae" stroke-width="3" stroke-linecap="round"/>
+<line x1="35" y1="195" x2="250" y2="195" stroke="#8f9cae" stroke-width="3" stroke-linecap="round"/>
+
+<!-- Botão CTA Mobile (Largura maior) -->
+<rect x="35" y="230" width="220" height="48" class="wire-btn"/>
+<text x="145" y="260" class="btn-text">EXPLORAR CARDÁPIO</text>
+
+<!-- Imagens dos Burgers Flutuantes (Posicionados Abaixo do Texto) -->
+<circle cx="215" cy="380" r="75" class="img-box"/>
+<text x="215" y="384" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">[IMG: BURGER HERO]</text>
+
+<circle cx="95" cy="440" r="55" class="img-box"/>
+<text x="95" y="444" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">[SMASH 2]</text>
+
+<circle cx="310" cy="420" r="50" class="img-box"/>
+<text x="310" y="424" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">[SMASH 3]</text>
+</g>
+<g id="sec-legends" transform="translate(25, 690)">
+<rect width="400" height="920" class="section-bg"/>
+code
+Code
+<text x="200" y="40" class="tag-title" text-anchor="middle">ZONA 02 // OS LENDÁRIOS</text>
+<text x="200" y="65" class="section-title" text-anchor="middle">MEET THE LEGENDS</text>
+<text x="200" y="85" class="sub-text" text-anchor="middle">Deslize ou role para ver os mais pedidos</text>
+
+<!-- Card 1 -->
+<g transform="translate(60, 120)">
+  <rect width="280" height="230" rx="12" fill="#f5efe6" stroke="#d5cdbf" stroke-width="1.5"/>
+  <circle cx="140" cy="80" r="60" class="img-box"/>
+  <text x="140" y="84" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">[IMG RECORTADA]</text>
+  <rect x="0" y="160" width="280" height="70" rx="0 0 12 12" fill="#d91e18"/>
+  <text x="20" y="185" font-size="14" font-weight="900" fill="#ffffff">THE RIOT CLASSIC</text>
+  <text x="20" y="200" font-size="11" fill="#ffd2d0">Smash duplo 160g + cheddar</text>
+  <text x="20" y="218" font-size="13" font-weight="900" fill="#ffffff">R$ 34,90</text>
+  <circle cx="245" cy="195" r="16" fill="#ffffff"/>
+  <text x="245" y="201" font-size="18" font-weight="bold" fill="#d91e18" text-anchor="middle">+</text>
+</g>
+
+<!-- Card 2 -->
+<g transform="translate(60, 380)">
+  <rect width="280" height="230" rx="12" fill="#f5efe6" stroke="#d5cdbf" stroke-width="1.5"/>
+  <circle cx="140" cy="80" r="60" class="img-box"/>
+  <text x="140" y="84" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">[IMG RECORTADA]</text>
+  <rect x="0" y="160" width="280" height="70" rx="0 0 12 12" fill="#d91e18"/>
+  <text x="20" y="185" font-size="14" font-weight="900" fill="#ffffff">GREEN FURY</text>
+  <text x="20" y="200" font-size="11" fill="#ffd2d0">Molho verde especial + bacon</text>
+  <text x="20" y="218" font-size="13" font-weight="900" fill="#ffffff">R$ 38,90</text>
+  <circle cx="245" cy="195" r="16" fill="#ffffff"/>
+  <text x="245" y="201" font-size="18" font-weight="bold" fill="#d91e18" text-anchor="middle">+</text>
+</g>
+
+<!-- Card 3 -->
+<g transform="translate(60, 640)">
+  <rect width="280" height="230" rx="12" fill="#f5efe6" stroke="#d5cdbf" stroke-width="1.5"/>
+  <circle cx="140" cy="80" r="60" class="img-box"/>
+  <text x="140" y="84" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">[IMG RECORTADA]</text>
+  <rect x="0" y="160" width="280" height="70" rx="0 0 12 12" fill="#d91e18"/>
+  <text x="20" y="185" font-size="14" font-weight="900" fill="#ffffff">MOLTEN MELT</text>
+  <text x="20" y="200" font-size="11" fill="#ffd2d0">Piscina de cheddar cremoso</text>
+  <text x="20" y="218" font-size="13" font-weight="900" fill="#ffffff">R$ 41,90</text>
+  <circle cx="245" cy="195" r="16" fill="#ffffff"/>
+  <text x="245" y="201" font-size="18" font-weight="bold" fill="#d91e18" text-anchor="middle">+</text>
+</g>
+</g>
+<g id="sec-pillars" transform="translate(25, 1610)">
+<rect width="400" height="480" class="section-bg"/>
+<text x="200" y="40" class="tag-title" text-anchor="middle">ZONA 03 // PROVA TÉCNICA</text>
+<text x="200" y="65" class="section-title" text-anchor="middle">WHY CHOOSE US?</text>
+code
+Code
+<!-- Pillar 1 (Top Left) -->
+<g transform="translate(30, 100)">
+  <rect width="160" height="170" rx="8" class="img-box"/>
+  <rect x="8" y="105" width="144" height="55" rx="6" fill="#12141a" opacity="0.9"/>
+  <rect x="15" y="113" width="70" height="14" rx="3" fill="#ffffff"/>
+  <text x="50" y="124" font-size="8" font-weight="bold" fill="#121212" text-anchor="middle">SMASH FRESCO</text>
+  <text x="15" y="140" font-size="9" fill="#8f9cae">Carne fresca na</text>
+  <text x="15" y="152" font-size="9" fill="#8f9cae">chapa quente.</text>
+</g>
+
+<!-- Pillar 2 (Top Right) -->
+<g transform="translate(210, 100)">
+  <rect width="160" height="170" rx="8" class="img-box"/>
+  <rect x="8" y="105" width="144" height="55" rx="6" fill="#12141a" opacity="0.9"/>
+  <rect x="15" y="113" width="75" height="14" rx="3" fill="#ffffff"/>
+  <text x="52" y="124" font-size="8" font-weight="bold" fill="#121212" text-anchor="middle">MOLHOS PRÓPRIOS</text>
+  <text x="15" y="140" font-size="9" fill="#8f9cae">Receitas autorais e</text>
+  <text x="15" y="152" font-size="9" fill="#8f9cae">artesanais.</text>
+</g>
+
+<!-- Pillar 3 (Bottom Left) -->
+<g transform="translate(30, 290)">
+  <rect width="160" height="170" rx="8" class="img-box"/>
+  <rect x="8" y="105" width="144" height="55" rx="6" fill="#12141a" opacity="0.9"/>
+  <rect x="15" y="113" width="75" height="14" rx="3" fill="#ffffff"/>
+  <text x="52" y="124" font-size="8" font-weight="bold" fill="#121212" text-anchor="middle">ENTREGA RÁPIDA</text>
+  <text x="15" y="140" font-size="9" fill="#8f9cae">Embalagem térmica</text>
+  <text x="15" y="152" font-size="9" fill="#8f9cae">para manter o calor.</text>
+</g>
+
+<!-- Pillar 4 (Bottom Right) -->
+<g transform="translate(210, 290)">
+  <rect width="160" height="170" rx="8" class="img-box"/>
+  <rect x="8" y="105" width="144" height="55" rx="6" fill="#12141a" opacity="0.9"/>
+  <rect x="15" y="113" width="75" height="14" rx="3" fill="#ffffff"/>
+  <text x="52" y="124" font-size="8" font-weight="bold" fill="#121212" text-anchor="middle">TRANSPARÊNCIA</text>
+  <text x="15" y="140" font-size="9" fill="#8f9cae">Ingredientes 100%</text>
+  <text x="15" y="152" font-size="9" fill="#8f9cae">selecionados.</text>
+</g>
+</g>
+<g id="sec-exploded" transform="translate(25, 2090)">
+<rect width="400" height="580" class="section-bg"/>
+code
+Code
+<text x="200" y="45" class="tag-title" text-anchor="middle">ZONA 04 // ANATOMIA DO BURGER</text>
+<text x="200" y="70" class="section-title" text-anchor="middle">WHAT MAKES OUR BURGER</text>
+<text x="200" y="90" class="section-title" text-anchor="middle">SO SPECIAL?</text>
+
+<!-- Centro: Camadas do Burger -->
+<g transform="translate(200, 110)">
+  <!-- Pão Topo -->
+  <ellipse cx="0" cy="40" rx="60" ry="22" class="wire-box-solid" fill="#2d3342"/>
+  <text x="0" y="44" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">PÃO TOPO</text>
+  
+  <!-- Bacon Crocante -->
+  <ellipse cx="0" cy="100" rx="58" ry="12" class="highlight-red"/>
+  <text x="0" y="103" font-size="7" font-weight="bold" fill="#ff7b72" text-anchor="middle">BACON ARTESANAL</text>
+  
+  <!-- Tomate -->
+  <ellipse cx="0" cy="150" rx="55" ry="10" class="highlight-red"/>
+  
+  <!-- Blend Smash + Queijo -->
+  <ellipse cx="0" cy="200" rx="62" ry="20" class="wire-box-solid" fill="#3b2b23"/>
+  <text x="0" y="203" font-size="8" font-weight="bold" fill="#ffb86c" text-anchor="middle">SMASH + CHEDDAR</text>
+  
+  <!-- Alface Lisa -->
+  <ellipse cx="0" cy="260" rx="55" ry="9" fill="#1b3323" stroke="#50fa7b" stroke-width="1"/>
+  
+  <!-- Pão Base -->
+  <ellipse cx="0" cy="310" rx="58" ry="16" class="wire-box-solid" fill="#2d3342"/>
+  <text x="0" y="313" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">PÃO BASE</text>
+</g>
+
+<!-- Callout Box (Pão Topo - Direita) -->
+<g transform="translate(265, 120)">
+  <rect width="115" height="50" rx="4" class="wire-box-solid"/>
+  <text x="10" y="20" font-size="8" font-weight="bold" fill="#ffffff">BRIOCHE SELADO</text>
+  <text x="10" y="32" font-size="7" fill="#8f9cae">Tostado na manteiga</text>
+  <polyline points="-50,30 0,25" fill="none" stroke="#00e5ff" stroke-width="1" stroke-dasharray="2 2" marker-end="url(#arrow)"/>
+</g>
+
+<!-- Callout Box (Bacon - Esquerda) -->
+<g transform="translate(20, 180)">
+  <rect width="115" height="50" rx="4" class="wire-box-solid"/>
+  <text x="10" y="20" font-size="8" font-weight="bold" fill="#ffffff">BACON DEFUMADO</text>
+  <text x="10" y="32" font-size="7" fill="#8f9cae">Cura lenta de 7 dias</text>
+  <polyline points="115,25 160,30" fill="none" stroke="#00e5ff" stroke-width="1" stroke-dasharray="2 2" marker-end="url(#arrow)"/>
+</g>
+
+<!-- Callout Box (Patty - Direita) -->
+<g transform="translate(265, 290)">
+  <rect width="115" height="50" rx="4" class="wire-box-solid"/>
+  <text x="10" y="20" font-size="8" font-weight="bold" fill="#ffffff">SMASH PATTY</text>
+  <text x="10" y="32" font-size="7" fill="#8f9cae">Crosta perfeita</text>
+  <polyline points="-50,-10 0,25" fill="none" stroke="#00e5ff" stroke-width="1" stroke-dasharray="2 2" marker-end="url(#arrow)"/>
+</g>
+
+<!-- Callout Box (Pão Base - Esquerda) -->
+<g transform="translate(20, 390)">
+  <rect width="115" height="50" rx="4" class="wire-box-solid"/>
+  <text x="10" y="20" font-size="8" font-weight="bold" fill="#ffffff">BASE ESTRUTURAL</text>
+  <text x="10" y="32" font-size="7" fill="#8f9cae">Não desmancha</text>
+  <polyline points="115,10 160,-20" fill="none" stroke="#00e5ff" stroke-width="1" stroke-dasharray="2 2" marker-end="url(#arrow)"/>
+</g>
+</g>
+<g id="sec-split" transform="translate(25, 2670)">
+<!-- Topo: Imagem Lifestyle -->
+<g>
+<rect width="400" height="220" class="img-box"/>
+<rect width="400" height="220" fill="#000000" opacity="0.4"/>
+<text x="200" y="115" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle">ALWAYS TASTY</text>
+<text x="200" y="135" font-size="11" fill="#cbd5e1" text-anchor="middle">A experiência que vicia do 1º ao último pedaço</text>
+</g>
+<!-- Base: Banner Vermelho Sazonais -->
+<g transform="translate(0, 220)">
+<rect width="400" height="220" fill="#d91e18"/>
+<circle cx="200" cy="55" r="30" class="img-box"/>
+<text x="200" y="110" font-size="15" font-weight="900" fill="#ffffff" text-anchor="middle">SEASONAL DROPS &amp; FLAVOR</text>
+<text x="200" y="130" font-size="15" font-weight="900" fill="#ffffff" text-anchor="middle">EXPERIMENTS</text>
+<rect x="110" y="155" width="180" height="36" rx="6" fill="#ffffff"/>
+<text x="200" y="177" font-size="11" font-weight="bold" fill="#d91e18" text-anchor="middle">PROVAR EDIÇÃO DO MÊS</text>
+</g>
+</g>
+<g id="sec-reviews" transform="translate(25, 3110)">
+<rect width="400" height="260" class="section-bg"/>
+<text x="200" y="40" class="tag-title" text-anchor="middle">ZONA 05 // PROVA SOCIAL</text>
+<text x="200" y="65" class="section-title" text-anchor="middle">PEOPLE DON'T WHISPER ABOUT</text>
+<text x="200" y="85" class="section-title" text-anchor="middle">GOOD FOOD — THEY TALK.</text>
+code
+Code
+<!-- Card Principal Focado -->
+<g transform="translate(70, 115)">
+  <rect width="260" height="115" rx="6" fill="#f5efe6"/>
+  <circle cx="35" cy="30" r="16" class="img-box"/>
+  <text x="65" y="28" font-size="12" font-weight="bold" fill="#121212">ANDRÉ S.</text>
+  <text x="65" y="42" font-size="10" fill="#d91e18">★★★★★</text>
+  <line x1="20" y1="55" x2="240" y2="55" stroke="#d5cdbf" stroke-width="1"/>
+  <text x="20" y="75" font-size="10" fill="#444">"Melhor smash da cidade.</text>
+  <text x="20" y="90" font-size="10" fill="#444">O queijo derretido é outro patamar!"</text>
+</g>
+
+<!-- Setas Navegação Carrossel -->
+<text x="35" y="180" font-size="24" fill="#637085" font-weight="bold">&lt;</text>
+<text x="355" y="180" font-size="24" fill="#637085" font-weight="bold">&gt;</text>
+
+<!-- Indicadores de Pontos (Dots) -->
+<circle cx="170" cy="245" r="3" fill="#00e5ff"/>
+<circle cx="190" cy="245" r="3" fill="#637085"/>
+<circle cx="210" cy="245" r="3" fill="#637085"/>
+<circle cx="230" cy="245" r="3" fill="#637085"/>
+</g>
+<g id="sec-manifesto" transform="translate(25, 3370)">
+<!-- Banner Manifesto (Texto Acima, Imagem Abaixo) -->
+<g>
+<rect width="400" height="150" fill="#991512"/>
+<text x="200" y="45" font-size="16" font-weight="900" fill="#ffffff" text-anchor="middle">GREAT BURGERS DON'T</text>
+<text x="200" y="68" font-size="16" font-weight="900" fill="#ffffff" text-anchor="middle">HAPPEN BY ACCIDENT.</text>
+<text x="200" y="95" font-size="9" font-weight="bold" fill="#ffd2d0" letter-spacing="1" text-anchor="middle">NO SHORTCUTS. NO FILLERS. NO FLAWED DELIVERIES.</text>
+</g>
+code
+Code
+<!-- Clube VIP -->
+<g transform="translate(0, 150)">
+  <rect width="400" height="150" class="section-bg"/>
+  
+  <!-- Batatas Decorativas Base -->
+  <path d="M 30 50 L 60 20 M 40 60 L 70 30" stroke="#f1c40f" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 370 50 L 340 20 M 360 60 L 330 30" stroke="#f1c40f" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Box Central VIP -->
+  <g transform="translate(60, 25)">
+    <rect width="280" height="28" rx="14" fill="#d91e18"/>
+    <text x="140" y="18" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">UNLOCK EXCLUSIVE DROPS</text>
+    
+    <rect y="40" width="280" height="40" rx="6" fill="#ffffff"/>
+    <text x="15" y="64" font-size="11" fill="#777">Seu WhatsApp para 10% OFF...</text>
+    <rect x="210" y="45" width="60" height="30" rx="4" fill="#121212"/>
+    <text x="240" y="64" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">QUERO</text>
+
+    <ellipse cx="140" cy="100" rx="110" ry="16" class="wire-box-solid"/>
+  </g>
+</g>
+</g>
+<g id="sec-footer" transform="translate(25, 3670)">
+<rect width="400" height="15" fill="url(#checker)"/>
+<rect y="15" width="400" height="100" fill="#0d0e12"/>
+code
+Code
+<text x="200" y="55" font-size="34" font-weight="900" fill="#f5efe6" text-anchor="middle" letter-spacing="3">STACKRIOT</text>
+
+<text x="200" y="80" font-size="9" fill="#637085" text-anchor="middle">HORÁRIO: TER A DOM • 18H ÀS 23H30</text>
+<text x="200" y="98" font-size="9" fill="#637085" text-anchor="middle">INSTAGRAM • WHATSAPP • IFOOD</text>
+</g>
+<g transform="translate(435, 170)">
+<line x1="0" y1="0" x2="0" y2="3600" stroke="#00e5ff" stroke-width="1.2" stroke-dasharray="3 3"/>
+<text x="-12" y="260" font-size="10" fill="#637085" transform="rotate(-90 -12 260)">ALTURA TOTAL DA TELA MOBILE (SCROLL)</text>
+</g>
+</svg>
+a imagem anexada, da esquerda é versão de desktop, da direita para móbile

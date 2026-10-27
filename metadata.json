@@ -1,0 +1,6 @@
+{
+  "name": "STACKRIOT Burgers - Templo do Smash Greco-Romano",
+  "description": "Hamburgueria artesanal com estética clássica greco-romana, colunas jônicas, meandros de ouro olímpico, cardápio dos deuses e sistema completo de pedidos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

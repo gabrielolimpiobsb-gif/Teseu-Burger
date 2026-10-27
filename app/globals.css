@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+:root {
+  --color-canvas: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-stone: #333533;
+  --color-parchment: #F2ECDD;
+  --color-gold: #F5CB5C;
+  --color-bronze: #CD9C20;
+  --color-obsidian: #0B0B0B;
+}
+
+/* Classical Greco-Roman Display Typography */
+.font-display {
+  font-family: var(--font-cinzel), 'Cinzel', 'Trajan Pro', Georgia, serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.font-ancient {
+  font-family: var(--font-cinzel), 'Cinzel', serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Authentic Greek Key / Meander Frieze Patterns (from IMG-20261023-WA0003 & WA0005) - Crisp Bronze on Light Stone */
+.greek-meander-vertical {
+  width: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='64' viewBox='0 0 32 64'%3E%3Cpath d='M4 0 L4 64 M28 0 L28 64 M4 8 L20 8 L20 24 L12 24 L12 16 L28 16 M28 40 L12 40 L12 56 L20 56 L20 48 L4 48' fill='none' stroke='%23CD9C20' stroke-width='2.2' stroke-linejoin='miter' stroke-linecap='square'/%3E%3C/svg%3E");
+  background-repeat: repeat-y;
+  background-size: 32px 64px;
+}
+
+.greek-meander-horizontal {
+  height: 24px;
+  width: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='24' viewBox='0 0 64 24'%3E%3Cpath d='M0 3 L64 3 M0 21 L64 21 M8 3 L8 15 L24 15 L24 9 L16 9 L16 21 M40 21 L40 9 L56 9 L56 15 L48 15 L48 3' fill='none' stroke='%23CD9C20' stroke-width='2' stroke-linejoin='miter' stroke-linecap='square'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 64px 24px;
+}
+
+.greek-meander-horizontal-dark {
+  height: 20px;
+  width: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='20' viewBox='0 0 64 20'%3E%3Cpath d='M0 2 L64 2 M0 18 L64 18 M8 2 L8 12 L24 12 L24 7 L16 7 L16 18 M40 18 L40 7 L56 7 L56 12 L48 12 L48 2' fill='none' stroke='%23CD9C20' stroke-width='1.8' stroke-linejoin='miter'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 64px 20px;
+}
+
+/* Classical Stone & Marble Tablet Card */
+.marble-tablet {
+  background-color: #FFFFFF;
+  color: #1c1c1c;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e2ddd3;
+}
+
+.marble-tablet::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(-45deg, transparent 5px, #FFFFFF 0), 
+              linear-gradient(45deg, transparent 5px, #FFFFFF 0);
+  background-size: 12px 8px;
+  background-repeat: repeat-x;
+}
+
+/* Golden Gradients & Chiseled Typography */
+.gold-gradient-bg {
+  background: linear-gradient(135deg, #F5CB5C 0%, #CD9C20 100%);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #B8860B 0%, #CD9C20 50%, #8B6914 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.chiseled-shadow {
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.9), 0 2px 10px rgba(205, 156, 32, 0.2);
+}
+
+.gold-glow {
+  box-shadow: 0 4px 20px rgba(205, 156, 32, 0.2);
+}
+
+.gold-glow-hover:hover {
+  box-shadow: 0 8px 30px rgba(205, 156, 32, 0.35);
+}
+
+/* Classical fluted column grooving simulation in warm stone */
+.fluted-column {
+  background: repeating-linear-gradient(
+    90deg,
+    #ede9de 0px,
+    #f5f2e8 6px,
+    #e2ddd1 12px
+  );
+}
+
+/* Custom scrollbar in Roman marble and antique gold */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+::-webkit-scrollbar-thumb {
+  background: #d8d3c5;
+  border: 1px solid #CD9C20;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #CD9C20;
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Ocultar badge/ícone "N" do Next.js Dev Indicator */
+nextjs-portal,
+[data-nextjs-dev-indicator],
+[data-nextjs-dev-tools-indicator],
+[data-next-badge],
+#next-badge,
+#__next-build-watcher {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
