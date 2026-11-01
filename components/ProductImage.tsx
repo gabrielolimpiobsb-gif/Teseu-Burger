@@ -24,10 +24,11 @@ export function ProductImage({
   badge,
   priority = false,
 }: ProductImageProps) {
+  const [useNativeImg, setUseNativeImg] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  // If a valid src is provided and has not failed to load
-  const hasValidImage = src && !imgError;
+  // If a valid src is provided and has not completely failed
+  const hasValidImage = Boolean(src) && !imgError;
 
   return (
     <div
@@ -42,15 +43,27 @@ export function ProductImage({
       }
     >
       {hasValidImage ? (
-        <Image
-          src={src!}
-          alt={alt}
-          fill
-          priority={priority}
-          referrerPolicy="no-referrer"
-          className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
-          onError={() => setImgError(true)}
-        />
+        !useNativeImg ? (
+          <Image
+            src={src!}
+            alt={alt}
+            fill
+            priority={priority}
+            unoptimized={true}
+            referrerPolicy="no-referrer"
+            className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+            onError={() => setUseNativeImg(true)}
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={src!}
+            alt={alt}
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105 absolute inset-0"
+            onError={() => setImgError(true)}
+          />
+        )
       ) : (
         /* Clean, professional placeholder frame specifically designed for the user to drop images */
         <div className="w-full h-full min-h-[110px] sm:min-h-[150px] bg-gradient-to-b from-[#1E1E1E] to-[#121212] border border-[#CD9C20]/40 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-inner group-hover:border-[#CD9C20] transition-colors relative">
