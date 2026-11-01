@@ -14,12 +14,145 @@ export const STORE_INFO = {
 };
 
 export const AVAILABLE_TOPPINGS: ExtraTopping[] = [
-  { id: 'bacon', name: 'Bacon Artesanal Defumado em Lenha Sagrada', price: 5.0 },
-  { id: 'cheddar', name: 'Queijo Cheddar Fundido ao Calor de Hefesto', price: 4.0 },
-  { id: 'patty', name: 'Carne Smash Extra 100% Bovina (100g)', price: 9.0 },
-  { id: 'onion', name: 'Cebola Caramelizada Lentamente na Chapa', price: 4.0 },
-  { id: 'sauce', name: 'Pote Extra de Molho Riot Secreto (50ml)', price: 3.5 },
-  { id: 'pickles', name: 'Picles Artesanal Crocante em Ervas Gregas', price: 3.0 },
+  { id: 'picles', name: 'Picles Artesanal Crocante', price: 3.0 },
+  { id: 'carne', name: 'Carne (Blend Bovino 160g Extra)', price: 12.0 },
+  { id: 'alface', name: 'Alface Americana', price: 2.0 },
+  { id: 'tomate', name: 'Tomate em Rodelas Fresco', price: 2.0 },
+  { id: 'bacon', name: 'Bacon Defumado Crocante', price: 5.0 },
+  { id: 'cheddar', name: 'Queijo Cheddar Derretido', price: 4.0 },
+];
+
+export const AVAILABLE_SAUCES: ExtraTopping[] = [
+  { id: 'sauce-defumada', name: 'Maionese Defumada da Casa', price: 3.5 },
+  { id: 'sauce-alho', name: 'Maionese de Alho Artesanal', price: 3.5 },
+  { id: 'sauce-barbecue', name: 'Molho Barbecue Rústico', price: 3.5 },
+  { id: 'sauce-pimenta', name: 'Geleia de Pimenta Doce', price: 4.0 },
+  { id: 'sauce-verde', name: 'Maionese Verde com Ervas', price: 3.5 },
+  { id: 'sauce-mostarda-mel', name: 'Molho Mostarda e Mel', price: 3.5 },
+];
+
+export interface FriesOption {
+  id: string;
+  size: 'P' | 'M' | 'G';
+  name: string;
+  description: string;
+  price: number;
+}
+
+export const FRIES_OPTIONS: FriesOption[] = [
+  { id: 'fries-p', size: 'P', name: 'Batata P (Pequena)', description: 'Porção individual crocante', price: 9.9 },
+  { id: 'fries-m', size: 'M', name: 'Batata M (Média)', description: 'Porção média dourada', price: 14.9 },
+  { id: 'fries-g', size: 'G', name: 'Batata G (Grande)', description: 'Porção farta para compartilhar', price: 19.9 },
+];
+
+export interface DrinkOption {
+  id: string;
+  name: string;
+  volume: string;
+  price: number;
+  image: string;
+}
+
+export const DRINK_OPTIONS: DrinkOption[] = [
+  { id: 'coca', name: 'Coca-Cola Original', volume: 'Lata 350ml', price: 7.5, image: '/coca.png' },
+  { id: 'coca-zero', name: 'Coca-Cola Sem Açúcar', volume: 'Lata 350ml', price: 7.5, image: '/coca-zero.png' },
+  { id: 'guarana', name: 'Guaraná Antarctica', volume: 'Lata 350ml', price: 7.5, image: '/guarana.png' },
+  { id: 'guarana-zero', name: 'Guaraná Antarctica Zero', volume: 'Lata 350ml', price: 7.5, image: '/guarana-zero.png' },
+  { id: 'fanta', name: 'Fanta Laranja', volume: 'Lata 350ml', price: 7.5, image: '/fanta.png' },
+  { id: 'agua', name: 'Água Mineral', volume: 'Garrafa 500ml', price: 5.0, image: '/agua.png' },
+];
+
+export interface SweetPrize {
+  id: string;
+  name: string;
+  subtitle: string;
+  icon: string;
+  color: string;
+  accent: string;
+  image?: string;
+}
+
+export const SWEET_PRIZES: SweetPrize[] = [
+  {
+    id: 'cookie-supremo',
+    name: 'Cookie Artesanal',
+    subtitle: 'Gotas de Chocolate Belga',
+    icon: '🍪',
+    color: '#1e1b4b', // Índigo escuro luxo
+    accent: '#f59e0b',
+    image: '/doce-cookie.png',
+  },
+  {
+    id: 'brigadeiro-gourmet',
+    name: 'Brigadeiro Gourmet',
+    subtitle: 'Cacau 70% com Granulado Nobre',
+    icon: '🍫',
+    color: '#7f1d1d', // Carmesim cassino
+    accent: '#fbbf24',
+    image: '/doce-ambrosia.png',
+  },
+  {
+    id: 'brownie-intenso',
+    name: 'Brownie Supremo',
+    subtitle: 'Casquinha Crocante & Fudge',
+    icon: '🥮',
+    color: '#0f172a', // Slate profundo
+    accent: '#f59e0b',
+    image: '/doce-brownie.png',
+  },
+  {
+    id: 'doce-especial',
+    name: 'Bombom da Casa',
+    subtitle: 'Recheio Cremoso Exclusivo',
+    icon: '🍬',
+    color: '#881337', // Ruby escuro
+    accent: '#fde047',
+    image: '/doce-torta.png',
+  },
+];
+
+export interface SweetGiftCard {
+  id: number;
+  roman: string;
+  name: string;
+  emoji: string;
+  description: string;
+  image: string;
+}
+
+export const SWEET_GIFT_CARDS: SweetGiftCard[] = [
+  {
+    id: 1,
+    roman: 'I',
+    name: 'Cookie Artesanal',
+    emoji: '🍪',
+    description: 'Gotas de Chocolate Belga',
+    image: '/doce-cookie.png',
+  },
+  {
+    id: 2,
+    roman: 'II',
+    name: 'Brigadeiro Gourmet',
+    emoji: '🍫',
+    description: 'Cacau 70% com Granulado Nobre',
+    image: '/doce-ambrosia.png',
+  },
+  {
+    id: 3,
+    roman: 'III',
+    name: 'Brownie Supremo',
+    emoji: '🥮',
+    description: 'Casquinha Crocante & Fudge',
+    image: '/doce-brownie.png',
+  },
+  {
+    id: 4,
+    roman: 'IV',
+    name: 'Bombom da Casa',
+    emoji: '🍬',
+    description: 'Recheio Cremoso Exclusivo',
+    image: '/doce-torta.png',
+  },
 ];
 
 export const COMBO_UPGRADE_PRICE = 14.9;
@@ -33,156 +166,365 @@ export const COMBO_DRINKS = [
 ];
 
 export const NEIGHBORHOOD_FEES: Record<string, number> = {
-  'Consolação / Augusta': 5.0,
-  'Bela Vista / Paulista': 6.0,
-  'Jardins / Cerqueira César': 7.0,
-  'Higienópolis / Santa Cecília': 6.5,
-  'Pinheiros / Vila Madalena': 9.0,
-  'República / Centro Histórico': 7.0,
-  'Vila Mariana / Paraíso': 9.5,
-  'Outro Bairro (Consulte o Oráculo no WhatsApp)': 10.0,
+  'Asa Sul': 6.0,
+  'Asa Norte': 6.0,
+  'Sudoeste / Octogonal': 7.0,
+  'Noroeste': 7.5,
+  'Águas Claras': 8.0,
+  'Taguatinga': 9.0,
+  'Guará I e II': 7.0,
+  'Lago Sul / Lago Norte': 9.0,
+  'Vicente Pires': 8.5,
+  'Ceilândia': 10.0,
+  'Gama': 12.0,
+  'Sobradinho': 12.0,
+  'Planaltina': 14.0,
+  'Samambaia': 10.0,
+  'Outro Bairro de Brasília': 10.0,
 };
 
-export const MENU_ITEMS: MenuItem[] = [
-  // 1. AS LENDAS DO OLIMPO (MEET THE LEGENDS)
-  {
-    id: 'legend-classic',
-    name: 'THE OLYMPIAN CLASSIC',
-    category: 'legends',
-    price: 34.9,
-    description: 'A joia do Olimpo: smash duplo 160g de carne bovina nobre, queijo cheddar fundido ao calor sagrado, picles crocante, cebola roxa fininha e molho Riot em brioche dourado com gergelim.',
-    badge: 'Oferenda Mais Pedida',
-    isLegend: true,
-    imageType: 'classic',
-    isBurger: true,
-    weight: '340g montado',
-    cookingTemp: '230°C na chapa viva',
-    blendInfo: '60% Peito Bovino Angus + 40% Costela Premium moída fresca',
-    bunInfo: 'Brioche de fermentação natural selado na manteiga clarificada',
-    cheeseInfo: 'Cheddar inglês envelhecido derretido no vapor da chapa',
-    sauceInfo: 'Molho Riot autoral à base de páprica defumada e especiarias do Mediterrâneo',
-    pairingSuggestion: 'Batatas Espartanas + Néctar de Cola',
-    flavorNotes: ['Umami Supremo', 'Crosta Maillard Dourada', 'Acidez Cítrica dos Picles', 'Maciez de Brioche'],
-  },
-  {
-    id: 'legend-fury',
-    name: 'ARES GREEN FURY',
-    category: 'legends',
-    price: 38.9,
-    description: 'Forjado com a fúria do deus da guerra: dois smash patties ultra prensados, queijo gouda fundido, farofa crocante de bacon defumado e a lendária maionese verde de ervas frescas dos vales de Olímpia.',
-    badge: 'Força Espartana',
-    isLegend: true,
-    imageType: 'fury',
-    isBurger: true,
-    weight: '360g montado',
-    cookingTemp: '230°C na chapa viva',
-    blendInfo: 'Blend clássico de costela nobre e fraldinha, moído fresco todo dia',
-    bunInfo: 'Brioche com mix de gergelim dourado e preto',
-    cheeseInfo: 'Queijo gouda holandês cremoso derretido sobre a carne',
-    sauceInfo: 'Maionese verde sagrada com cebolinha fresca, salsa, coentro e limão siciliano',
-    pairingSuggestion: 'Loaded Fries do Coliseu + Ambrosia Shake',
-    flavorNotes: ['Frescor Herbal', 'Bacon Defumado em Macieira', 'Gouda Amanteigado', 'Sucos Selados'],
-  },
-  {
-    id: 'legend-melt',
-    name: 'HEPHAESTUS MOLTEN MELT',
-    category: 'legends',
-    price: 41.9,
-    description: 'Digno da forja vulcânica de Hefesto: smash duplo coberto por uma cascata torrencial de cheddar melt dourado como ouro líquido, cubos crocantes de bacon e cebola caramelizada por 4 horas.',
-    badge: 'Ouro Líquido',
-    isLegend: true,
-    imageType: 'melt',
-    isBurger: true,
-    weight: '410g montado',
-    cookingTemp: '235°C na chapa viva',
-    blendInfo: 'Duplo smash 80g de costela pura com bordas rendadas lacy ultra crocantes',
-    bunInfo: 'Brioche ultra macio banhado na manteiga ghee',
-    cheeseInfo: 'Cascata de cheddar melt aveludado e queijo prato nobre',
-    sauceInfo: 'Gordura de bacon caramelizada e redução de cebola doce artesanal',
-    pairingSuggestion: 'Nuggets Dourados + Milk-Shake Néctar de Doce de Leite',
-    flavorNotes: ['Explosão de Queijo Dourado', 'Doçura da Cebola Lenta', 'Textura Aveludada', 'Sal de Bacon'],
-  },
+export interface NeighborhoodCoupon {
+  code: string;
+  neighborhood: string;
+  giftTitle: string;
+  giftDescription: string;
+}
 
-  // 2. SMASH BURGERS
+export const NEIGHBORHOOD_COUPONS: Record<string, NeighborhoodCoupon> = {
+  'ASASUL': {
+    code: 'ASASUL',
+    neighborhood: 'Asa Sul',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'ASANORTE': {
+    code: 'ASANORTE',
+    neighborhood: 'Asa Norte',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'SUDOESTE': {
+    code: 'SUDOESTE',
+    neighborhood: 'Sudoeste / Octogonal',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'NOROESTE': {
+    code: 'NOROESTE',
+    neighborhood: 'Noroeste',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'AGUASCLARAS': {
+    code: 'AGUASCLARAS',
+    neighborhood: 'Águas Claras',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'TAGUATINGA': {
+    code: 'TAGUATINGA',
+    neighborhood: 'Taguatinga',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'GUARA': {
+    code: 'GUARA',
+    neighborhood: 'Guará I e II',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'LAGO': {
+    code: 'LAGO',
+    neighborhood: 'Lago Sul / Norte',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'VICENTEPIRES': {
+    code: 'VICENTEPIRES',
+    neighborhood: 'Vicente Pires',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'CEILANDIA': {
+    code: 'CEILANDIA',
+    neighborhood: 'Ceilândia',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'GAMA': {
+    code: 'GAMA',
+    neighborhood: 'Gama',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'SOBRADINHO': {
+    code: 'SOBRADINHO',
+    neighborhood: 'Sobradinho',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'PLANALTINA': {
+    code: 'PLANALTINA',
+    neighborhood: 'Planaltina',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'SAMAMBAIA': {
+    code: 'SAMAMBAIA',
+    neighborhood: 'Samambaia',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+  'BRASILIA': {
+    code: 'BRASILIA',
+    neighborhood: 'Distrito Federal (Geral)',
+    giftTitle: 'Doce Brinde: Ambrosia dos Deuses',
+    giftDescription: 'Cookie vulcânico com Nutella pura ou mini sobremesa artesanal cortesia!',
+  },
+};
+
+export interface ComboFriesUpgrade {
+  size: 'P' | 'M' | 'G';
+  name: string;
+  extraPrice: number;
+  label: string;
+}
+
+export const COMBO_FRIES_UPGRADES: ComboFriesUpgrade[] = [
+  { size: 'P', name: 'Batata Pequena (P)', extraPrice: 0, label: 'Inclusa (+R$ 0,00)' },
+  { size: 'M', name: 'Batata Média (M)', extraPrice: 1.5, label: '+R$ 1,50' },
+  { size: 'G', name: 'Batata Grande (G)', extraPrice: 5.0, label: '+R$ 5,00' },
+];
+
+export const MENU_ITEMS: MenuItem[] = [
+  // ========================================================
+  // 1. OS 7 DEUSES DO OLIMPO (HAMBÚRGUERES OFICIAIS)
+  // ========================================================
   {
-    id: 'smash-single',
-    name: 'SPARTAN SMASH SINGLE',
+    id: 'burger-zeus',
+    name: 'ZEUS',
     category: 'smash',
-    price: 26.9,
-    description: 'Direto, minimalista e implacável: 100g de carne fresca prensada na chapa quente com crosta perfeita, cheddar legítimo e molho dos deuses no pão brioche selado.',
-    imageType: 'classic',
+    price: 36.9,
+    description: 'Pão brioche selado na manteiga, blend bovino (160g) grelhado, fatias de queijo cheddar derretido, cebola caramelizada doce, farofa de bacon super crocante e maionese defumada.',
+    badge: 'Trono do Olimpo',
+    isLegend: true,
+    image: '/zeus.png',
+    imageType: 'zeus',
     isBurger: true,
+    bun: 'Brioche selado na manteiga',
+    meat: 'Blend bovino (160g) grelhado',
+    cheese: 'Fatias de queijo cheddar derretido',
+    complements: 'Cebola caramelizada doce e farofa de bacon super crocante',
+    sauce: 'Maionese defumada',
+    weight: '350g',
+    cookingTemp: '230°C na chapa viva',
+    blendInfo: '160g blend nobre bovino moído fresco e grelhado com crosta Maillard',
+    bunInfo: 'Brioche artesanal selado na manteiga clarificada',
+    cheeseInfo: 'Fatias generosas de queijo cheddar derretido no vapor',
+    sauceInfo: 'Maionese defumada autoral da casa',
+    pairingSuggestion: 'Batatas Espartanas + Coca-Cola bem gelada',
+    flavorNotes: ['Doçura da Cebola', 'Crosta Defumada', 'Crocância da Farofa de Bacon', 'Cheddar Intenso'],
   },
   {
-    id: 'smash-double-bacon',
-    name: 'MINOTAUR SMOKED BACON',
+    id: 'burger-atena',
+    name: 'ATENA',
     category: 'smash',
-    price: 39.9,
-    description: 'Dois smash patties de 80g, 4 fatias generosas de bacon artesanal defumado 7 dias em lenha frutífera, duplo cheddar e barbecue rústico com toque de especiarias.',
-    badge: 'Favorito do Templo',
-    imageType: 'bacon',
+    price: 37.9,
+    description: 'Pão brioche selado na manteiga, blend bovino (160g) grelhado, queijo provolone derretido, farta camada de crispy de alho-poró frito e sequinho, com maionese de alho ou cream cheese.',
+    badge: 'Sabedoria & Sabor',
+    isLegend: true,
+    image: '/atena.png',
+    imageType: 'atena',
     isBurger: true,
+    bun: 'Brioche selado na manteiga',
+    meat: 'Blend bovino (160g) grelhado',
+    cheese: 'Queijo provolone ou muçarela derretida',
+    complements: 'Farta camada de crispy de alho-poró frito e sequinho',
+    sauce: 'Cream cheese ou maionese de alho',
+    weight: '340g',
+    cookingTemp: '230°C na chapa viva',
+    blendInfo: '160g blend bovino suculento grelhado',
+    bunInfo: 'Brioche macio com selagem perfeita na manteiga',
+    cheeseInfo: 'Provolone nobre ou muçarela fundida',
+    sauceInfo: 'Cream cheese cremoso ou maionese de alho suave',
+    pairingSuggestion: 'Batatas Espartanas + Néctar Sagrado',
+    flavorNotes: ['Crocância Dourada do Alho-Poró', 'Untuosidade do Provolone', 'Alho Harmonioso', 'Maciez'],
   },
   {
-    id: 'smash-onion-royale',
-    name: 'COLOSSUS OKLAHOMA CRUNCH',
+    id: 'burger-apolo',
+    name: 'APOLO',
     category: 'smash',
     price: 35.9,
-    description: 'Estilo clássico milenar: cebola ultrafina prensada diretamente na carne incandescente, gerando caramelização aromática e crocância incomparável.',
-    imageType: 'onion',
+    description: 'Pão brioche macio, blend bovino (160g) grelhado, queijo coalho em fatia grossa tostado na chapa, uma rodela de abacaxi grelhado finalizada com um fio de mel puro e maionese tradicional.',
+    badge: 'Luz Dourada',
+    isLegend: true,
+    image: '/apolo.png',
+    imageType: 'apolo',
     isBurger: true,
+    bun: 'Brioche macio',
+    meat: 'Blend bovino (160g) grelhado',
+    cheese: 'Queijo coalho em fatia grossa, tostado na chapa',
+    complements: 'Uma rodela de abacaxi grelhado finalizada com um fio de mel puro',
+    sauce: 'Maionese tradicional',
+    weight: '360g',
+    cookingTemp: '230°C na chapa viva',
+    blendInfo: '160g carne bovina suculenta',
+    bunInfo: 'Brioche macio e amanteigado',
+    cheeseInfo: 'Queijo coalho artesanal tostado com crosta dourada',
+    sauceInfo: 'Maionese tradicional leve e aveludada com toque de mel puro',
+    pairingSuggestion: 'Loaded Fries + Guaraná bem gelado',
+    flavorNotes: ['Agridoce Perfeito', 'Acidez Cítrica do Abacaxi', 'Coalho Tostado', 'Toque de Mel Puro'],
+  },
+  {
+    id: 'burger-afrodite',
+    name: 'AFRODITE',
+    category: 'smash',
+    price: 34.9,
+    description: 'Pão brioche selado na manteiga, blend bovino (160g) grelhado, queijo prato derretido, folhas de alface americana, rodelas de tomate fresco, anéis de cebola roxa crua e maionese verde artesanal.',
+    badge: 'Deusa da Beleza',
+    isLegend: false,
+    image: '/afrodite.png',
+    imageType: 'afrodite',
+    isBurger: true,
+    bun: 'Brioche selado na manteiga',
+    meat: 'Blend bovino (160g) grelhado',
+    cheese: 'Queijo prato derretido',
+    complements: 'Folhas de alface americana, rodelas de tomate fresco e anéis de cebola roxa crua',
+    sauce: 'Maionese verde artesanal',
+    weight: '350g',
+    cookingTemp: '230°C na chapa viva',
+    blendInfo: '160g blend bovino fresco e tenro',
+    bunInfo: 'Brioche selado na manteiga',
+    cheeseInfo: 'Queijo prato clássico derretido',
+    sauceInfo: 'Maionese verde artesanal com ervas frescas',
+    pairingSuggestion: 'Batatas Espartanas + Bebida gelada',
+    flavorNotes: ['Frescor dos Vegetais', 'Crocância da Cebola Roxa', 'Ervas Frescas', 'Suavidade'],
+  },
+  {
+    id: 'burger-ares',
+    name: 'ARES',
+    category: 'smash',
+    price: 38.9,
+    description: 'Pão brioche selado na manteiga, blend bovino (160g) grelhado, queijo gouda ou cheddar, anéis de cebola empanada (onion rings) inteiros e crocantes, geleia de pimenta na tampa e maionese na base.',
+    badge: 'Fúria da Guerra',
+    isLegend: false,
+    image: '/ares.png',
+    imageType: 'ares',
+    isBurger: true,
+    bun: 'Brioche selado na manteiga',
+    meat: 'Blend bovino (160g) grelhado',
+    cheese: 'Queijo gouda ou cheddar',
+    complements: 'Anéis de cebola empanada (onion rings) inteiros e crocantes',
+    sauce: 'Geleia de pimenta (na tampa) e maionese na base',
+    weight: '380g',
+    cookingTemp: '235°C na chapa viva',
+    blendInfo: '160g blend bovino grelhado com força total',
+    bunInfo: 'Brioche amanteigado com gergelim',
+    cheeseInfo: 'Queijo gouda cremoso ou cheddar',
+    sauceInfo: 'Geleia de pimenta doce e picante na tampa com maionese na base',
+    pairingSuggestion: 'Loaded Fries do Coliseu + Bebida gelada',
+    flavorNotes: ['Picância Doce', 'Crocância Monumental da Onion Ring', 'Gouda Fundido', 'Explosão de Sabor'],
+  },
+  {
+    id: 'burger-hermes',
+    name: 'HERMES',
+    category: 'smash',
+    price: 33.9,
+    description: 'Pão brioche selado na manteiga, filé de sobrecoxa ou peito de frango empanado, frito até dourar, queijo prato ou muçarela, alface americana fresca, picles de pepino e maionese de limão siciliano ou mostarda e mel.',
+    badge: 'Velocidade dos Deuses',
+    isLegend: false,
+    image: '/hermes.png',
+    imageType: 'hermes',
+    isBurger: true,
+    bun: 'Brioche selado na manteiga',
+    meat: 'Filé de sobrecoxa ou peito de frango empanado, frito até dourar',
+    cheese: 'Queijo prato ou muçarela',
+    complements: 'Alface americana e picles de pepino',
+    sauce: 'Maionese de limão siciliano ou molho de mostarda e mel',
+    weight: '330g',
+    cookingTemp: 'Frito no ponto dourado perfeito',
+    blendInfo: 'Filé de frango nobre marinado e super crocante',
+    bunInfo: 'Brioche fofo selado',
+    cheeseInfo: 'Queijo prato ou muçarela derretida',
+    sauceInfo: 'Maionese cítrica de limão siciliano ou mostarda e mel',
+    pairingSuggestion: 'Batatas com Páprica + Refrigerante',
+    flavorNotes: ['Crocância do Frango Empanado', 'Acidez do Picles', 'Frescor Cítrico', 'Equilíbrio'],
+  },
+  {
+    id: 'burger-hercules',
+    name: 'HÉRCULES',
+    category: 'smash',
+    price: 39.9,
+    description: 'Pão brioche selado na manteiga, blend bovino (160g) grelhado, queijo cheddar ou prato derretido em dobro, tiras longas de bacon defumado e crocante, molho barbecue ou maionese da casa.',
+    badge: 'Força Titânica',
+    isLegend: true,
+    image: '/hercules.png',
+    imageType: 'hercules',
+    isBurger: true,
+    bun: 'Brioche selado na manteiga',
+    meat: 'Blend bovino (160g) grelhado',
+    cheese: 'Queijo cheddar ou prato derretido em dobro',
+    complements: 'Tiras longas de bacon defumado e crocante',
+    sauce: 'Molho barbecue ou maionese da casa',
+    weight: '390g',
+    cookingTemp: '230°C na chapa viva',
+    blendInfo: '160g blend bovino nobre grelhado no ponto',
+    bunInfo: 'Brioche tostado na manteiga clarificada',
+    cheeseInfo: 'Dose dupla de cheddar ou queijo prato derretido',
+    sauceInfo: 'Molho barbecue rústico defumado ou maionese da casa',
+    pairingSuggestion: 'Batatas Espartanas + Doce Brinde do Bairro',
+    flavorNotes: ['Queijo em Dobro', 'Bacon Rústico Defumado', 'Barbecue Encorpado', 'Poder Máximo'],
   },
 
-  // 3. BURGERS ESPECIAIS & DROPS SAZONAIS
+  // ========================================================
+  // 2. O ÚNICO COMBO ESPECIAL COM DOCE BRINDE: COMBO CASAL
+  // ========================================================
   {
-    id: 'special-quad',
-    name: 'TITAN 4X4 OLYMPUS',
-    category: 'especiais',
-    price: 52.9,
-    description: 'Quatro smash patties maciços (360g de carne nobre), 4 camadas de queijo cheddar inglês, fatias duplas de bacon e dose generosa de molho Riot. O banquete definitivo dos Titãs.',
-    badge: 'Poder dos Titãs',
-    imageType: 'melt',
-    isBurger: true,
-  },
-  {
-    id: 'special-truffle',
-    name: 'APOLLO TRUFFLE ROYALE DROP',
-    category: 'especiais',
-    price: 44.9,
-    description: 'Edição limitada do mês sob a luz de Apolo: blend smash duplo, queijo emmental suíço, cogumelos salteados no azeite trufado e aioli de alho negro.',
-    badge: 'Drop dos Deuses',
-    imageType: 'fury',
-    isBurger: true,
-  },
-
-  // 4. COMBOS
-  {
-    id: 'combo-riot-classic',
-    name: 'COMBO OLYMPIAN CLASSIC',
+    id: 'combo-casal',
+    name: 'MONTE SEU COMBO CASAL + DOCE GRÁTIS',
     category: 'combos',
-    price: 47.9,
-    description: '1 The Olympian Classic + 1 Porção Individual de Batatas Espartanas crocantes com páprica + 1 Bebida em lata gelada.',
-    badge: 'Banquete Completo',
+    price: 69.9,
+    description: 'Banquete Completo para 2 Pessoas: 2 Hambúrgueres artesanais à sua escolha + 2 Refrigerantes gelados + 2 Batatas crocantes (P, M ou G) + 1 DOCE GRÁTIS na Roleta Premiada de Cassino!',
+    badge: '🎰 Combo Casal + Doce Grátis',
+    isLegend: true,
+    image: '/combocasal.png',
     imageType: 'combo',
-    isBurger: true,
-  },
-  {
-    id: 'combo-fury',
-    name: 'COMBO ARES FURY & NUGGETS',
-    category: 'combos',
-    price: 51.9,
-    description: '1 Ares Green Fury + 4 Chicken Nuggets dourados na farinha Panko + 1 Bebida em lata gelada.',
-    imageType: 'combo',
-    isBurger: true,
+    isBurger: false,
+    freeSweetGift: 'Doce da Roleta Premiada',
+    weight: 'Banquete para 2 Pessoas + Doce Grátis',
+    flavorNotes: ['2 Burgers dos Deuses', '2 Batatas Crocantes', '2 Refris Gelados', 'Doce Grátis na Roleta'],
   },
 
-  // 5. FRITAS & ACOMPANHAMENTOS
+  // ========================================================
+  // 3. FRITAS & ACOMPANHAMENTOS (BATATA P, M, G)
+  // ========================================================
   {
-    id: 'side-fries-rustic',
-    name: 'BATATAS ESPARTANAS COM PÁPRICA',
+    id: 'side-fries-p',
+    name: 'BATATA ESPARTANA P (Pequena)',
     category: 'sides',
-    price: 18.9,
-    description: 'Batatas com casca rústica cortadas à mão, fritas duas vezes com flor de sal do Mediterrâneo e páprica defumada. Acompanha molho Riot.',
+    price: 9.9,
+    description: 'Porção individual de batatas crocantes com flor de sal e páprica especial (120g).',
+    image: '/batata-p.png',
+    imageType: 'fries',
+    isBurger: false,
+  },
+  {
+    id: 'side-fries-m',
+    name: 'BATATA ESPARTANA M (Média)',
+    category: 'sides',
+    price: 14.9,
+    description: 'Porção média de batatas crocantes fritas duas vezes com toque de páprica (200g).',
+    image: '/batata-m.png',
+    imageType: 'fries',
+    isBurger: false,
+  },
+  {
+    id: 'side-fries-g',
+    name: 'BATATA ESPARTANA G (Grande)',
+    category: 'sides',
+    price: 19.9,
+    description: 'Porção generosa de batatas crocantes para compartilhar com a legião (320g).',
+    image: '/batata-g.png',
     imageType: 'fries',
     isBurger: false,
   },
@@ -191,47 +533,33 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'LOADED FRIES DO COLISEU (Cheddar & Bacon)',
     category: 'sides',
     price: 27.9,
-    description: 'Porção farta de fritas douradas cobertas por piscina de cheddar cremoso quente e chuva de bacon artesanal crocante.',
+    description: 'Porção farta de fritas douradas cobertas com piscina de cheddar cremoso quente e chuva de bacon artesanal crocante.',
     badge: 'Para a Legião',
+    image: '/loaded-fries.png',
     imageType: 'fries',
     isBurger: false,
   },
   {
-    id: 'side-nuggets',
-    name: 'NUGGETS DOURADOS DE FRANGO (6 un)',
+    id: 'side-onion-rings',
+    name: 'ONION RINGS CROCANTES DE ARES (8 un)',
     category: 'sides',
-    price: 22.9,
-    description: 'Peito de frango selecionado marinado em ervas clássicas e empanamento duplo em crosta dourada e crocante. Acompanha molho barbecue.',
+    price: 21.9,
+    description: 'Anéis de cebola selecionados empanados na farinha especial e fritos ultra crocantes. Acompanha geleia de pimenta.',
+    image: '/onion-rings.png',
     imageType: 'nuggets',
     isBurger: false,
   },
 
-  // 6. BEBIDAS & NÉCTARES
-  {
-    id: 'shake-dulce',
-    name: 'NÉCTAR DE DOCE DE LEITE & FLOR DE SAL',
-    category: 'bebidas',
-    price: 23.9,
-    description: 'Sorvete aveludado batido com doce de leite artesanal argentino, chantilly fresco e cristais puros de flor de sal.',
-    badge: 'Néctar Sagrado',
-    imageType: 'shake',
-    isBurger: false,
-  },
-  {
-    id: 'shake-red-velvet',
-    name: 'NÉCTAR RED VELVET OLYMPUS',
-    category: 'bebidas',
-    price: 24.9,
-    description: 'Sorvete de baunilha, pedaços de bolo red velvet carmesim, calda pura de frutas vermelhas e topo de chantilly.',
-    imageType: 'shake',
-    isBurger: false,
-  },
+  // ========================================================
+  // 4. BEBIDAS & NÉCTARES
+  // ========================================================
   {
     id: 'drink-coca',
     name: 'Coca-Cola Original (Lata 350ml)',
     category: 'bebidas',
     price: 7.5,
-    description: 'Lata bem gelada servida com copo de vidro e gelo.',
+    description: 'Lata bem gelada servida com copo e gelo.',
+    image: '/coca.png',
     imageType: 'combo',
     isBurger: false,
   },
@@ -241,18 +569,42 @@ export const MENU_ITEMS: MenuItem[] = [
     category: 'bebidas',
     price: 7.5,
     description: 'Lata zero açúcares bem gelada.',
+    image: '/coca-zero.png',
+    imageType: 'combo',
+    isBurger: false,
+  },
+  {
+    id: 'drink-guarana',
+    name: 'Guaraná Antarctica (Lata 350ml)',
+    category: 'bebidas',
+    price: 7.5,
+    description: 'Lata bem gelada servida com copo e gelo.',
+    image: '/guarana.png',
+    imageType: 'combo',
+    isBurger: false,
+  },
+  {
+    id: 'drink-guarana-zero',
+    name: 'Guaraná Antarctica Zero (Lata 350ml)',
+    category: 'bebidas',
+    price: 7.5,
+    description: 'Lata zero açúcares bem gelada.',
+    image: '/guarana-zero.png',
     imageType: 'combo',
     isBurger: false,
   },
 
-  // 7. AMBROSIA & SOBREMESAS
+  // ========================================================
+  // 5. DOCES & SOBREMESAS (DOCES BRINDES DO OLIMPO)
+  // ========================================================
   {
     id: 'dessert-cookie',
     name: 'AMBROSIA: COOKIE GIGANTE COM NUTELLA',
     category: 'sobremesas',
     price: 16.9,
-    description: 'Massa quentinha de cookie assada em pedra com pedaços de chocolate nobre e recheio vulcânico de Nutella pura.',
-    badge: 'Ambrosia Quente',
+    description: 'Massa quentinha de cookie assada com pedaços de chocolate nobre e recheio de Nutella pura. O Doce Brinde oficial dos cupons de bairro!',
+    badge: 'Doce Brinde',
+    image: '/cookie.png',
     imageType: 'dessert',
     isBurger: false,
   },
@@ -261,7 +613,8 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'FUDGE BROWNIE COM CALDA QUENTE',
     category: 'sobremesas',
     price: 19.9,
-    description: 'Brownie artesanal 70% cacau denso com nozes douradas e calda fervente de chocolate meio amargo.',
+    description: 'Brownie artesanal 70% cacau super macio com nozes douradas e calda fervente de chocolate meio amargo.',
+    image: '/brownie.png',
     imageType: 'dessert',
     isBurger: false,
   },

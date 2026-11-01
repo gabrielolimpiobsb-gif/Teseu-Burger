@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CartItem, CustomerDetails } from '@/types/burger';
-import { STORE_INFO } from '@/lib/data';
+import { STORE_INFO, NEIGHBORHOOD_COUPONS } from '@/lib/data';
 import { LaurelWreathIcon, SpartanHelmetIcon, ParthenonIcon } from '@/components/GreekOrnament';
-import { Check, Copy, MessageSquare, X, QrCode, Sparkles } from 'lucide-react';
+import { Check, MessageSquare, X, Sparkles, Gift } from 'lucide-react';
 
 interface OrderSuccessModalProps {
   orderData: {
@@ -23,30 +23,40 @@ interface OrderSuccessModalProps {
 }
 
 export function OrderSuccessModal({ orderData, isOpen, onClose }: OrderSuccessModalProps) {
-  const [copiedPix, setCopiedPix] = useState(false);
-
   if (!isOpen || !orderData) return null;
 
   const { items, customer, subtotal, discount, deliveryFee, total, orderId } = orderData;
-
-  const pixKeySimulated = `00020126580014BR.GOV.BCB.PIX0136olympus-smash-${orderId.toLowerCase()}520400005303986540${total.toFixed(2)}5802BR5916TESEU BURGER6009SAO PAULO62070503***6304`;
-
-  const copyPixCode = () => {
-    navigator.clipboard.writeText(pixKeySimulated);
-    setCopiedPix(true);
-    setTimeout(() => setCopiedPix(false), 2500);
-  };
 
   const generateWhatsAppMessage = () => {
     const itemsText = items
       .map((item, idx) => {
         let details = '';
-        if (item.doneness) details += `\n   - Ponto: ${item.doneness}`;
-        if (item.selectedToppings.length > 0) {
-          details += `\n   - Extras: ${item.selectedToppings.map((t) => t.name).join(', ')}`;
+        if (item.comboCasal) {
+          details += `\n   🍔 *Burger 1:* ${item.comboCasal.burger1.name} ${item.comboCasal.burger1.doneness ? `(${item.comboCasal.burger1.doneness})` : ''}`;
+          details += `\n   🍔 *Burger 2:* ${item.comboCasal.burger2.name} ${item.comboCasal.burger2.doneness ? `(${item.comboCasal.burger2.doneness})` : ''}`;
+          details += `\n   🥤 *Bebidas:* ${item.comboCasal.drink1.name} + ${item.comboCasal.drink2.name}`;
+          details += `\n   🍟 *Batatas:* ${item.comboCasal.fries1.name} + ${item.comboCasal.fries2.name}`;
+        } else {
+          if (item.doneness) details += `\n   - Ponto: ${item.doneness}`;
+          if (item.selectedToppings.length > 0) {
+            details += `\n   - Extras: ${item.selectedToppings.map((t) => t.name).join(', ')}`;
+          }
+          if (item.selectedSauces && item.selectedSauces.length > 0) {
+            details += `\n   - Molhos: ${item.selectedSauces.map((s) => s.name).join(', ')}`;
+          }
+          if (item.selectedFries) {
+            details += `\n   - Batata: ${item.selectedFries.name}`;
+          }
+          if (item.selectedDrink) {
+            details += `\n   - Refri: ${item.selectedDrink.name}`;
+          }
         }
-        if (item.isComboUpgrade) {
-          details += `\n   - Combo: Batatas Espartanas + ${item.comboDrink || 'Bebida'}`;
+
+        if (item.drawnSweetGift) {
+          details += `\n   🎁 *Doce Brinde Sorteado:* ${item.drawnSweetGift} (100% Grátis na Roleta)`;
+        }
+        if (item.isComboUpgrade && !item.comboCasal) {
+          details += `\n   - Combo: Batatas + ${item.comboDrink || 'Bebida'}`;
         }
         if (item.notes) details += `\n   - Obs: "${item.notes}"`;
 
@@ -63,10 +73,17 @@ export function OrderSuccessModal({ orderData, isOpen, onClose }: OrderSuccessMo
 
     const paymentText =
       customer.paymentMethod === 'pix'
-        ? 'PIX Instantâneo'
+        ? 'PIX (Solicito a chave Pix no WhatsApp)'
         : customer.paymentMethod === 'card'
-        ? 'Cartão na Entrega'
+        ? 'Cartão na Maquininha (Entrega/Retirada)'
         : `Dinheiro na Entrega ${customer.cashChangeFor ? `(Troco para: ${customer.cashChangeFor})` : '(Sem troco)'}`;
+
+    const neighborhoodCouponData =
+      customer.couponCode ? NEIGHBORHOOD_COUPONS[customer.couponCode.toUpperCase()] : null;
+
+    const sweetGiftText = neighborhoodCouponData
+      ? `🎁 *DOCE BRINDE LIBERADO:* Ambrosia Sagrada / Cookie com Nutella Grátis (Cupom do Bairro: ${customer.couponCode} - ${neighborhoodCouponData.neighborhood})\n----------------------------------------\n`
+      : '';
 
     const rawMessage = `🏛️ *BANQUETE SAGRADO TESEU BURGER // OLIMPO*
 *Comanda do Templo:* #${orderId}
@@ -78,7 +95,7 @@ ${addressText}
 *OFERENDAS DO BANQUETE:*
 ${itemsText}
 ----------------------------------------
-*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}
+${sweetGiftText}*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}
 ${discount > 0 ? `*Desconto Oráculo:* - R$ ${discount.toFixed(2).replace('.', ',')}\n` : ''}*Taxa Entrega:* R$ ${deliveryFee.toFixed(2).replace('.', ',')}
 *TOTAL DO BANQUETE:* R$ ${total.toFixed(2).replace('.', ',')}
 *Forma de Pagamento:* ${paymentText}
@@ -215,6 +232,26 @@ _Enviado com a bênção dos deuses do smash!_`;
                       • Extras: {item.selectedToppings.map((t) => t.name).join(', ')}
                     </p>
                   )}
+                  {item.selectedSauces && item.selectedSauces.length > 0 && (
+                    <p className="text-[10px] text-neutral-600">
+                      • Molhos: {item.selectedSauces.map((s) => s.name).join(', ')}
+                    </p>
+                  )}
+                  {item.selectedFries && (
+                    <p className="text-[10px] text-amber-800 font-bold">
+                      • Batata: {item.selectedFries.name}
+                    </p>
+                  )}
+                  {item.selectedDrink && (
+                    <p className="text-[10px] text-neutral-800 font-bold">
+                      • Refri: {item.selectedDrink.name}
+                    </p>
+                  )}
+                  {item.drawnSweetGift && (
+                    <p className="text-[10px] text-amber-700 font-bold">
+                      • 🎁 Doce Brinde Sorteado: {item.drawnSweetGift} (Grátis)
+                    </p>
+                  )}
                   {item.isComboUpgrade && (
                     <p className="text-[10px] text-neutral-700 font-bold">
                       • Banquete Completo (+ Fritas + {item.comboDrink})
@@ -237,6 +274,15 @@ _Enviado com a bênção dos deuses do smash!_`;
                   <span>- R$ {discount.toFixed(2).replace('.', ',')}</span>
                 </div>
               )}
+              {customer.couponCode && NEIGHBORHOOD_COUPONS[customer.couponCode.toUpperCase()] && (
+                <div className="flex justify-between text-amber-700 font-bold bg-amber-50 px-2 py-1 rounded">
+                  <span className="flex items-center gap-1">
+                    <Gift className="w-3.5 h-3.5 text-amber-600" />
+                    DOCE BRINDE ({NEIGHBORHOOD_COUPONS[customer.couponCode.toUpperCase()].neighborhood}):
+                  </span>
+                  <span className="text-emerald-700 font-extrabold">GRÁTIS</span>
+                </div>
+              )}
               <div className="flex justify-between text-neutral-700">
                 <span>TAXA DE ENTREGA:</span>
                 <span>{deliveryFee > 0 ? `R$ ${deliveryFee.toFixed(2).replace('.', ',')}` : 'GRÁTIS'}</span>
@@ -248,42 +294,21 @@ _Enviado com a bênção dos deuses do smash!_`;
             </div>
           </div>
 
-          {/* PIX payment box */}
-          {customer.paymentMethod === 'pix' && (
-            <div className="p-4 bg-[#F8F6F0] rounded-xl border border-[#CD9C20]/60 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-ancient font-bold text-[#CD9C20] uppercase text-[11px] flex items-center gap-1.5">
-                  <QrCode className="w-4 h-4 text-[#CD9C20]" />
-                  Chave Pix Instantânea do Templo
-                </span>
-                <span className="font-mono text-xs font-bold text-[#1c1c1c]">
-                  R$ {total.toFixed(2).replace('.', ',')}
-                </span>
-              </div>
-
-              <div className="p-2.5 bg-white rounded-lg border border-neutral-300 font-mono text-[10px] text-neutral-800 break-all select-all">
-                {pixKeySimulated}
-              </div>
-
-              <button
-                type="button"
-                onClick={copyPixCode}
-                className="w-full py-2.5 px-3 gold-gradient-bg text-[#0B0B0B] font-ancient font-bold rounded-lg flex items-center justify-center gap-2 hover:brightness-105 transition-colors text-xs shadow-sm"
-              >
-                {copiedPix ? (
-                  <>
-                    <Check className="w-4 h-4 stroke-[2.5]" />
-                    <span>Chave Pix Copiada com Glória!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 stroke-[2.5]" />
-                    <span>Copiar Código Pix</span>
-                  </>
-                )}
-              </button>
+          {/* WhatsApp Payment Clarification Box */}
+          <div className="p-4 bg-emerald-50/80 rounded-xl border border-emerald-300 space-y-2">
+            <div className="flex items-center justify-between text-emerald-900">
+              <span className="font-ancient font-bold uppercase text-[11px] flex items-center gap-1.5">
+                <MessageSquare className="w-4 h-4 text-emerald-600" />
+                Pagamento pelo WhatsApp
+              </span>
+              <span className="font-mono text-xs font-bold text-neutral-800">
+                Total: R$ {total.toFixed(2).replace('.', ',')}
+              </span>
             </div>
-          )}
+            <p className="text-[11px] text-emerald-950 font-normal leading-relaxed">
+              Você não pagou nada pelo site! Clique no botão abaixo para enviar o pedido direto para o nosso WhatsApp. Lá você poderá fazer o <strong>Pix</strong>, ou avisar para levarmos a <strong>maquininha de cartão</strong> ou o <strong>troco</strong>.
+            </p>
+          </div>
         </div>
 
         {/* Footer Actions */}

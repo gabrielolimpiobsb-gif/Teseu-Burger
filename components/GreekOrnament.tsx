@@ -168,7 +168,7 @@ export function GreekColumnElement({ className = '', height = 400 }: { className
 export function GreekFrieze({ variant = 'gold', className = '' }: { variant?: 'gold' | 'dark'; className?: string }) {
   return (
     <div
-      className={`w-full ${
+      className={`w-full max-w-full overflow-hidden ${
         variant === 'gold' ? 'greek-meander-horizontal opacity-90' : 'greek-meander-horizontal-dark opacity-60'
       } ${className}`}
     />

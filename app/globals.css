@@ -1,5 +1,55 @@
 @import "tailwindcss";
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE e Edge */
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  touch-action: pan-y pinch-zoom;
+  -webkit-font-smoothing: antialiased;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE e Edge */
+}
+
+/* Ocultar barra de rolagem de todo o site mantendo a rolagem ativa */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE e Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
+
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
+
+/* Evitar que carrosséis ou barras horizontais transmitam arrasto para a tela inteira (sambando) */
+.overflow-x-auto {
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 :root {
   --color-canvas: #f5f5f5;
   --color-surface: #ffffff;
@@ -16,6 +66,25 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   line-height: 1.05;
+}
+
+/* Burger Builder Layer Fall Animation */
+@keyframes dropIn {
+  0% {
+    transform: translateY(-150px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.ingredient-layer {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  animation: dropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .font-ancient {
@@ -35,6 +104,8 @@
 .greek-meander-horizontal {
   height: 24px;
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='24' viewBox='0 0 64 24'%3E%3Cpath d='M0 3 L64 3 M0 21 L64 21 M8 3 L8 15 L24 15 L24 9 L16 9 L16 21 M40 21 L40 9 L56 9 L56 15 L48 15 L48 3' fill='none' stroke='%23CD9C20' stroke-width='2' stroke-linejoin='miter' stroke-linecap='square'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
   background-size: 64px 24px;
@@ -43,6 +114,8 @@
 .greek-meander-horizontal-dark {
   height: 20px;
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='20' viewBox='0 0 64 20'%3E%3Cpath d='M0 2 L64 2 M0 18 L64 18 M8 2 L8 12 L24 12 L24 7 L16 7 L16 18 M40 18 L40 7 L56 7 L56 12 L48 12 L48 2' fill='none' stroke='%23CD9C20' stroke-width='1.8' stroke-linejoin='miter'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
   background-size: 64px 20px;
@@ -144,3 +217,54 @@ nextjs-portal,
   pointer-events: none !important;
   visibility: hidden !important;
 }
+
+/* ==========================================
+   THERMAL RECEIPT PRINTING STYLES (58mm / 80mm)
+   ========================================== */
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+  
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #thermal-print-area,
+  #thermal-print-area *,
+  #thermal-receipt-document,
+  #thermal-receipt-document * {
+    visibility: visible !important;
+  }
+
+  #thermal-print-area {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    display: block !important;
+    background: #ffffff !important;
+    z-index: 9999999 !important;
+  }
+
+  .print\:hidden,
+  header.print\:hidden {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+

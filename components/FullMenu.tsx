@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { MenuItem } from '@/types/burger';
 import { STORE_INFO } from '@/lib/data';
-import { BurgerGraphic } from '@/components/BurgerGraphics';
+import { ProductImage } from '@/components/ProductImage';
 import { GreekFrieze, ParthenonIcon, LaurelWreathIcon } from '@/components/GreekOrnament';
 import { Search, Plus, ArrowRight, Clock, Flame } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -48,12 +49,11 @@ export function FullMenu({
 
   const categories = [
     { id: 'all', label: '🏛️ Banquete Completo' },
-    { id: 'smash', label: '⚡ Smash do Olimpo' },
-    { id: 'especiais', label: '👑 Especiais & Drops' },
-    { id: 'combos', label: '🏺 Combos Sagrados' },
-    { id: 'sides', label: '🍟 Fritas Espartanas' },
-    { id: 'bebidas', label: '🍷 Néctares & Shakes' },
-    { id: 'sobremesas', label: '🍇 Ambrosias' },
+    { id: 'smash', label: '⚡ Os 7 Deuses (Hambúrgueres)' },
+    { id: 'combos', label: '🏺 Combos com Doce Brinde' },
+    { id: 'sides', label: '🍟 Acompanhamentos' },
+    { id: 'bebidas', label: '🥤 Bebidas Geladas' },
+    { id: 'sobremesas', label: '🍪 Ambrosia & Sobremesas' },
   ];
 
   const filteredItems = liveItems.filter((item) => {
@@ -61,7 +61,7 @@ export function FullMenu({
       selectedCategory === 'all'
         ? true
         : selectedCategory === 'smash'
-        ? item.category === 'smash' || item.category === 'legends'
+        ? item.category === 'smash' || item.isBurger
         : item.category === selectedCategory;
 
     const matchesSearch =
@@ -78,7 +78,7 @@ export function FullMenu({
       id="cardapio"
       className={`${
         isDedicatedPage ? 'pt-6 pb-20' : 'py-20 sm:py-24'
-      } bg-[#f5f5f5] text-[#1c1c1c] border-b border-[#CD9C20]/25 relative`}
+      } bg-[#f5f5f5] text-[#1c1c1c] border-b border-[#CD9C20]/25 relative w-full max-w-full overflow-hidden`}
     >
       {/* Subtle Greek Frieze Top Border */}
       {!isDedicatedPage && <GreekFrieze variant="dark" className="absolute top-0 left-0 right-0" />}
@@ -134,7 +134,7 @@ export function FullMenu({
         </div>
 
         {/* Categories Tab Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 scrollbar-none overscroll-x-contain">
           {categories.map((cat) => {
             const isActive = selectedCategory === cat.id;
             return (
@@ -176,38 +176,62 @@ export function FullMenu({
                       : 'bg-white border-[#CD9C20]/30 group-hover:border-[#CD9C20] group-hover:shadow-[0_12px_30px_rgba(205,156,32,0.18)]'
                   }`}
                 >
-                  {/* Top: Image & Badge */}
-                  <div className="relative mb-2.5 sm:mb-4 flex items-center justify-center bg-[#F8F6F0] rounded-lg sm:rounded-xl p-2 sm:p-4 min-h-[110px] sm:min-h-[170px] overflow-hidden border border-[#CD9C20]/20">
-                    {item.isAvailable === 0 ? (
-                      <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 bg-rose-600 text-white text-[8px] sm:text-[9px] font-ancient font-black uppercase px-2 py-0.5 rounded shadow-sm z-10">
-                        Esgotado
-                      </span>
-                    ) : item.badge ? (
-                      <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 gold-gradient-bg text-[#0B0B0B] text-[8px] sm:text-[9px] font-ancient font-black uppercase px-1.5 sm:px-2.5 py-0.5 rounded shadow-sm">
-                        {item.badge}
-                      </span>
-                    ) : null}
-                    <div className={`transform transition-transform duration-300 ${item.isAvailable === 0 ? 'grayscale opacity-60' : 'group-hover:scale-105'}`}>
-                      <div className="block sm:hidden">
-                        <BurgerGraphic type={item.imageType} size={88} />
+                  {/* Top: Image or Inline Drink Card */}
+                  {item.category === 'bebidas' ? (
+                    <div className="flex items-center gap-3 p-2.5 bg-[#FAF8F3] rounded-xl border border-[#CD9C20]/40 mb-3">
+                      <div className="relative w-10 h-10 rounded-lg bg-white border border-[#CD9C20]/30 flex items-center justify-center shrink-0 overflow-hidden">
+                        <Image
+                          src={item.image || '/coca.png'}
+                          alt={item.name}
+                          width={36}
+                          height={36}
+                          referrerPolicy="no-referrer"
+                          className="object-contain w-full h-full p-0.5"
+                        />
                       </div>
-                      <div className="hidden sm:block">
-                        <BurgerGraphic type={item.imageType} size={130} />
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-display text-xs sm:text-sm uppercase tracking-wide text-[#1c1c1c] group-hover:text-[#CD9C20] transition-colors truncate">
+                          {item.name}
+                        </h3>
+                        <p className="text-[10px] text-neutral-500 font-ancient line-clamp-1">{item.description}</p>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="relative mb-2.5 sm:mb-4 overflow-hidden rounded-lg sm:rounded-xl">
+                      <ProductImage
+                        src={item.image}
+                        alt={item.name}
+                        badge={item.isAvailable === 0 ? 'Esgotado' : undefined}
+                        imageCodeHint={item.image || `/${item.imageType}.png`}
+                        className="w-full h-32 sm:h-44"
+                      />
+                    </div>
+                  )}
 
-                  {/* Content */}
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="font-display text-xs sm:text-base uppercase tracking-wider text-[#1c1c1c] group-hover:text-[#CD9C20] transition-colors leading-tight line-clamp-1 sm:line-clamp-none">
-                        {item.name}
-                      </h3>
-                      <p className="text-[10px] sm:text-xs text-neutral-600 leading-snug sm:leading-relaxed line-clamp-2 my-1.5 sm:mb-4 font-normal">
-                        {item.description}
-                      </p>
+                  {/* Content (for non-beverages) */}
+                  {item.category !== 'bebidas' && (
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-display text-xs sm:text-base uppercase tracking-wider text-[#1c1c1c] group-hover:text-[#CD9C20] transition-colors leading-tight line-clamp-1 sm:line-clamp-none">
+                          {item.name}
+                        </h3>
+                        <p className="text-[10px] sm:text-xs text-neutral-600 leading-snug sm:leading-relaxed line-clamp-2 my-1.5 sm:mb-2 font-normal">
+                          {item.description}
+                        </p>
+
+                        {/* Ingredients Breakdown Tag */}
+                        {item.isBurger && item.meat && (
+                          <div className="mb-2 p-1.5 bg-[#F9F7F1] rounded-lg border border-[#CD9C20]/20 text-[9px] sm:text-[10px] text-neutral-600 space-y-0.5 hidden sm:block">
+                            <p className="truncate"><strong className="text-neutral-800">Carne:</strong> {item.meat}</p>
+                            <p className="truncate"><strong className="text-neutral-800">Queijo:</strong> {item.cheese}</p>
+                            {item.complements && (
+                              <p className="truncate"><strong className="text-neutral-800">Extras:</strong> {item.complements}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Bottom Row */}
                   <div className="pt-2 sm:pt-3 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-auto">

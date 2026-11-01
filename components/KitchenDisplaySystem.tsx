@@ -36,11 +36,13 @@ import {
   Key,
   Eye,
   EyeOff,
+  Printer,
 } from 'lucide-react';
 import { LaurelWreathIcon, SpartanHelmetIcon } from '@/components/GreekOrnament';
 import { KDS_STATUSES } from '@/components/OrderLiveTracker';
 import { auth, googleAuthProvider } from '@/lib/firebase';
 import { signInWithPopup } from 'firebase/auth';
+import { ThermalReceiptModal } from '@/components/ThermalReceipt';
 
 interface KitchenOrder {
   id: number;
@@ -69,10 +71,7 @@ interface KitchenOrder {
 export function KitchenDisplaySystem() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [operatorName, setOperatorName] = useState<string>('Gabriel Olímpio');
-  const [operatorEmail, setOperatorEmail] = useState<string>('');
-  const [emailInput, setEmailInput] = useState<string>('');
-  const [passcodeInput, setPasscodeInput] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [operatorEmail, setOperatorEmail] = useState<string>('gabrielolimpiobsb@gmail.com');
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -89,6 +88,9 @@ export function KitchenDisplaySystem() {
 
   // Track checked items per order (interactive kitchen prep checklist)
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+
+  // Active order for thermal receipt printing (58mm/80mm)
+  const [printingOrder, setPrintingOrder] = useState<KitchenOrder | null>(null);
 
   const prevOrderCountRef = useRef(0);
 
@@ -142,7 +144,6 @@ export function KitchenDisplaySystem() {
           if (data.operator) setOperatorName(data.operator);
           if (data.email) {
             setOperatorEmail(data.email);
-            setEmailInput(data.email);
           }
         } else {
           setIsAuthenticated(false);
@@ -223,48 +224,7 @@ export function KitchenDisplaySystem() {
     };
   }, [isAuthenticated, playKitchenChime]);
 
-  // Handle Email & Passcode Login
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
 
-    const normalized = emailInput.toLowerCase().trim();
-    if (normalized !== 'gabrielolimpiobsb@gmail.com') {
-      setAuthError('Acesso Negado: Apenas o e-mail gabrielolimpiobsb@gmail.com possui autorização para o Painel da Cozinha.');
-      return;
-    }
-
-    setIsAuthenticating(true);
-
-    try {
-      const res = await fetch('/api/kitchen/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: normalized,
-          passcode: passcodeInput.trim(),
-          operatorName: operatorName.trim() || 'Gabriel Olímpio',
-        }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        if (data.token) {
-          localStorage.setItem('teseu_kitchen_token', data.token);
-        }
-        setIsAuthenticated(true);
-        if (data.email) setOperatorEmail(data.email);
-        setPasscodeInput('');
-        fetchKitchenOrders();
-      } else {
-        setAuthError(data.error || 'Acesso negado.');
-      }
-    } catch {
-      setAuthError('Falha ao comunicar com o servidor.');
-    } finally {
-      setIsAuthenticating(false);
-    }
-  };
 
   // Handle Google Sign-In for Kitchen Display
   const handleGoogleLogin = async () => {
@@ -433,13 +393,13 @@ export function KitchenDisplaySystem() {
             Terminal operacional da chapa e expedição. Insira suas credenciais para gerenciar pedidos.
           </p>
 
-          {/* Option 1: Google Sign-In */}
-          <div className="mt-6 space-y-3">
+          {/* Entrada Exclusiva com Conta Google */}
+          <div className="mt-6">
             <button
               type="button"
               onClick={handleGoogleLogin}
               disabled={isAuthenticating}
-              className="w-full py-2.5 px-4 rounded-xl border border-slate-300 hover:border-amber-500 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold flex items-center justify-center gap-2.5 transition-all shadow-xs"
+              className="w-full py-3.5 px-4 rounded-xl border border-slate-300 hover:border-amber-500 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold flex items-center justify-center gap-2.5 transition-all shadow-xs"
             >
               <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                 <path
@@ -461,81 +421,14 @@ export function KitchenDisplaySystem() {
               </svg>
               <span>Entrar com Conta Google</span>
             </button>
-
-            <div className="flex items-center gap-2 my-2 text-[10px] text-slate-400 uppercase tracking-widest font-medium">
-              <div className="h-px bg-slate-200 flex-1" />
-              <span>ou login por credencial</span>
-              <div className="h-px bg-slate-200 flex-1" />
-            </div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4 text-left mt-3">
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wide mb-1">
-                E-mail do Operador
-              </label>
-              <div className="relative">
-                <input
-                  type="email"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  placeholder="cozinha@dominio.com"
-                  required
-                  className="w-full py-2.5 pl-3.5 pr-9 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs outline-none transition-all"
-                />
-                <Mail className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
-              </div>
+          {authError && (
+            <div className="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 text-left">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+              <span>{authError}</span>
             </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wide mb-1">
-                Chave / Senha do Terminal
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={passcodeInput}
-                  onChange={(e) => setPasscodeInput(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className="w-full py-2.5 pl-3.5 pr-10 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs outline-none transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 p-0.5"
-                  title={showPassword ? 'Ocultar senha' : 'Ver senha'}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {authError && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
-                <span>{authError}</span>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isAuthenticating}
-              className="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 active:scale-[0.98] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 mt-2"
-            >
-              {isAuthenticating ? (
-                <>
-                  <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                  <span>Validando operador...</span>
-                </>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4" />
-                  <span>Acessar Painel da Cozinha</span>
-                </>
-              )}
-            </button>
-          </form>
+          )}
 
           <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center">
             <Link
@@ -677,13 +570,26 @@ export function KitchenDisplaySystem() {
             </div>
 
             <div className="text-right shrink-0">
-              <span
-                suppressHydrationWarning
-                className={`inline-flex items-center gap-1 text-[11px] font-mono px-2.5 py-1 rounded-full ${timerBadgeClass}`}
-              >
-                <Clock className="w-3 h-3 stroke-[2.5]" />
-                <span>{elapsedMinutes}m atrás</span>
-              </span>
+              <div className="flex items-center justify-end gap-1.5">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPrintingOrder(order);
+                  }}
+                  className="p-1 rounded-lg bg-neutral-100 hover:bg-[#161616] text-neutral-600 hover:text-[#F5CB5C] border border-neutral-200 hover:border-[#CD9C20]/40 transition-all shadow-2xs"
+                  title="Imprimir Comanda Térmica (58mm/80mm)"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                </button>
+                <span
+                  suppressHydrationWarning
+                  className={`inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-full ${timerBadgeClass}`}
+                >
+                  <Clock className="w-3 h-3 stroke-[2.5]" />
+                  <span>{elapsedMinutes}m atrás</span>
+                </span>
+              </div>
               <h5 className="font-display font-bold text-sm text-[#1C1C1C] mt-1 truncate max-w-[140px]">
                 {order.customerName}
               </h5>
@@ -870,8 +776,8 @@ export function KitchenDisplaySystem() {
             </div>
           )}
 
-          {/* Secondary Action Row: WhatsApp Chat Link + Customer View Link */}
-          <div className="flex items-center justify-between pt-1 text-[11px] text-neutral-500">
+          {/* Secondary Action Row: WhatsApp Chat Link + Thermal Receipt Print Button + Customer View Link */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-neutral-100 text-[11px] text-neutral-500">
             <a
               href={whatsappCustomerUrl}
               target="_blank"
@@ -879,8 +785,28 @@ export function KitchenDisplaySystem() {
               className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-semibold"
             >
               <Phone className="w-3 h-3 text-emerald-600" />
-              <span>Abrir WhatsApp</span>
+              <span>WhatsApp</span>
             </a>
+
+            <div className="inline-flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setPrintingOrder(order)}
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#F8F6F0] hover:bg-[#161616] text-[#161616] hover:text-[#F5CB5C] border border-[#CD9C20]/40 font-bold text-[11px] transition-all shadow-xs"
+                title="Imprimir comanda para a cozinha ou motoboy (Mini Impressora Térmica 58mm/80mm)"
+              >
+                <Printer className="w-3.5 h-3.5 text-[#CD9C20]" />
+                <span>Imprimir Comanda</span>
+              </button>
+              <Link
+                href={`/comanda/${order.orderNumber}`}
+                target="_blank"
+                className="p-1.5 rounded-xl bg-[#F8F6F0] hover:bg-[#161616] text-neutral-600 hover:text-[#F5CB5C] border border-[#CD9C20]/40 transition-all shadow-xs"
+                title="Abrir comanda térmica em tela cheia para impressão"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
+            </div>
 
             <Link
               href={`/pedido/${order.orderNumber}`}
@@ -897,7 +823,7 @@ export function KitchenDisplaySystem() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] text-[#1C1C1C] flex font-sans selection:bg-[#F5CB5C] selection:text-black">
+    <div className="min-h-screen bg-[#F5F5F5] text-[#1C1C1C] flex font-sans selection:bg-[#F5CB5C] selection:text-black w-full max-w-full overflow-x-hidden">
       {/* ========================================================= */}
       {/* 1. LEFT ICON SIDEBAR DOCK (MATCHING ATTACHED IMAGE)       */}
       {/* ========================================================= */}
@@ -1224,6 +1150,14 @@ export function KitchenDisplaySystem() {
           )}
         </main>
       </div>
+
+      {/* Thermal Receipt Print Modal & Hidden Print Area */}
+      {printingOrder && (
+        <ThermalReceiptModal
+          order={printingOrder}
+          onClose={() => setPrintingOrder(null)}
+        />
+      )}
     </div>
   );
 }

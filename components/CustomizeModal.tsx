@@ -2,11 +2,21 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { MenuItem, MeatDoneness, ExtraTopping } from '@/types/burger';
-import { AVAILABLE_TOPPINGS, COMBO_UPGRADE_PRICE, COMBO_DRINKS } from '@/lib/data';
+import {
+  AVAILABLE_TOPPINGS,
+  AVAILABLE_SAUCES,
+  FRIES_OPTIONS,
+  DRINK_OPTIONS,
+  FriesOption,
+  DrinkOption,
+  COMBO_UPGRADE_PRICE,
+  COMBO_DRINKS,
+} from '@/lib/data';
 import { BurgerGraphic } from '@/components/BurgerGraphics';
 import { LaurelWreathIcon, SpartanHelmetIcon } from '@/components/GreekOrnament';
-import { X, Plus, Minus, Check, Sparkles } from 'lucide-react';
+import { X, Plus, Minus, Check, Sparkles, Droplets, CupSoda, Utensils } from 'lucide-react';
 
 interface CustomizeModalProps {
   item: MenuItem | null;
@@ -21,6 +31,9 @@ interface CustomizeModalProps {
     imageType: MenuItem['imageType'];
     doneness?: MeatDoneness;
     selectedToppings: ExtraTopping[];
+    selectedSauces?: ExtraTopping[];
+    selectedFries?: { size: 'P' | 'M' | 'G'; name: string; price: number };
+    selectedDrink?: { id: string; name: string; price: number; image?: string };
     isComboUpgrade: boolean;
     comboDrink?: string;
     notes?: string;
@@ -45,6 +58,9 @@ function CustomizeModalContent({
   const [quantity, setQuantity] = useState(1);
   const [doneness, setDoneness] = useState<MeatDoneness>('Ao ponto');
   const [selectedToppings, setSelectedToppings] = useState<ExtraTopping[]>([]);
+  const [selectedSauces, setSelectedSauces] = useState<ExtraTopping[]>([]);
+  const [selectedFries, setSelectedFries] = useState<FriesOption | null>(null);
+  const [selectedDrink, setSelectedDrink] = useState<DrinkOption | null>(null);
   const [isCombo, setIsCombo] = useState(false);
   const [comboDrink, setComboDrink] = useState(COMBO_DRINKS[0]);
   const [notes, setNotes] = useState('');
@@ -57,9 +73,36 @@ function CustomizeModalContent({
     }
   };
 
+  const toggleSauce = (sauce: ExtraTopping) => {
+    if (selectedSauces.some((s) => s.id === sauce.id)) {
+      setSelectedSauces(selectedSauces.filter((s) => s.id !== sauce.id));
+    } else {
+      setSelectedSauces([...selectedSauces, sauce]);
+    }
+  };
+
+  const toggleFries = (fries: FriesOption) => {
+    if (selectedFries?.id === fries.id) {
+      setSelectedFries(null);
+    } else {
+      setSelectedFries(fries);
+    }
+  };
+
+  const toggleDrink = (drink: DrinkOption) => {
+    if (selectedDrink?.id === drink.id) {
+      setSelectedDrink(null);
+    } else {
+      setSelectedDrink(drink);
+    }
+  };
+
   const toppingsTotal = selectedToppings.reduce((acc, t) => acc + t.price, 0);
+  const saucesTotal = selectedSauces.reduce((acc, s) => acc + s.price, 0);
+  const friesTotal = selectedFries ? selectedFries.price : 0;
+  const drinkTotal = selectedDrink ? selectedDrink.price : 0;
   const comboPrice = isCombo ? COMBO_UPGRADE_PRICE : 0;
-  const singleItemPrice = item.price + toppingsTotal + comboPrice;
+  const singleItemPrice = item.price + toppingsTotal + saucesTotal + friesTotal + drinkTotal + comboPrice;
   const finalPrice = singleItemPrice * quantity;
 
   const handleConfirm = () => {
@@ -72,6 +115,13 @@ function CustomizeModalContent({
       imageType: item.imageType,
       doneness: item.isBurger ? doneness : undefined,
       selectedToppings,
+      selectedSauces: selectedSauces.length > 0 ? selectedSauces : undefined,
+      selectedFries: selectedFries
+        ? { size: selectedFries.size, name: selectedFries.name, price: selectedFries.price }
+        : undefined,
+      selectedDrink: selectedDrink
+        ? { id: selectedDrink.id, name: `${selectedDrink.name} (${selectedDrink.volume})`, price: selectedDrink.price, image: selectedDrink.image }
+        : undefined,
       isComboUpgrade: isCombo,
       comboDrink: isCombo ? comboDrink : undefined,
       notes: notes.trim() || undefined,
@@ -167,16 +217,19 @@ function CustomizeModalContent({
             </div>
           )}
 
-          {/* 2. Extra Toppings */}
+          {/* 1. Adicionais */}
           {item.isBurger && (
             <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <label className="font-ancient font-bold text-[#1c1c1c] uppercase text-xs tracking-wider">
-                  Turbine com Oferendas Extras
+              <div className="flex items-center justify-between mb-2">
+                <label className="font-ancient font-bold text-[#1c1c1c] uppercase text-xs tracking-wider flex items-center gap-1.5">
+                  <Utensils className="w-3.5 h-3.5 text-[#CD9C20]" />
+                  <span>Adicionais</span>
                 </label>
-                <span className="text-[11px] text-neutral-500">Opcional</span>
+                <span className="text-[10px] text-neutral-500 font-ancient">
+                  {selectedToppings.length > 0 ? `${selectedToppings.length} selecionado(s)` : 'Opcional'}
+                </span>
               </div>
-              <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-1.5 max-h-36 overflow-y-auto pr-0.5">
                 {AVAILABLE_TOPPINGS.map((topping) => {
                   const isSelected = selectedToppings.some((t) => t.id === topping.id);
                   return (
@@ -184,24 +237,24 @@ function CustomizeModalContent({
                       key={topping.id}
                       type="button"
                       onClick={() => toggleTopping(topping)}
-                      className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs transition-all ${
+                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg border text-left transition-all ${
                         isSelected
-                          ? 'bg-[#F2ECDD] border-2 border-[#CD9C20] text-[#1c1c1c] shadow-sm'
+                          ? 'bg-[#F2ECDD] border-2 border-[#CD9C20] text-[#1c1c1c]'
                           : 'bg-white border-neutral-300 text-neutral-700 hover:border-[#CD9C20]'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5 text-left">
+                      <div className="flex items-center gap-1.5 min-w-0">
                         <div
-                          className={`w-4 h-4 rounded border flex items-center justify-center ${
+                          className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 ${
                             isSelected ? 'bg-[#CD9C20] border-[#CD9C20] text-white' : 'border-neutral-400'
                           }`}
                         >
-                          {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                          {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                         </div>
-                        <span className="font-medium text-[#1c1c1c]">{topping.name}</span>
+                        <span className="text-[11px] font-medium truncate">{topping.name}</span>
                       </div>
-                      <span className="font-bold text-[#CD9C20] shrink-0 ml-2">
-                        + R$ {topping.price.toFixed(2).replace('.', ',')}
+                      <span className="text-[10px] font-bold text-[#CD9C20] shrink-0 ml-1">
+                        +R${topping.price.toFixed(0)}
                       </span>
                     </button>
                   );
@@ -209,6 +262,151 @@ function CustomizeModalContent({
               </div>
             </div>
           )}
+
+          {/* 2. Molhos de Acompanhamento */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="font-ancient font-bold text-[#1c1c1c] uppercase text-xs tracking-wider flex items-center gap-1.5">
+                <Droplets className="w-3.5 h-3.5 text-[#CD9C20]" />
+                <span>Molhos de Acompanhamento</span>
+              </label>
+              <span className="text-[10px] text-neutral-500 font-ancient">
+                {selectedSauces.length > 0 ? `${selectedSauces.length} selecionado(s)` : 'Opcional'}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5 max-h-36 overflow-y-auto pr-0.5">
+              {AVAILABLE_SAUCES.map((sauce) => {
+                const isSelected = selectedSauces.some((s) => s.id === sauce.id);
+                return (
+                  <button
+                    key={sauce.id}
+                    type="button"
+                    onClick={() => toggleSauce(sauce)}
+                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg border text-left transition-all ${
+                      isSelected
+                        ? 'bg-[#F2ECDD] border-2 border-[#CD9C20] text-[#1c1c1c]'
+                        : 'bg-white border-neutral-300 text-neutral-700 hover:border-[#CD9C20]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <div
+                        className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 ${
+                          isSelected ? 'bg-[#CD9C20] border-[#CD9C20] text-white' : 'border-neutral-400'
+                        }`}
+                      >
+                        {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                      </div>
+                      <span className="text-[11px] font-medium truncate">{sauce.name}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-[#CD9C20] shrink-0 ml-1">
+                      +R${sauce.price.toFixed(2).replace('.', ',')}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. Adicionar Batata (P, M, G) */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="font-ancient font-bold text-[#1c1c1c] uppercase text-xs tracking-wider flex items-center gap-1.5">
+                <span className="text-xs">🍟</span>
+                <span>Adicionar Batata (P, M, G)</span>
+              </label>
+              <span className="text-[10px] text-neutral-500 font-ancient">
+                {selectedFries ? selectedFries.size : 'Opcional'}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {FRIES_OPTIONS.map((fries) => {
+                const isSelected = selectedFries?.id === fries.id;
+                return (
+                  <button
+                    key={fries.id}
+                    type="button"
+                    onClick={() => toggleFries(fries)}
+                    className={`flex flex-col items-center justify-center py-2 px-1.5 rounded-xl border text-center transition-all ${
+                      isSelected
+                        ? 'bg-[#F2ECDD] border-2 border-[#CD9C20] text-[#1c1c1c] shadow-xs'
+                        : 'bg-white border-neutral-300 text-neutral-700 hover:border-[#CD9C20]'
+                    }`}
+                  >
+                    <span className="text-xs font-bold leading-tight uppercase">
+                      {fries.name.split('(')[0].trim()}
+                    </span>
+                    <span className="text-[10px] text-neutral-500 font-ancient mt-0.5">
+                      {fries.name.includes('Pequena') ? '120g' : fries.name.includes('Média') ? '200g' : '320g'}
+                    </span>
+                    <span className="text-[10px] font-bold text-[#CD9C20] mt-0.5">
+                      +R$ {fries.price.toFixed(2).replace('.', ',')}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 4. Adicionar Refrigerante (Foto + Nome na mesma linha) */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="font-ancient font-bold text-[#1c1c1c] uppercase text-xs tracking-wider flex items-center gap-1.5">
+                <CupSoda className="w-3.5 h-3.5 text-[#CD9C20]" />
+                <span>Adicionar Refrigerante</span>
+              </label>
+              <span className="text-[10px] text-neutral-500 font-ancient">
+                {selectedDrink ? selectedDrink.name : 'Opcional'}
+              </span>
+            </div>
+            <div className="space-y-1.5 max-h-40 overflow-y-auto pr-0.5">
+              {DRINK_OPTIONS.map((drink) => {
+                const isSelected = selectedDrink?.id === drink.id;
+                return (
+                  <button
+                    key={drink.id}
+                    type="button"
+                    onClick={() => toggleDrink(drink)}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl border text-left transition-all ${
+                      isSelected
+                        ? 'bg-[#F2ECDD] border-2 border-[#CD9C20] text-[#1c1c1c] shadow-xs'
+                        : 'bg-white border-neutral-300 text-neutral-700 hover:border-[#CD9C20]'
+                    }`}
+                  >
+                    {/* Inline photo + name on same line */}
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="relative w-7 h-7 rounded-lg bg-[#FAF8F3] border border-[#CD9C20]/40 flex items-center justify-center shrink-0 overflow-hidden">
+                        <Image
+                          src={drink.image}
+                          alt={drink.name}
+                          width={28}
+                          height={28}
+                          referrerPolicy="no-referrer"
+                          className="object-contain w-full h-full p-0.5"
+                        />
+                      </div>
+                      <div className="min-w-0 flex items-baseline gap-1.5">
+                        <span className="text-xs font-semibold text-[#1c1c1c] truncate">{drink.name}</span>
+                        <span className="text-[9px] text-neutral-500 font-ancient hidden sm:inline">{drink.volume}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 ml-2">
+                      <span className="text-[11px] font-bold text-[#CD9C20]">
+                        +R$ {drink.price.toFixed(2).replace('.', ',')}
+                      </span>
+                      <div
+                        className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                          isSelected ? 'border-[#CD9C20] bg-[#CD9C20] text-white' : 'border-neutral-400'
+                        }`}
+                      >
+                        {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* 3. Combo Upgrade */}
           {item.isBurger && (

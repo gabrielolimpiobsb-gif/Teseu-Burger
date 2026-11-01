@@ -26,7 +26,7 @@ export const CustomerDetailsSchema = z.object({
     .max(250, 'Endereço muito longo')
     .optional()
     .transform((val) => (val ? sanitizeString(val) : undefined)),
-  deliveryMethod: z.enum(['delivery', 'takeaway']),
+  deliveryMethod: z.enum(['delivery', 'takeaway', 'pickup']),
   paymentMethod: z.enum(['pix', 'card', 'cash']),
   notes: z
     .string()
@@ -42,6 +42,7 @@ export const CartItemSchema = z.object({
   unitPrice: z.number().positive('Preço unitário deve ser positivo').max(1000),
   quantity: z.number().int().positive('Quantidade deve ser positiva').max(50),
   totalPrice: z.number().positive('Preço total deve ser positivo').max(50000),
+  image: z.string().optional(),
   imageType: z.string().max(50),
   doneness: z.string().max(50).optional(),
   selectedToppings: z
@@ -52,7 +53,13 @@ export const CartItemSchema = z.object({
         price: z.number().nonnegative(),
       })
     )
-    .max(15),
+    .max(15)
+    .default([]),
+  selectedSauces: z.array(z.any()).optional(),
+  selectedFries: z.any().optional(),
+  selectedDrink: z.any().optional(),
+  drawnSweetGift: z.string().optional(),
+  comboCasal: z.any().optional(),
   isComboUpgrade: z.boolean().default(false),
   comboDrink: z.string().max(50).optional(),
   notes: z
@@ -60,7 +67,7 @@ export const CartItemSchema = z.object({
     .max(200)
     .optional()
     .transform((val) => (val ? sanitizeString(val) : undefined)),
-});
+}).passthrough();
 
 export const CreateOrderSchema = z.object({
   customer: CustomerDetailsSchema,

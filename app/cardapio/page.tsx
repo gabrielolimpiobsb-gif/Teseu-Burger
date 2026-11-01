@@ -18,7 +18,7 @@ export default function CardapioPage() {
   } = useCart();
 
   return (
-    <main className="min-h-screen bg-[#f5f5f5] text-[#1c1c1c] selection:bg-[#F5CB5C] selection:text-[#0B0B0B] relative">
+    <main className="min-h-screen bg-[#f5f5f5] text-[#1c1c1c] selection:bg-[#F5CB5C] selection:text-[#0B0B0B] relative w-full max-w-full overflow-x-hidden">
       {/* 0. Top Pill Navbar */}
       <Navbar
         cartCount={totalCartCount}

@@ -46,13 +46,15 @@ import {
   Bike,
   Plus,
   Save,
+  Printer,
 } from 'lucide-react';
-import { SpartanHelmetIcon, ParthenonIcon } from '@/components/GreekOrnament';
+import { SpartanHelmetIcon, ParthenonIcon, LaurelWreathIcon } from '@/components/GreekOrnament';
 import { MENU_ITEMS, NEIGHBORHOOD_FEES } from '@/lib/data';
 import { MenuItem } from '@/types/burger';
 import { auth, googleAuthProvider } from '@/lib/firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { KDS_STATUSES } from '@/components/OrderLiveTracker';
+import { ThermalReceiptModal } from '@/components/ThermalReceipt';
 
 type AdminNavTab = 'dashboard' | 'orders' | 'menu' | 'financials' | 'delivery' | 'settings';
 type PeriodFilter = 'today' | 'week' | 'month' | 'year' | 'all';
@@ -74,12 +76,16 @@ interface OrderItem {
 export function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [ownerName, setOwnerName] = useState('Gabriel Olímpio');
-  const [ownerEmail, setOwnerEmail] = useState('');
-  const [emailInput, setEmailInput] = useState('');
-  const [passcodeInput, setPasscodeInput] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState('gabrielolimpiobsb@gmail.com');
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+  // Clock ticker for real-time dashboard monitoring
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Navigation & Filters
   const [activeTab, setActiveTab] = useState<AdminNavTab>('dashboard');
@@ -109,6 +115,9 @@ export function AdminDashboard() {
   // Order Details Modal
   const [inspectingOrder, setInspectingOrder] = useState<any | null>(null);
   const [orderStatusUpdating, setOrderStatusUpdating] = useState<number | null>(null);
+
+  // Thermal Receipt Printing Modal
+  const [printingOrder, setPrintingOrder] = useState<any | null>(null);
 
   // Calendar
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string>(
@@ -198,51 +207,7 @@ export function AdminDashboard() {
     };
   }, [isAuthenticated, fetchMasterData]);
 
-  // Handle Login
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
 
-    const emailTrimmed = emailInput.trim();
-    const passTrimmed = passcodeInput.trim();
-
-    if (!emailTrimmed || !passTrimmed) {
-      setAuthError('Por favor, informe seu e-mail e chave de acesso.');
-      return;
-    }
-
-    setIsAuthenticating(true);
-
-    try {
-      const res = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: emailTrimmed,
-          passcode: passTrimmed,
-          ownerName: ownerName.trim() || 'Gabriel Olímpio',
-        }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        if (data.token) {
-          localStorage.setItem('teseu_admin_token', data.token);
-        }
-        setIsAuthenticated(true);
-        setOwnerEmail(data.email);
-        if (data.ownerName) setOwnerName(data.ownerName);
-        setPasscodeInput('');
-        fetchMasterData();
-      } else {
-        setAuthError(data.error || 'Credenciais inválidas. Verifique seu e-mail e senha.');
-      }
-    } catch {
-      setAuthError('Falha ao comunicar com o servidor de autenticação.');
-    } finally {
-      setIsAuthenticating(false);
-    }
-  };
 
   // Handle Google Login
   const handleGoogleLogin = async () => {
@@ -572,13 +537,13 @@ export function AdminDashboard() {
   // ==========================================
   if (isAuthenticated === false) {
     return (
-      <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center justify-center p-4 selection:bg-amber-500 selection:text-white">
-        <div className="w-full max-w-md p-8 bg-white border border-slate-200 rounded-3xl shadow-[0_10px_35px_rgba(0,0,0,0.05)] text-center relative overflow-hidden">
-          {/* Subtle top brand bar */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+      <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center justify-center p-4 selection:bg-[#F5CB5C] selection:text-black">
+        <div className="w-full max-w-md p-8 bg-white border-2 border-[#CD9C20]/40 rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.06)] text-center relative overflow-hidden">
+          {/* Imperial Gold top bar */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#CD9C20] via-[#F5CB5C] to-[#CD9C20]" />
 
-          {/* Logo */}
-          <div className="relative h-12 w-44 mx-auto mb-4">
+          {/* Official Brand Logo */}
+          <div className="relative h-12 w-48 mx-auto mb-4">
             <Image
               src="/logo.png"
               alt="Teseu Burger"
@@ -586,33 +551,33 @@ export function AdminDashboard() {
               priority
               referrerPolicy="no-referrer"
               className="object-contain"
-              sizes="176px"
+              sizes="192px"
             />
           </div>
 
-          <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center shadow-xs">
-            <SpartanHelmetIcon size={24} color="#d97706" />
+          <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[#F8F6F0] border border-[#CD9C20]/50 flex items-center justify-center shadow-xs">
+            <SpartanHelmetIcon size={26} color="#CD9C20" />
           </div>
 
-          <span className="text-[11px] font-bold tracking-[0.2em] text-amber-600 uppercase block font-sans">
+          <span className="text-[11px] font-bold tracking-[0.2em] text-[#CD9C20] uppercase block font-sans">
             ACESSO RESTRITO • SUPER-ADMIN
           </span>
 
-          <h2 className="font-extrabold text-2xl tracking-tight text-slate-900 mt-1">
+          <h2 className="font-extrabold text-2xl tracking-tight text-[#161616] mt-1 font-display">
             Painel Administrativo
           </h2>
 
-          <p className="text-xs text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">
-            Área de controle exclusivo da gestão. Insira suas credenciais autorizadas para continuar.
+          <p className="text-xs text-neutral-500 mt-2 leading-relaxed max-w-xs mx-auto">
+            Acesso exclusivo do proprietário. Autenticação restrita e monitorada.
           </p>
 
-          {/* Google Sign-In */}
-          <div className="mt-6 space-y-3">
+          {/* Entrada Exclusiva com Conta Google */}
+          <div className="mt-6">
             <button
               type="button"
               onClick={handleGoogleLogin}
               disabled={isAuthenticating}
-              className="w-full py-2.5 px-4 rounded-xl border border-slate-300 hover:border-amber-500 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold flex items-center justify-center gap-2.5 transition-all shadow-xs"
+              className="w-full py-3.5 px-4 rounded-xl border border-slate-300 hover:border-[#CD9C20] bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold flex items-center justify-center gap-2.5 transition-all shadow-xs"
             >
               <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                 <path
@@ -634,88 +599,21 @@ export function AdminDashboard() {
               </svg>
               <span>Entrar com Conta Google</span>
             </button>
-
-            <div className="flex items-center gap-2 my-2 text-[10px] text-slate-400 uppercase tracking-widest font-medium">
-              <div className="h-px bg-slate-200 flex-1" />
-              <span>ou login por credencial</span>
-              <div className="h-px bg-slate-200 flex-1" />
-            </div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4 text-left mt-3">
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wide mb-1">
-                E-mail do Administrador
-              </label>
-              <div className="relative">
-                <input
-                  type="email"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  placeholder="admin@dominio.com"
-                  required
-                  className="w-full py-2.5 pl-3.5 pr-9 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs outline-none transition-all"
-                />
-                <Mail className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
-              </div>
+          {authError && (
+            <div className="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 text-left">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+              <span>{authError}</span>
             </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wide mb-1">
-                Senha / Chave de Segurança
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={passcodeInput}
-                  onChange={(e) => setPasscodeInput(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className="w-full py-2.5 pl-3.5 pr-10 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs outline-none transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 p-0.5"
-                  title={showPassword ? 'Ocultar senha' : 'Ver senha'}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {authError && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
-                <span>{authError}</span>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isAuthenticating}
-              className="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 active:scale-[0.98] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 mt-2"
-            >
-              {isAuthenticating ? (
-                <>
-                  <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                  <span>Validando credenciais...</span>
-                </>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4" />
-                  <span>Acessar Painel Admin</span>
-                </>
-              )}
-            </button>
-          </form>
+          )}
 
           <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center">
             <Link
               href="/"
-              className="text-xs font-medium text-slate-500 hover:text-amber-600 transition-colors"
+              className="text-xs font-medium text-slate-500 hover:text-[#CD9C20] transition-colors"
             >
-              ← Voltar à Loja
+              ← Voltar à Loja Principal
             </Link>
           </div>
         </div>
@@ -725,23 +623,31 @@ export function AdminDashboard() {
 
   // ==========================================
   // RENDER: Main Admin Dashboard (#F5F5F5)
-  // Clean, high-readability, inspired by reference
+  // Visual identity matching the site and Kitchen Panel
   // ==========================================
   return (
-    <div className="min-h-screen bg-[#F5F5F5] flex font-sans selection:bg-amber-500 selection:text-white">
-      {/* 1. LEFT SIDEBAR */}
-      <aside className="w-64 shrink-0 bg-white border-r border-slate-200 text-slate-800 flex flex-col justify-between p-4 hidden md:flex sticky top-0 h-screen z-30 shadow-xs">
+    <div className="min-h-screen bg-[#F5F5F5] flex font-sans selection:bg-[#F5CB5C] selection:text-black text-[#1C1C1C] w-full max-w-full overflow-x-hidden">
+      {/* 1. LEFT SIDEBAR (OBSIDIAN DOCK MATCHING KITCHEN DISPLAY) */}
+      <aside className="w-64 shrink-0 bg-[#161616] text-white border-r border-black/20 flex flex-col justify-between p-4 hidden md:flex sticky top-0 h-screen z-30 shadow-xl">
         <div className="space-y-6">
           {/* Brand Header */}
-          <div className="flex items-center gap-3 px-2 py-1">
-            <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center text-white shadow-sm shrink-0">
-              <SpartanHelmetIcon size={22} color="#ffffff" />
+          <div className="flex items-center gap-3 px-2 py-2 border-b border-white/10 pb-4">
+            <div className="w-10 h-10 rounded-2xl bg-[#222222] border border-[#CD9C20]/50 flex items-center justify-center text-[#F5CB5C] shadow-md shrink-0">
+              <SpartanHelmetIcon size={22} color="#F5CB5C" />
             </div>
-            <div>
-              <h1 className="font-extrabold text-sm tracking-wider uppercase text-slate-900 leading-tight">
-                TESEU BURGER
-              </h1>
-              <span className="text-[10px] font-bold tracking-widest text-amber-600 uppercase block">
+            <div className="min-w-0">
+              <div className="relative h-6 w-28">
+                <Image
+                  src="/logo.png"
+                  alt="Teseu Burger"
+                  fill
+                  priority
+                  referrerPolicy="no-referrer"
+                  className="object-contain object-left"
+                  sizes="112px"
+                />
+              </div>
+              <span className="text-[10px] font-bold tracking-widest text-[#CD9C20] uppercase block mt-0.5 font-ancient">
                 ADMIN MASTER
               </span>
             </div>
@@ -765,16 +671,16 @@ export function AdminDashboard() {
                   onClick={() => setActiveTab(tab.id as AdminNavTab)}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-amber-600 text-white shadow-xs font-bold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'bg-[#CD9C20]/20 text-[#F5CB5C] border border-[#CD9C20]/50 shadow-[0_0_12px_rgba(205,156,32,0.25)] font-bold'
+                      : 'text-neutral-400 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#F5CB5C]' : 'text-neutral-400'}`} />
                     <span>{tab.label}</span>
                   </div>
                   {tab.badge !== undefined && tab.badge > 0 && (
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white text-amber-600' : 'bg-amber-100 text-amber-700'}`}>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? 'bg-[#F5CB5C] text-black' : 'bg-white/10 text-[#F5CB5C]'}`}>
                       {tab.badge}
                     </span>
                   )}
@@ -785,22 +691,34 @@ export function AdminDashboard() {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="space-y-2 pt-4 border-t border-slate-100">
+        <div className="space-y-2 pt-4 border-t border-white/10">
           <Link
             href="/cozinha"
             target="_blank"
-            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200 transition-colors"
+            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-200 text-xs font-medium border border-white/10 transition-colors"
           >
             <div className="flex items-center gap-2">
-              <Flame className="w-3.5 h-3.5 text-orange-600" />
+              <Flame className="w-3.5 h-3.5 text-[#F5CB5C]" />
               <span>Abrir Painel da Cozinha</span>
             </div>
-            <ExternalLink className="w-3 h-3 text-slate-400" />
+            <ExternalLink className="w-3 h-3 text-neutral-400" />
+          </Link>
+
+          <Link
+            href="/cardapio"
+            target="_blank"
+            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-200 text-xs font-medium border border-white/10 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <LaurelWreathIcon size={16} color="#CD9C20" />
+              <span>Ver Cardápio do Cliente</span>
+            </div>
+            <ExternalLink className="w-3 h-3 text-neutral-400" />
           </Link>
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 text-xs font-medium transition-colors"
+            className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 text-xs font-medium transition-colors"
           >
             <LogOut className="w-4 h-4" />
             <span>Encerrar Sessão</span>
@@ -811,14 +729,14 @@ export function AdminDashboard() {
       {/* 2. MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         {/* Top Header */}
-        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4 shadow-xs">
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#CD9C20]/20 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-4 shadow-xs">
           {/* Title & Mobile Selector */}
           <div className="flex items-center gap-3">
             <div className="md:hidden">
               <select
                 value={activeTab}
                 onChange={(e) => setActiveTab(e.target.value as AdminNavTab)}
-                className="py-1.5 px-2.5 rounded-lg text-xs font-bold uppercase bg-white text-slate-800 border border-slate-300"
+                className="py-1.5 px-2.5 rounded-lg text-xs font-bold uppercase bg-white text-slate-800 border border-[#CD9C20]/40"
               >
                 <option value="dashboard">Dashboard</option>
                 <option value="orders">Pedidos / KDS</option>
@@ -829,46 +747,48 @@ export function AdminDashboard() {
               </select>
             </div>
             <div>
-              <h2 className="font-extrabold text-lg sm:text-xl uppercase tracking-wider text-slate-900">
-                {activeTab === 'dashboard' && 'PAINEL DE ADMINISTRAÇÃO'}
-                {activeTab === 'orders' && 'CONTROLE DE PEDIDOS & KDS'}
-                {activeTab === 'menu' && 'GESTÃO DE CARDÁPIO & CMV'}
-                {activeTab === 'financials' && 'RELATÓRIO FINANCEIRO'}
-                {activeTab === 'delivery' && 'LOGÍSTICA POR BAIRRO'}
-                {activeTab === 'settings' && 'CONFIGURAÇÕES DA LOJA'}
-              </h2>
-              <span className="text-[11px] text-slate-500 hidden sm:block">
+              <div className="flex items-center gap-2">
+                <h2 className="font-extrabold text-base sm:text-lg uppercase tracking-wider text-[#161616] font-display">
+                  {activeTab === 'dashboard' && 'PAINEL DE ADMINISTRAÇÃO'}
+                  {activeTab === 'orders' && 'CONTROLE DE PEDIDOS & KDS'}
+                  {activeTab === 'menu' && 'GESTÃO DE CARDÁPIO & CMV'}
+                  {activeTab === 'financials' && 'RELATÓRIO FINANCEIRO'}
+                  {activeTab === 'delivery' && 'LOGÍSTICA POR BAIRRO'}
+                  {activeTab === 'settings' && 'CONFIGURAÇÕES DA LOJA'}
+                </h2>
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold font-mono">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  <span>{ownerEmail}</span>
+                </span>
+              </div>
+              <span className="text-[11px] text-neutral-500 hidden sm:block">
                 Sincronizado em tempo real com a Cozinha e Clientes
               </span>
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="hidden lg:flex items-center flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              <input
-                type="text"
-                value={globalSearch}
-                onChange={(e) => setGlobalSearch(e.target.value)}
-                placeholder="Buscar pedido, cliente, produto..."
-                className="w-full py-2 pl-9 pr-4 rounded-xl text-xs bg-slate-50 text-slate-800 border border-slate-200 focus:border-amber-500 focus:bg-white outline-none transition-all"
-              />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
-            </div>
+          {/* Center: GIANT DIGITAL CLOCK (MATCHING KITCHEN DISPLAY) */}
+          <div className="font-display font-black text-xl sm:text-2xl text-[#1C1C1C] tracking-wider px-4 py-1 rounded-xl bg-[#F8F6F0] border border-[#CD9C20]/30 shadow-xs">
+            <span suppressHydrationWarning>
+              {currentTime.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
           </div>
 
           {/* Right Controls */}
           <div className="flex items-center gap-2.5">
-            {/* Period Filter Dropdown */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">
+            {/* Period Filter Pills */}
+            <div className="flex items-center gap-1 bg-[#F8F6F0] p-1 rounded-xl border border-[#CD9C20]/30 text-xs font-semibold">
               {(['today', 'week', 'month', 'all'] as PeriodFilter[]).map((period) => (
                 <button
                   key={period}
                   onClick={() => setPeriodFilter(period)}
-                  className={`px-2.5 py-1 rounded-lg transition-all ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-display font-bold uppercase transition-all ${
                     periodFilter === period
-                      ? 'bg-white text-slate-900 shadow-xs font-bold'
-                      : 'hover:text-slate-900'
+                      ? 'bg-[#161616] text-[#F5CB5C] shadow-sm ring-1 ring-[#CD9C20]'
+                      : 'text-neutral-600 hover:text-black hover:bg-white/60'
                   }`}
                 >
                   {period === 'today' && 'Hoje'}
@@ -883,26 +803,11 @@ export function AdminDashboard() {
             <button
               onClick={() => fetchMasterData(true)}
               disabled={isRefreshing}
-              className="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors shadow-xs"
+              className="p-2 rounded-xl bg-white border border-[#CD9C20]/30 hover:bg-[#F8F6F0] text-neutral-700 transition-colors shadow-xs"
               title="Atualizar dados agora"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-amber-600' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#CD9C20]' : ''}`} />
             </button>
-
-            {/* Profile */}
-            <div className="flex items-center gap-2 pl-2 pr-3 py-1 bg-white border border-slate-200 rounded-xl text-slate-800 shadow-xs">
-              <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
-                <ShieldCheck className="w-4 h-4" />
-              </div>
-              <div className="text-left hidden sm:block">
-                <div className="text-[11px] font-bold leading-tight text-slate-900">
-                  {ownerName || 'Gabriel Olímpio'}
-                </div>
-                <span className="text-[9px] text-slate-400 block font-mono leading-none">
-                  {ownerEmail || 'Super-Admin'}
-                </span>
-              </div>
-            </div>
           </div>
         </header>
 
@@ -922,69 +827,73 @@ export function AdminDashboard() {
         {/* TAB 1: DASHBOARD OVERVIEW */}
         {activeTab === 'dashboard' && (
           <div className="p-4 sm:p-8 space-y-6">
-            {/* Top 4 KPI Cards (Exatamente como na imagem de referência) */}
+            {/* Top 4 KPI Cards (Identidade Visual Teseu Burger) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Card 1: Receita Bruta */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-300 transition-all relative overflow-hidden">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-1">
-                  <span>RECEITA BRUTA</span>
-                  <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-bold">
+              <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#CD9C20]/60 transition-all relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#CD9C20]" />
+                <div className="flex items-center justify-between text-xs text-neutral-500 font-semibold mb-1">
+                  <span className="font-display uppercase tracking-wider text-[11px]">RECEITA BRUTA</span>
+                  <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold">
                     Vendas
                   </span>
                 </div>
-                <div className="font-extrabold text-2xl text-slate-900 mt-1">
+                <div className="font-extrabold text-2xl text-[#161616] mt-1 font-display">
                   R$ {realFinancials.grossRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                <div className="text-[11px] text-neutral-500 mt-1 flex items-center gap-1">
                   <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Calculado sobre {realFinancials.totalOrders} pedidos</span>
                 </div>
               </div>
 
               {/* Card 2: Lucro Líquido Real (CMV Deduzido) */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-300 transition-all relative overflow-hidden">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-1">
-                  <span>LUCRO REAL (CMV DEDUZIDO)</span>
-                  <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-bold">
+              <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#CD9C20]/60 transition-all relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500" />
+                <div className="flex items-center justify-between text-xs text-neutral-500 font-semibold mb-1">
+                  <span className="font-display uppercase tracking-wider text-[11px]">LUCRO REAL (CMV DEDUZIDO)</span>
+                  <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold">
                     {realFinancials.marginPercent}% Margem
                   </span>
                 </div>
-                <div className="font-extrabold text-2xl text-emerald-700 mt-1">
+                <div className="font-extrabold text-2xl text-emerald-700 mt-1 font-display">
                   R$ {realFinancials.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-[11px] text-slate-400 mt-1">
+                <div className="text-[11px] text-neutral-500 mt-1">
                   Custo Produção: R$ {realFinancials.productionCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
               </div>
 
               {/* Card 3: Ticket Médio */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-300 transition-all relative overflow-hidden">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-1">
-                  <span>TICKET MÉDIO</span>
-                  <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full text-[10px] font-bold">
+              <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#CD9C20]/60 transition-all relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#F5CB5C]" />
+                <div className="flex items-center justify-between text-xs text-neutral-500 font-semibold mb-1">
+                  <span className="font-display uppercase tracking-wider text-[11px]">TICKET MÉDIO</span>
+                  <span className="text-[#CD9C20] bg-[#F8F6F0] border border-[#CD9C20]/30 px-2 py-0.5 rounded-full text-[10px] font-bold">
                     Médio
                   </span>
                 </div>
-                <div className="font-extrabold text-2xl text-slate-900 mt-1">
+                <div className="font-extrabold text-2xl text-[#161616] mt-1 font-display">
                   R$ {realFinancials.avgTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-[11px] text-slate-400 mt-1">
+                <div className="text-[11px] text-neutral-500 mt-1">
                   Por pedido finalizado
                 </div>
               </div>
 
               {/* Card 4: Total de Pedidos */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-300 transition-all relative overflow-hidden">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-1">
-                  <span>TOTAL DE PEDIDOS</span>
-                  <span className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full text-[10px] font-bold">
+              <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#CD9C20]/60 transition-all relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#2563EB]" />
+                <div className="flex items-center justify-between text-xs text-neutral-500 font-semibold mb-1">
+                  <span className="font-display uppercase tracking-wider text-[11px]">TOTAL DE PEDIDOS</span>
+                  <span className="text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full text-[10px] font-bold">
                     {realFinancials.completedCount} Concluídos
                   </span>
                 </div>
-                <div className="font-extrabold text-2xl text-slate-900 mt-1">
+                <div className="font-extrabold text-2xl text-[#161616] mt-1 font-display">
                   {realFinancials.totalOrders}
                 </div>
-                <div className="text-[11px] text-slate-400 mt-1">
+                <div className="text-[11px] text-neutral-500 mt-1">
                   {allOrders.filter(o => o.status !== 'completed' && o.status !== 'cancelled').length} em andamento na chapa
                 </div>
               </div>
@@ -993,28 +902,28 @@ export function AdminDashboard() {
             {/* Mid Section: Payment Methods + Delivery Neighborhoods + Real Orders */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Payment Methods Breakdown */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-sm text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                    <CreditCard className="w-4 h-4 text-amber-600" />
+              <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
+                  <h3 className="font-bold text-sm text-[#161616] font-display uppercase tracking-wider flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-[#CD9C20]" />
                     <span>MÉTODOS DE PAGAMENTO</span>
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-semibold">100% Real</span>
+                  <span className="text-[10px] text-[#CD9C20] font-bold font-mono">100% Real</span>
                 </div>
 
                 <div className="space-y-4">
                   {/* PIX */}
                   <div>
                     <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="font-semibold text-slate-700 flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                      <span className="font-semibold text-neutral-700 flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shadow-xs" />
                         PIX
                       </span>
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-[#161616]">
                         {realFinancials.pixShare}% • R$ {realFinancials.paymentMap.pix.total.toFixed(2)}
                       </span>
                     </div>
-                    <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="w-full h-2.5 bg-neutral-100 rounded-full overflow-hidden">
                       <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${realFinancials.pixShare}%` }} />
                     </div>
                   </div>
@@ -1022,15 +931,15 @@ export function AdminDashboard() {
                   {/* Cartão */}
                   <div>
                     <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="font-semibold text-slate-700 flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
+                      <span className="font-semibold text-neutral-700 flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block shadow-xs" />
                         Cartão de Crédito / Débito
                       </span>
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-[#161616]">
                         {realFinancials.cardShare}% • R$ {realFinancials.paymentMap.card.total.toFixed(2)}
                       </span>
                     </div>
-                    <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="w-full h-2.5 bg-neutral-100 rounded-full overflow-hidden">
                       <div className="h-full bg-blue-500 rounded-full" style={{ width: `${realFinancials.cardShare}%` }} />
                     </div>
                   </div>
@@ -1038,33 +947,33 @@ export function AdminDashboard() {
                   {/* Dinheiro */}
                   <div>
                     <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="font-semibold text-slate-700 flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
+                      <span className="font-semibold text-neutral-700 flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-xs" />
                         Dinheiro
                       </span>
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-[#161616]">
                         {realFinancials.cashShare}% • R$ {realFinancials.paymentMap.cash.total.toFixed(2)}
                       </span>
                     </div>
-                    <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="w-full h-2.5 bg-neutral-100 rounded-full overflow-hidden">
                       <div className="h-full bg-amber-500 rounded-full" style={{ width: `${realFinancials.cashShare}%` }} />
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs text-slate-600">
-                  Total faturado no período: <strong className="text-slate-900">R$ {realFinancials.grossRevenue.toFixed(2)}</strong>
+                <div className="mt-5 p-3 bg-[#F8F6F0] border border-[#CD9C20]/25 rounded-xl text-xs text-neutral-600">
+                  Total faturado no período: <strong className="text-[#161616]">R$ {realFinancials.grossRevenue.toFixed(2)}</strong>
                 </div>
               </div>
 
               {/* Delivery Neighborhoods Ranking */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-sm text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-amber-600" />
+              <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
+                  <h3 className="font-bold text-sm text-[#161616] font-display uppercase tracking-wider flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-[#CD9C20]" />
                     <span>BAIRROS COM MAIS PEDIDOS</span>
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-semibold">Logística</span>
+                  <span className="text-[10px] text-[#CD9C20] font-bold font-mono">Logística</span>
                 </div>
 
                 {realFinancials.topHoods.length === 0 ? (
@@ -1094,22 +1003,22 @@ export function AdminDashboard() {
               </div>
 
               {/* Quick Menu Stock Overview */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+              <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-bold text-sm text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                      <UtensilsCrossed className="w-4 h-4 text-amber-600" />
+                  <div className="flex items-center justify-between mb-3 pb-2 border-b border-neutral-100">
+                    <h3 className="font-bold text-sm text-[#161616] font-display uppercase tracking-wider flex items-center gap-2">
+                      <UtensilsCrossed className="w-4 h-4 text-[#CD9C20]" />
                       <span>ESTOQUE RÁPIDO & CMV</span>
                     </h3>
                     <button
                       onClick={() => setActiveTab('menu')}
-                      className="text-xs text-amber-600 font-semibold hover:underline"
+                      className="text-xs text-[#CD9C20] font-bold hover:underline"
                     >
                       Ver Todos →
                     </button>
                   </div>
 
-                  <p className="text-xs text-slate-500 mb-3 leading-relaxed">
+                  <p className="text-xs text-neutral-500 mb-3 leading-relaxed">
                     Altere a disponibilidade do item no site em tempo real e edite o custo unitário.
                   </p>
 
@@ -1117,11 +1026,11 @@ export function AdminDashboard() {
                     {menuItems.slice(0, 4).map((item) => (
                       <div
                         key={item.id}
-                        className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs"
+                        className="p-2.5 bg-[#F8F6F0] border border-[#CD9C20]/20 rounded-xl flex items-center justify-between text-xs"
                       >
                         <div className="truncate mr-2">
-                          <p className="font-bold text-slate-900 truncate">{item.name}</p>
-                          <p className="text-[11px] text-slate-500">
+                          <p className="font-bold text-[#161616] truncate">{item.name}</p>
+                          <p className="text-[11px] text-neutral-500">
                             Preço: R$ {item.price.toFixed(2)} | Custo: R$ {(item.costPrice || item.price * 0.35).toFixed(2)}
                           </p>
                         </div>
@@ -1129,7 +1038,7 @@ export function AdminDashboard() {
                           <button
                             type="button"
                             onClick={() => openEditModal(item)}
-                            className="p-1 rounded-lg hover:bg-slate-200 text-slate-600"
+                            className="p-1 rounded-lg hover:bg-white text-neutral-700 border border-transparent hover:border-[#CD9C20]/30 transition-all"
                             title="Editar Custo e Preço"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -1151,10 +1060,10 @@ export function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-slate-100 text-center">
+                <div className="pt-3 mt-3 border-t border-neutral-100 text-center">
                   <button
                     onClick={() => setActiveTab('menu')}
-                    className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors"
+                    className="w-full py-2 bg-[#F8F6F0] hover:bg-[#161616] text-[#161616] hover:text-[#F5CB5C] border border-[#CD9C20]/30 text-xs font-bold font-display uppercase tracking-wider rounded-xl transition-all"
                   >
                     Gerenciar Cardápio Completo
                   </button>
@@ -1163,20 +1072,20 @@ export function AdminDashboard() {
             </div>
 
             {/* Bottom Section: Live Orders Pipeline */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all">
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
                 <div>
-                  <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                    <ClipboardList className="w-4 h-4 text-amber-600" />
+                  <h3 className="font-bold text-base text-[#161616] font-display uppercase tracking-wider flex items-center gap-2">
+                    <ClipboardList className="w-4 h-4 text-[#CD9C20]" />
                     <span>ÚLTIMOS PEDIDOS EM TEMPO REAL</span>
                   </h3>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-neutral-500">
                     Sincronizados com a chapa da Cozinha
                   </span>
                 </div>
                 <button
                   onClick={() => setActiveTab('orders')}
-                  className="text-xs text-amber-600 font-semibold hover:underline"
+                  className="text-xs text-[#CD9C20] font-bold hover:underline"
                 >
                   Ver Painel KDS Completo →
                 </button>
@@ -1386,8 +1295,23 @@ export function AdminDashboard() {
                                 onClick={() => setInspectingOrder(order)}
                                 className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-lg"
                               >
-                                Ver Detalhes
+                                Detalhes
                               </button>
+                              <button
+                                onClick={() => setPrintingOrder(order)}
+                                className="p-1.5 bg-[#161616] hover:bg-black text-[#F5CB5C] border border-[#CD9C20]/40 rounded-lg transition-colors"
+                                title="Imprimir Comanda Térmica"
+                              >
+                                <Printer className="w-3.5 h-3.5 text-[#CD9C20]" />
+                              </button>
+                              <Link
+                                href={`/comanda/${order.orderNumber}`}
+                                target="_blank"
+                                className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-black rounded-lg transition-colors"
+                                title="Abrir Comanda em Nova Aba"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </Link>
                             </div>
                           </td>
                         </tr>
@@ -1989,27 +1913,56 @@ export function AdminDashboard() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <a
-                  href={`https://wa.me/55${inspectingOrder.customerPhone.replace(/\D/g, '')}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center gap-1.5 transition-colors"
-                >
-                  <Phone className="w-3.5 h-3.5" />
-                  <span>WhatsApp Cliente</span>
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setInspectingOrder(null)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl"
-                >
-                  Fechar
-                </button>
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setPrintingOrder(inspectingOrder)}
+                    className="px-3.5 py-2 bg-[#161616] hover:bg-black text-[#F5CB5C] border border-[#CD9C20]/40 font-bold rounded-xl flex items-center gap-1.5 transition-colors shadow-xs"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-[#CD9C20]" />
+                    <span>Imprimir Comanda</span>
+                  </button>
+                  <Link
+                    href={`/comanda/${inspectingOrder.orderNumber}`}
+                    target="_blank"
+                    className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl flex items-center gap-1 transition-colors"
+                    title="Abrir comanda em página inteira sem iframe"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`https://wa.me/55${inspectingOrder.customerPhone.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center gap-1.5 transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>WhatsApp Cliente</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setInspectingOrder(null)}
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl"
+                  >
+                    Fechar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Thermal Receipt Print Modal & Hidden Print Area */}
+      {printingOrder && (
+        <ThermalReceiptModal
+          order={printingOrder}
+          onClose={() => setPrintingOrder(null)}
+        />
       )}
     </div>
   );

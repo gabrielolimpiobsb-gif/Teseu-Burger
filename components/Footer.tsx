@@ -13,7 +13,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-[#EFEAE0] text-[#1c1c1c] relative border-t border-[#CD9C20]/30">
+    <footer className="bg-[#EFEAE0] text-[#1c1c1c] relative border-t border-[#CD9C20]/30 w-full max-w-full overflow-hidden">
       {/* Authentic Horizontal Greek Key Meander Frieze (from IMG-20261023-WA0003 & WA0005) */}
       <GreekFrieze variant="gold" className="relative z-10" />
 

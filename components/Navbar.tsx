@@ -29,6 +29,7 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
 
   const navLinks = [
     { label: 'Início', href: '/#hero' },
+    { label: 'Monte o Seu', href: '/monte-seu-burger' },
     { label: 'Os Deuses', href: '/#lendas' },
     { label: 'Cardápio', href: '/cardapio' },
   ];
@@ -36,17 +37,17 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
   return (
     <>
       {/* Top Floating Pill Container */}
-      <header className="fixed top-4 left-0 right-0 z-40 px-4 sm:px-6 pointer-events-none">
+      <header className="fixed top-3 sm:top-4 left-0 right-0 z-40 px-2.5 sm:px-6 pointer-events-none w-full max-w-full">
         <div className="max-w-4xl mx-auto flex items-center justify-between pointer-events-auto">
           {/* Pill Navbar with Roman Marble & Imperial Gold Styling */}
           <nav
-            className={`w-full bg-white/95 text-[#1c1c1c] rounded-full px-4 sm:px-6 py-2 sm:py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-[#CD9C20]/40 flex items-center justify-between gap-4 transition-all duration-300 backdrop-blur-md ${
+            className={`w-full bg-white/95 text-[#1c1c1c] rounded-full px-3 sm:px-6 py-1.5 sm:py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-[#CD9C20]/40 flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 backdrop-blur-md ${
               scrolled ? 'shadow-[0_12px_35px_rgba(0,0,0,0.12)] border-[#CD9C20]' : ''
             }`}
           >
             {/* Left: Brand with Official Logo (Only logo.png, no redundant text) */}
             <Link href="/" className="flex items-center gap-2 shrink-0 group py-0.5">
-              <div className="relative h-8 sm:h-10 w-32 sm:w-44 shrink-0 transition-transform duration-200 group-hover:scale-105">
+              <div className="relative h-7 sm:h-10 w-28 sm:w-44 shrink-0 transition-transform duration-200 group-hover:scale-105">
                 <Image
                   src="/logo.png"
                   alt="Teseu Burger"
@@ -82,8 +83,8 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
             <div className="flex items-center gap-2 shrink-0">
               <motion.button
                 onClick={onOpenCart}
-                animate={cartShake ? { scale: [1, 1.15, 0.95, 1.1, 1], rotate: [0, -3, 3, -2, 0] } : {}}
-                transition={{ duration: 0.4 }}
+                animate={cartShake ? { scale: [1, 1.25, 0.92, 1.15, 1], rotate: [0, -6, 6, -3, 0], boxShadow: ['0 2px 15px rgba(205,156,32,0.35)', '0 0 30px rgba(205,156,32,0.95)', '0 2px 15px rgba(205,156,32,0.35)'] } : {}}
+                transition={{ duration: 0.6 }}
                 className="gold-gradient-bg text-[#0B0B0B] font-display font-black text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-full flex items-center gap-2 shadow-[0_2px_15px_rgba(205,156,32,0.35)] hover:shadow-[0_2px_22px_rgba(205,156,32,0.5)] transition-all"
                 aria-label="Abrir banquete de pedidos"
               >

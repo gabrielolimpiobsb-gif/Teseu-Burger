@@ -22,9 +22,12 @@ export default function Home() {
     triggerCartAnimation,
   } = useCart();
 
-  // Quick order hero handler - opens featured burger in new tab or scrolls to menu
-  const handleQuickOrderHero = () => {
-    handleScrollToMenu();
+  // Smooth scroll to combos specials
+  const handleScrollToCombos = () => {
+    const el = document.getElementById('combos-especiais') || document.getElementById('lendas');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   // Smooth scroll helper
@@ -35,16 +38,22 @@ export default function Home() {
     }
   };
 
+  // Quick order hero handler - scrolls to combos
+  const handleQuickOrderHero = () => {
+    handleScrollToCombos();
+  };
+
   // VIP coupon unlocked
   const handleCouponUnlocked = (code: string) => {
     showToast(`Cupom de 10% "${code}" desbloqueado e ativado!`);
     triggerCartAnimation();
   };
 
+  const comboPromos = MENU_ITEMS.filter((item) => item.category === 'combos').slice(0, 3);
   const legendsList = MENU_ITEMS.filter((item) => item.isLegend);
 
   return (
-    <main className="min-h-screen bg-[#f5f5f5] text-[#1c1c1c] selection:bg-[#F5CB5C] selection:text-[#0B0B0B] relative">
+    <main className="min-h-screen bg-[#f5f5f5] text-[#1c1c1c] selection:bg-[#F5CB5C] selection:text-[#0B0B0B] relative w-full max-w-full overflow-x-hidden">
       {/* 0. Floating Pill Navbar */}
       <Navbar
         cartCount={totalCartCount}
@@ -55,12 +64,14 @@ export default function Home() {
 
       {/* 1. Hero Section */}
       <HeroSection
-        onExploreMenu={handleScrollToMenu}
+        onExploreCombos={handleScrollToCombos}
+        onExploreMenu={handleScrollToCombos}
         onQuickOrderHero={handleQuickOrderHero}
       />
 
-      {/* 2. Meet The Legends (Opens product in new tab) */}
+      {/* 2. Combos Especiais com Doce Brinde (Dark Charcoal almost black background) */}
       <MeetTheLegends
+        combos={comboPromos}
         legends={legendsList}
       />
 

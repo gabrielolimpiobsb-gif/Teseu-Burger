@@ -80,9 +80,9 @@ export function VipClubSection({ onCouponUnlocked }: VipClubSectionProps) {
               y: isUnlocked ? -55 : isHovered ? -35 : -15,
             }}
             transition={{ type: 'spring', stiffness: 220, damping: 18 }}
-            className="relative z-20 flex justify-center"
+            className="relative z-20 flex justify-center w-full px-2"
           >
-            <div className="bg-gradient-to-b from-[#df8a34] to-[#c77727] border-2 border-[#CD9C20] w-72 sm:w-88 h-20 rounded-t-full shadow-[0_10px_25px_rgba(0,0,0,0.15)] relative flex items-center justify-center">
+            <div className="bg-gradient-to-b from-[#df8a34] to-[#c77727] border-2 border-[#CD9C20] w-full max-w-[270px] sm:max-w-xs h-20 rounded-t-full shadow-[0_10px_25px_rgba(0,0,0,0.15)] relative flex items-center justify-center">
               <span className="gold-gradient-bg text-[#0B0B0B] text-[10px] font-ancient font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-md border border-[#F5CB5C]">
                 {isUnlocked ? 'SEGREDO REVELADO!' : 'ABRA O TEMPLO DO SMASH'}
               </span>
@@ -133,8 +133,8 @@ export function VipClubSection({ onCouponUnlocked }: VipClubSectionProps) {
           </div>
 
           {/* Bottom Bun / Classical Plinth */}
-          <div className="relative z-10 flex justify-center -mt-6">
-            <div className="bg-gradient-to-b from-[#c77727] to-[#df8a34] border-2 border-[#CD9C20] w-72 sm:w-88 h-12 rounded-b-[2rem] shadow-lg flex items-center justify-center">
+          <div className="relative z-10 flex justify-center -mt-6 w-full px-2">
+            <div className="bg-gradient-to-b from-[#c77727] to-[#df8a34] border-2 border-[#CD9C20] w-full max-w-[270px] sm:max-w-xs h-12 rounded-b-[2rem] shadow-lg flex items-center justify-center">
               <span className="text-[10px] font-ancient text-[#0B0B0B] font-black tracking-widest uppercase">
                 TEMPLO DO SMASH // TESEU BURGER
               </span>

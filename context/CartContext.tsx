@@ -1,7 +1,15 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CartItem, CustomerDetails, ExtraTopping, MeatDoneness, MenuItem } from '@/types/burger';
+import { CartItem, CustomerDetails, ExtraTopping, MeatDoneness, MenuItem, ComboCasalSelection } from '@/types/burger';
+
+export interface AddedItemNotification {
+  id: string;
+  name: string;
+  quantity: number;
+  totalPrice: number;
+  image?: string;
+}
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -9,18 +17,26 @@ interface CartContextType {
   setIsCartOpen: (open: boolean) => void;
   cartShake: boolean;
   triggerCartAnimation: () => void;
+  lastAddedItem: AddedItemNotification | null;
+  dismissAddedNotification: () => void;
   addToCart: (customized: {
     menuItemId: string;
     name: string;
     unitPrice: number;
     quantity: number;
     totalPrice: number;
+    image?: string;
     imageType: MenuItem['imageType'];
     doneness?: MeatDoneness;
     selectedToppings: ExtraTopping[];
+    selectedSauces?: ExtraTopping[];
+    selectedFries?: { size: 'P' | 'M' | 'G'; name: string; price: number };
+    selectedDrink?: { id: string; name: string; price: number; image?: string };
     isComboUpgrade: boolean;
     comboDrink?: string;
     notes?: string;
+    drawnSweetGift?: string;
+    comboCasal?: ComboCasalSelection;
   }) => void;
   updateQuantity: (id: string, delta: number) => void;
   removeItem: (id: string) => void;
@@ -56,6 +72,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartShake, setCartShake] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [lastAddedItem, setLastAddedItem] = useState<AddedItemNotification | null>(null);
   const [orderSuccessData, setOrderSuccessData] = useState<any | null>(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -105,9 +122,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }, 3200);
   };
 
+  const dismissAddedNotification = () => {
+    setLastAddedItem(null);
+  };
+
   const triggerCartAnimation = () => {
     setCartShake(true);
-    setTimeout(() => setCartShake(false), 500);
+    setTimeout(() => setCartShake(false), 800);
   };
 
   const addToCart = (customized: {
@@ -116,12 +137,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     unitPrice: number;
     quantity: number;
     totalPrice: number;
+    image?: string;
     imageType: MenuItem['imageType'];
     doneness?: MeatDoneness;
     selectedToppings: ExtraTopping[];
+    selectedSauces?: ExtraTopping[];
+    selectedFries?: { size: 'P' | 'M' | 'G'; name: string; price: number };
+    selectedDrink?: { id: string; name: string; price: number; image?: string };
     isComboUpgrade: boolean;
     comboDrink?: string;
     notes?: string;
+    drawnSweetGift?: string;
+    comboCasal?: ComboCasalSelection;
   }) => {
     const newItem: CartItem = {
       id: `${customized.menuItemId}-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
@@ -130,6 +157,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     setCartItems((prev) => [...prev, newItem]);
     triggerCartAnimation();
+
+    // Prominent visual feedback notification
+    setLastAddedItem({
+      id: newItem.id,
+      name: customized.name,
+      quantity: customized.quantity,
+      totalPrice: customized.totalPrice,
+      image: customized.image,
+    });
+
+    // Auto-dismiss notification after 4.5s
+    setTimeout(() => {
+      setLastAddedItem((current) => (current?.id === newItem.id ? null : current));
+    }, 4500);
+
     showToast(`"${customized.name}" adicionado ao pedido!`);
   };
 
@@ -172,6 +214,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setIsCartOpen,
         cartShake,
         triggerCartAnimation,
+        lastAddedItem,
+        dismissAddedNotification,
         addToCart,
         updateQuantity,
         removeItem,

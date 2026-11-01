@@ -36,8 +36,8 @@ import { NavigationLoadingOverlay } from '@/components/NavigationLoadingOverlay'
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="pt-BR" className={`${cinzel.variable} ${plusJakarta.variable} scroll-smooth`}>
-      <body className="font-sans bg-[#f5f5f5] text-[#1c1c1c] antialiased selection:bg-[#F5CB5C] selection:text-[#0B0B0B]" suppressHydrationWarning>
+    <html lang="pt-BR" className={`${cinzel.variable} ${plusJakarta.variable} scroll-smooth overflow-x-hidden w-full max-w-full`}>
+      <body className="font-sans bg-[#f5f5f5] text-[#1c1c1c] antialiased selection:bg-[#F5CB5C] selection:text-[#0B0B0B] overflow-x-hidden w-full max-w-full" suppressHydrationWarning>
         <CartProvider>
           {children}
           <GlobalCartModals />
