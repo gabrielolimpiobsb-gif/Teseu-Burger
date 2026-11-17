@@ -39,14 +39,8 @@ export function HeroSection({ onExploreMenu, onExploreCombos }: HeroSectionProps
         />
 
         {/* Top Celestial Open Area Content */}
-        <div className="absolute inset-x-0 top-0 z-20 flex flex-col items-center text-center pt-12 px-5 pointer-events-auto">
-          {/* Subtle Greek laurel pill badge */}
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/85 backdrop-blur-xs border border-[#CD9C20]/45 shadow-xs mb-3">
-            <LaurelWreathIcon size={15} color="#CD9C20" />
-            <span className="text-[11px] font-ancient font-bold tracking-widest text-[#9A7314] uppercase">
-              FORJADO NO OLIMPO
-            </span>
-          </div>
+        <div className="absolute inset-x-0 top-0 z-20 flex flex-col items-center text-center pt-36 px-5 pointer-events-auto">
+
 
           <h1 className="font-display font-black text-3xl uppercase tracking-wider text-[#1c1c1c] drop-shadow-xs leading-[1.1] flex flex-col items-center gap-1.5">
             BEM-VINDO AO{' '}
@@ -95,13 +89,7 @@ export function HeroSection({ onExploreMenu, onExploreCombos }: HeroSectionProps
 
         {/* Left Side Content */}
         <div className="absolute inset-y-0 left-0 z-20 flex flex-col justify-center items-start text-left pl-8 md:pl-14 lg:pl-20 pr-6 max-w-xl lg:max-w-2xl pointer-events-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-xs border border-[#CD9C20]/45 shadow-xs mb-3">
-            <LaurelWreathIcon size={16} color="#CD9C20" />
-            <span className="text-xs font-ancient font-bold tracking-widest text-[#9A7314] uppercase">
-              HAMBURGUERIA ARTESANAL • OLIMPO
-            </span>
-          </div>
+
 
           <h1 className="font-display font-black text-3xl md:text-5xl lg:text-6xl uppercase tracking-wider text-[#1c1c1c] drop-shadow-xs leading-[1.08] flex flex-col items-start gap-2">
             BEM-VINDO AO{' '}
@@ -122,20 +110,7 @@ export function HeroSection({ onExploreMenu, onExploreCombos }: HeroSectionProps
             Hambúrgueres artesanais dignos da realeza greco-romana. Forjados no fogo sagrado com carnes nobres e ingredientes divinos.
           </p>
 
-          {/* Highlights tag pills */}
-          <div className="flex flex-wrap items-center gap-2 mt-4 text-[11px] md:text-xs font-semibold text-neutral-700">
-            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 border border-neutral-200/80 shadow-2xs">
-              <Flame className="w-3 h-3 text-[#CD9C20]" />
-              Blend 100% Angus
-            </span>
-            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 border border-neutral-200/80 shadow-2xs">
-              <Award className="w-3 h-3 text-[#CD9C20]" />
-              Cheddar Artesanal
-            </span>
-            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 border border-neutral-200/80 shadow-2xs">
-              Brioche Selado
-            </span>
-          </div>
+
 
           <button
             type="button"

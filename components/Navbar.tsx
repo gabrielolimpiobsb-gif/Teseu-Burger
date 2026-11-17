@@ -77,12 +77,7 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
                   sizes="(max-width: 640px) 130px, 180px"
                 />
               </div>
-              <div className="hidden lg:flex items-center gap-1.5 text-[10px] text-neutral-600 font-medium ml-1 border-l border-neutral-300 pl-2.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-neutral-800 font-semibold">{STORE_INFO.status}</span>
-                <span className="text-neutral-400">·</span>
-                <span>{STORE_INFO.avgTime}</span>
-              </div>
+
             </Link>
 
             {/* Right: Golden Cart Button (Links to dedicated /carinho tab) */}

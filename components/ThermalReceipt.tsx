@@ -155,7 +155,7 @@ export function ThermalReceiptModal({ order, onClose, autoPrint = false }: Therm
   const handleShareWhatsApp = () => {
     const text = buildPlainTextComanda();
     const encoded = encodeURIComponent(text);
-    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+    window.open(`https://wa.me/5561992055050?text=${encoded}`, '_blank');
   };
 
   return (

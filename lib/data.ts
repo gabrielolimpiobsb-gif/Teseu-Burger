@@ -7,7 +7,8 @@ export const STORE_INFO = {
   status: 'Aberto no Olimpo',
   avgTime: '30-45 min',
   minOrder: 25.0,
-  whatsapp: 'message/E6QO4JEINVA2K1',
+  whatsapp: '5561992055050',
+  whatsappFormatted: '(61) 99205-5050',
   whatsappUrl: 'https://wa.me/message/E6QO4JEINVA2K1',
   address: 'Via Ápia do Sabor, 1420 - Templo Central / Jardins',
   hours: 'Terça a Domingo • 18h00 às 23h30',
@@ -15,9 +16,8 @@ export const STORE_INFO = {
 };
 
 export function getStoreWhatsAppUrl(encodedMessage?: string): string {
-  const baseUrl = STORE_INFO.whatsappUrl;
-  if (!encodedMessage) return baseUrl;
-  return `${baseUrl}?text=${encodedMessage}`;
+  if (!encodedMessage) return STORE_INFO.whatsappUrl;
+  return `https://wa.me/${STORE_INFO.whatsapp}?text=${encodedMessage}`;
 }
 
 export const AVAILABLE_TOPPINGS: ExtraTopping[] = [
