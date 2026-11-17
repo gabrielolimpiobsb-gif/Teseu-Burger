@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CartItem, CustomerDetails, OrderType, PaymentMethod } from '@/types/burger';
-import { STORE_INFO, NEIGHBORHOOD_FEES, NEIGHBORHOOD_COUPONS, getStoreWhatsAppUrl } from '@/lib/data';
+import { STORE_INFO, MENU_ITEMS, NEIGHBORHOOD_FEES, NEIGHBORHOOD_COUPONS, getStoreWhatsAppUrl } from '@/lib/data';
 import { ProductImage } from '@/components/ProductImage';
 import { LaurelWreathIcon, SpartanHelmetIcon } from '@/components/GreekOrnament';
 import {
@@ -513,10 +513,16 @@ _Pedido enviado pelo cardápio digital do Teseu Burger._`;
                           {/* Thumbnail */}
                           <div className="w-14 h-14 bg-white rounded-lg shrink-0 flex items-center justify-center border border-neutral-200 overflow-hidden relative">
                             <ProductImage
-                              src={item.image}
+                              src={
+                                item.image ||
+                                MENU_ITEMS.find((m) => m.id === item.menuItemId)?.image ||
+                                item.comboCasal?.burger1?.image ||
+                                (item.menuItemId?.startsWith('custom-burger') ? '/zeus.png' : undefined)
+                              }
                               alt={item.name}
                               imageCodeHint={item.image || `/${item.imageType}.png`}
                               size={52}
+                              compactFallback
                             />
                           </div>
 

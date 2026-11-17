@@ -2,6 +2,21 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CartItem, CustomerDetails, ExtraTopping, MeatDoneness, MenuItem, ComboCasalSelection } from '@/types/burger';
+import { MENU_ITEMS } from '@/lib/data';
+
+function resolveCartItemImage(item: {
+  menuItemId: string;
+  image?: string;
+  imageType?: MenuItem['imageType'];
+  comboCasal?: ComboCasalSelection;
+}): string | undefined {
+  if (item.image) return item.image;
+  const matched = MENU_ITEMS.find((m) => m.id === item.menuItemId);
+  if (matched?.image) return matched.image;
+  if (item.comboCasal?.burger1?.image) return item.comboCasal.burger1.image;
+  if (item.menuItemId.startsWith('custom-burger')) return '/zeus.png';
+  return undefined;
+}
 
 export interface AddedItemNotification {
   id: string;
@@ -84,7 +99,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       try {
         const saved = localStorage.getItem('stackriot_cart');
         if (saved) {
-          setCartItems(JSON.parse(saved));
+          const parsed: CartItem[] = JSON.parse(saved);
+          const hydrated = parsed.map((item) => ({
+            ...item,
+            image: resolveCartItemImage(item),
+          }));
+          setCartItems(hydrated);
         }
       } catch {
         // ignore
@@ -150,9 +170,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     drawnSweetGift?: string;
     comboCasal?: ComboCasalSelection;
   }) => {
+    const resolvedImage = resolveCartItemImage(customized);
     const newItem: CartItem = {
       id: `${customized.menuItemId}-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
       ...customized,
+      image: resolvedImage,
     };
 
     setCartItems((prev) => [...prev, newItem]);
@@ -164,7 +186,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       name: customized.name,
       quantity: customized.quantity,
       totalPrice: customized.totalPrice,
-      image: customized.image,
+      image: resolvedImage,
     });
 
     // Auto-dismiss notification after 4.5s

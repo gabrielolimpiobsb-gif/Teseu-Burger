@@ -260,6 +260,7 @@ export function ProductDetailView({ item }: ProductDetailViewProps) {
       unitPrice,
       quantity,
       totalPrice,
+      image: item.image,
       imageType: item.imageType,
       doneness: item.isBurger ? doneness : undefined,
       selectedToppings,

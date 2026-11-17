@@ -170,6 +170,7 @@ export function BurgerBuilderComponent() {
       unitPrice: totalPrice,
       quantity: 1,
       totalPrice,
+      image: '/zeus.png',
       imageType: 'classic',
       selectedToppings: nonBuns.map((i) => ({
         id: i.id,

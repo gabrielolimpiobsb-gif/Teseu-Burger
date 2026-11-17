@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { STORE_INFO, NEIGHBORHOOD_FEES, NEIGHBORHOOD_COUPONS, getStoreWhatsAppUrl } from '@/lib/data';
+import { STORE_INFO, MENU_ITEMS, NEIGHBORHOOD_FEES, NEIGHBORHOOD_COUPONS, getStoreWhatsAppUrl } from '@/lib/data';
 import { ProductImage } from '@/components/ProductImage';
 import { LaurelWreathIcon } from '@/components/GreekOrnament';
 import { OrderType, PaymentMethod } from '@/types/burger';
@@ -596,7 +596,14 @@ _Pedido enviado com facilidade pelo cardápio digital do Teseu Burger._`;
                     </span>
                   </div>
 
-                  {cartItems.map((item) => (
+                  {cartItems.map((item) => {
+                    const resolvedImage =
+                      item.image ||
+                      MENU_ITEMS.find((m) => m.id === item.menuItemId)?.image ||
+                      item.comboCasal?.burger1?.image ||
+                      (item.menuItemId?.startsWith('custom-burger') ? '/zeus.png' : undefined);
+
+                    return (
                     <div
                       key={item.id}
                       className="bg-white border border-[#CD9C20]/40 hover:border-[#CD9C20] rounded-2xl p-3.5 sm:p-4 shadow-xs transition-colors flex flex-col gap-3"
@@ -604,12 +611,13 @@ _Pedido enviado com facilidade pelo cardápio digital do Teseu Burger._`;
                       {/* Topo do Card: Imagem + Nome + Subtotal */}
                       <div className="flex items-start gap-3">
                         <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-[#FAF8F5] border border-neutral-200 overflow-hidden shrink-0 relative flex items-center justify-center">
-                          {item.image ? (
+                          {resolvedImage ? (
                             <ProductImage
-                              src={item.image}
+                              src={resolvedImage}
                               alt={item.name}
-                              imageCodeHint={item.image || `/${item.imageType}.png`}
+                              imageCodeHint={resolvedImage || `/${item.imageType}.png`}
                               className="w-full h-full object-cover"
+                              compactFallback
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-[#F2ECDD] text-[#CD9C20] text-2xl">
@@ -761,7 +769,8 @@ _Pedido enviado com facilidade pelo cardápio digital do Teseu Burger._`;
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
 
                   {/* Atalhos Rápidos para Continuar Adicionando */}
                   <div className="p-3.5 bg-white border border-neutral-200 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs shadow-2xs">

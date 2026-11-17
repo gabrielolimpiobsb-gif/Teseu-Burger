@@ -13,6 +13,7 @@ interface ProductImageProps {
   imageCodeHint?: string;
   badge?: string;
   priority?: boolean;
+  compactFallback?: boolean;
 }
 
 export function ProductImage({
@@ -23,6 +24,7 @@ export function ProductImage({
   imageCodeHint,
   badge,
   priority = false,
+  compactFallback = false,
 }: ProductImageProps) {
   const [useNativeImg, setUseNativeImg] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -64,6 +66,10 @@ export function ProductImage({
             onError={() => setImgError(true)}
           />
         )
+      ) : compactFallback ? (
+        <div className="w-full h-full flex items-center justify-center bg-[#F2ECDD] text-[#CD9C20]">
+          <SpartanHelmetIcon size={28} color="#CD9C20" />
+        </div>
       ) : (
         /* Clean, professional placeholder frame specifically designed for the user to drop images */
         <div className="w-full h-full min-h-[110px] sm:min-h-[150px] bg-gradient-to-b from-[#FAF8F5] to-[#EFECE4] border border-[#CD9C20]/35 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-inner group-hover:border-[#CD9C20] transition-colors relative">
