@@ -7,11 +7,18 @@ export const STORE_INFO = {
   status: 'Aberto no Olimpo',
   avgTime: '30-45 min',
   minOrder: 25.0,
-  whatsapp: '5511999998888',
+  whatsapp: 'message/E6QO4JEINVA2K1',
+  whatsappUrl: 'https://wa.me/message/E6QO4JEINVA2K1',
   address: 'Via Ápia do Sabor, 1420 - Templo Central / Jardins',
   hours: 'Terça a Domingo • 18h00 às 23h30',
   instagram: '@teseuburger.oficial',
 };
+
+export function getStoreWhatsAppUrl(encodedMessage?: string): string {
+  const baseUrl = STORE_INFO.whatsappUrl;
+  if (!encodedMessage) return baseUrl;
+  return `${baseUrl}?text=${encodedMessage}`;
+}
 
 export const AVAILABLE_TOPPINGS: ExtraTopping[] = [
   { id: 'picles', name: 'Picles Artesanal Crocante', price: 3.0 },
@@ -484,15 +491,15 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'MONTE SEU COMBO CASAL + DOCE GRÁTIS',
     category: 'combos',
     price: 69.9,
-    description: 'Banquete Completo para 2 Pessoas: 2 Hambúrgueres artesanais à sua escolha + 2 Refrigerantes gelados + 2 Batatas crocantes (P, M ou G) + 1 DOCE GRÁTIS na Roleta Premiada de Cassino!',
+    description: 'Banquete Completo para 2 Pessoas: 2 Hambúrgueres artesanais à sua escolha + 2 Refrigerantes gelados + 2 Batatas crocantes (P, M ou G) + 1 DOCE GRÁTIS no Caça-Níqueis Retrô!',
     badge: '🎰 Combo Casal + Doce Grátis',
     isLegend: true,
     image: '/combocasal.png',
     imageType: 'combo',
     isBurger: false,
-    freeSweetGift: 'Doce da Roleta Premiada',
+    freeSweetGift: 'Doce do Caça-Níqueis Retrô',
     weight: 'Banquete para 2 Pessoas + Doce Grátis',
-    flavorNotes: ['2 Burgers dos Deuses', '2 Batatas Crocantes', '2 Refris Gelados', 'Doce Grátis na Roleta'],
+    flavorNotes: ['2 Burgers dos Deuses', '2 Batatas Crocantes', '2 Refris Gelados', 'Doce Grátis no Caça-Níqueis'],
   },
 
   // ========================================================

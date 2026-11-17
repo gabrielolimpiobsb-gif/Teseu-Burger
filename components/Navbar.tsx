@@ -29,9 +29,11 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
 
   const navLinks = [
     { label: 'Início', href: '/#hero' },
+    { label: 'Brindes 🎰', href: '/brindes' },
     { label: 'Monte o Seu', href: '/monte-seu-burger' },
     { label: 'Os Deuses', href: '/#lendas' },
     { label: 'Cardápio', href: '/cardapio' },
+    { label: 'Carrinho 🛒', href: '/carinho' },
   ];
 
   return (
@@ -66,41 +68,29 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
               </div>
             </Link>
 
-            {/* Center: Desktop Nav Links in Roman Display Typography */}
-            <div className="hidden md:flex items-center gap-5 text-xs font-display font-semibold text-[#333533] tracking-wider uppercase">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="hover:text-[#CD9C20] transition-colors whitespace-nowrap relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#CD9C20] hover:after:w-full after:transition-all"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-
-            {/* Right: Golden Cart Button */}
+            {/* Right: Golden Cart Button (Links to dedicated /carinho tab) */}
             <div className="flex items-center gap-2 shrink-0">
-              <motion.button
-                onClick={onOpenCart}
-                animate={cartShake ? { scale: [1, 1.25, 0.92, 1.15, 1], rotate: [0, -6, 6, -3, 0], boxShadow: ['0 2px 15px rgba(205,156,32,0.35)', '0 0 30px rgba(205,156,32,0.95)', '0 2px 15px rgba(205,156,32,0.35)'] } : {}}
-                transition={{ duration: 0.6 }}
-                className="gold-gradient-bg text-[#0B0B0B] font-display font-black text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-full flex items-center gap-2 shadow-[0_2px_15px_rgba(205,156,32,0.35)] hover:shadow-[0_2px_22px_rgba(205,156,32,0.5)] transition-all"
-                aria-label="Abrir banquete de pedidos"
-              >
-                <div className="relative">
-                  <ShoppingBag className="w-4 h-4 stroke-[2.5]" />
-                  {cartCount > 0 && (
-                    <span suppressHydrationWarning className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#0B0B0B] text-[#F5CB5C] text-[9px] font-black rounded-full flex items-center justify-center font-sans shadow-sm border border-[#F5CB5C]">
-                      {cartCount}
-                    </span>
-                  )}
-                </div>
-                <span suppressHydrationWarning className="hidden xs:inline font-bold">
-                  {cartTotal > 0 ? `R$ ${cartTotal.toFixed(2).replace('.', ',')}` : 'PEDIDO (0)'}
-                </span>
-                <span className="xs:hidden font-bold">PEDIR</span>
-              </motion.button>
+              <Link href="/carinho">
+                <motion.div
+                  animate={cartShake ? { scale: [1, 1.25, 0.92, 1.15, 1], rotate: [0, -6, 6, -3, 0], boxShadow: ['0 2px 15px rgba(205,156,32,0.35)', '0 0 30px rgba(205,156,32,0.95)', '0 2px 15px rgba(205,156,32,0.35)'] } : {}}
+                  transition={{ duration: 0.6 }}
+                  className="gold-gradient-bg text-[#0B0B0B] font-display font-black text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-full flex items-center gap-2 shadow-[0_2px_15px_rgba(205,156,32,0.35)] hover:shadow-[0_2px_22px_rgba(205,156,32,0.5)] transition-all cursor-pointer"
+                  aria-label="Abrir banquete de pedidos"
+                >
+                  <div className="relative">
+                    <ShoppingBag className="w-4 h-4 stroke-[2.5]" />
+                    {cartCount > 0 && (
+                      <span suppressHydrationWarning className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#0B0B0B] text-[#F5CB5C] text-[9px] font-black rounded-full flex items-center justify-center font-sans shadow-sm border border-[#F5CB5C]">
+                        {cartCount}
+                      </span>
+                    )}
+                  </div>
+                  <span suppressHydrationWarning className="hidden xs:inline font-bold">
+                    {cartTotal > 0 ? `R$ ${cartTotal.toFixed(2).replace('.', ',')}` : 'PEDIDO (0)'}
+                  </span>
+                  <span className="xs:hidden font-bold">PEDIR</span>
+                </motion.div>
+              </Link>
 
               {/* Mobile Menu Icon */}
               <button
@@ -126,7 +116,7 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
           >
             <div className="flex flex-col gap-3 font-display uppercase tracking-wider text-sm">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
@@ -134,7 +124,7 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
                 >
                   <span>{link.label}</span>
                   <SpartanHelmetIcon size={16} color="#CD9C20" />
-                </a>
+                </Link>
               ))}
             </div>
 

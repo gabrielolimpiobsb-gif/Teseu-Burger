@@ -27,7 +27,7 @@ import {
   CheckSquare,
   Sparkles,
 } from 'lucide-react';
-import { STORE_INFO } from '@/lib/data';
+import { STORE_INFO, getStoreWhatsAppUrl } from '@/lib/data';
 
 interface OrderLiveTrackerProps {
   initialOrderNumber: string;
@@ -413,7 +413,7 @@ export function OrderLiveTracker({ initialOrderNumber }: OrderLiveTrackerProps) 
           {/* Prominent Luminous WhatsApp Action Button (Matching Reference Image!) */}
           <div className="pt-4 space-y-3">
             <a
-              href={`https://wa.me/${STORE_INFO.whatsapp}?text=${whatsappMessage}`}
+              href={getStoreWhatsAppUrl(whatsappMessage)}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-4 px-6 bg-[#25D366] hover:bg-[#20bd5a] active:scale-[0.98] text-[#0B0B0B] font-display font-black text-sm uppercase tracking-wider rounded-2xl shadow-[0_4px_22px_rgba(37,211,102,0.4)] flex items-center justify-center gap-2.5 transition-all"

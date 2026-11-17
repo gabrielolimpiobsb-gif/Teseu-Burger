@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Image as ImageIcon, Camera } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { SpartanHelmetIcon } from './GreekOrnament';
 
 interface ProductImageProps {
@@ -32,7 +32,7 @@ export function ProductImage({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl flex items-center justify-center select-none ${className}`}
+      className={`relative overflow-hidden rounded-xl flex items-center justify-center select-none bg-[#FAF8F5] ${className}`}
       style={
         size
           ? {
@@ -66,22 +66,22 @@ export function ProductImage({
         )
       ) : (
         /* Clean, professional placeholder frame specifically designed for the user to drop images */
-        <div className="w-full h-full min-h-[110px] sm:min-h-[150px] bg-gradient-to-b from-[#1E1E1E] to-[#121212] border border-[#CD9C20]/40 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-inner group-hover:border-[#CD9C20] transition-colors relative">
+        <div className="w-full h-full min-h-[110px] sm:min-h-[150px] bg-gradient-to-b from-[#FAF8F5] to-[#EFECE4] border border-[#CD9C20]/35 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-inner group-hover:border-[#CD9C20] transition-colors relative">
           {/* Subtle Greek accent in background */}
           <div className="absolute inset-0 opacity-10 flex items-center justify-center pointer-events-none">
             <SpartanHelmetIcon size={70} color="#CD9C20" />
           </div>
 
           <div className="relative z-10 flex flex-col items-center justify-center space-y-1.5">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-black/60 border border-[#CD9C20]/50 flex items-center justify-center shadow-md text-[#F5CB5C]">
-              <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-[#F5CB5C]" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white border border-[#CD9C20]/40 flex items-center justify-center shadow-sm text-[#996D09]">
+              <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-[#CD9C20]" />
             </div>
 
-            <span className="text-[10px] sm:text-xs font-ancient font-bold uppercase tracking-wider text-[#F5CB5C] block">
+            <span className="text-[10px] sm:text-xs font-ancient font-bold uppercase tracking-wider text-[#1c1c1c] block">
               {alt}
             </span>
 
-            <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-black/70 border border-[#CD9C20]/30 text-neutral-300 block">
+            <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-white border border-[#CD9C20]/30 text-neutral-600 block">
               {imageCodeHint || 'Adicionar Imagem'}
             </span>
           </div>

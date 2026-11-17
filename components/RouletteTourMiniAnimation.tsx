@@ -22,9 +22,9 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 2,
-    badge: '2. Gire a Roleta',
-    title: 'Gire a Roleta de Cassino de Luxo',
-    description: 'Motor de física em tempo real com agulha mecânica e luzes de LED.',
+    badge: '2. Puxe a Alavanca',
+    title: 'Caça-Níqueis Retrô Vermelho',
+    description: '3 cilindros vintage com alavanca lateral e jackpot de brinde garantido.',
     accent: '#F5CB5C',
   },
   {
@@ -64,7 +64,7 @@ export function RouletteTourMiniAnimation() {
       <div className="flex items-center justify-between gap-1.5 sm:gap-2 mb-2 pb-2 border-b border-white/5">
         <div className="flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-ancient font-bold uppercase tracking-wider text-[#F5CB5C]">
           <Dices className="w-3.5 h-3.5 text-[#F5CB5C] animate-spin" style={{ animationDuration: '8s' }} />
-          <span>Como Funciona o Combo + Roleta:</span>
+          <span>Como Funciona o Combo Casal:</span>
         </div>
 
         {/* 3 Step Progress Bars */}
@@ -168,37 +168,42 @@ export function RouletteTourMiniAnimation() {
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="relative w-full h-full flex items-center justify-center"
               >
-                {/* Micro luxury casino roulette */}
-                <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
-                  {/* Outer LED ring */}
-                  <div className="absolute inset-0 rounded-full border border-[#CD9C20]/50" />
-                  {/* Spinning wheel */}
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
-                    className="w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 border-[#CD9C20] relative shadow-[0_0_10px_rgba(205,156,32,0.5)] overflow-hidden"
-                    style={{
-                      background: 'conic-gradient(#1e1b4b 0deg 45deg, #7f1d1d 45deg 90deg, #0f172a 90deg 135deg, #881337 135deg 180deg, #1e1b4b 180deg 225deg, #7f1d1d 225deg 270deg, #0f172a 270deg 315deg, #881337 315deg 360deg)',
-                    }}
-                  >
-                    {/* Inner gold dividers */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-[1px] h-full bg-[#CD9C20]/60" />
-                      <div className="w-full h-[1px] bg-[#CD9C20]/60 absolute" />
+                {/* Micro Retro Red Slot Machine */}
+                <div className="relative w-12 h-14 flex items-center justify-center">
+                  {/* Red Cabinet */}
+                  <div className="w-10 h-13 rounded-t-xl rounded-b-md bg-gradient-to-b from-red-600 via-red-800 to-red-950 p-1 border border-red-500 shadow-md flex flex-col justify-between items-center relative">
+                    {/* Chrome screen bezel */}
+                    <div className="w-full h-6 rounded bg-gradient-to-r from-zinc-300 via-zinc-100 to-zinc-400 p-[1.5px] shadow-inner">
+                      <div className="w-full h-full bg-zinc-950 rounded-sm grid grid-cols-3 gap-[1px] p-[1px] overflow-hidden">
+                        {[0, 1, 2].map((idx) => (
+                          <div key={idx} className="bg-[#ebd9b4] rounded-[1px] flex items-center justify-center overflow-hidden">
+                            <motion.div
+                              animate={{ y: [-15, 0, -15] }}
+                              transition={{ repeat: Infinity, duration: 0.6 + idx * 0.15, ease: 'linear' }}
+                              className="text-[8px]"
+                            >
+                              🍪
+                            </motion.div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </motion.div>
 
-                  {/* Central gold core */}
-                  <div className="absolute w-3.5 h-3.5 rounded-full bg-gradient-to-br from-[#F5CB5C] to-[#8c6b12] border border-white flex items-center justify-center shadow-xs">
-                    <div className="w-1 h-1 rounded-full bg-white" />
+                    {/* Lower slot opening */}
+                    <div className="w-6 h-1.5 rounded-sm bg-zinc-400 p-[1px] mb-0.5">
+                      <div className="w-full h-full bg-black rounded-[0.5px]" />
+                    </div>
                   </div>
 
-                  {/* Needle pointer with vibration */}
+                  {/* Micro side lever */}
                   <motion.div
-                    animate={{ rotate: [0, -12, 10, -5, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.25 }}
-                    className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[8px] border-t-red-500 drop-shadow-sm z-10"
-                  />
+                    animate={{ rotate: [5, 40, 5] }}
+                    transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                    className="absolute -right-2 top-2 origin-bottom flex flex-col items-center"
+                  >
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-600 border border-red-400 shadow-xs" />
+                    <div className="w-[1.5px] h-6 bg-zinc-300" />
+                  </motion.div>
                 </div>
               </motion.div>
             )}

@@ -8,6 +8,7 @@ import {
   ClipboardList,
   UtensilsCrossed,
   CreditCard,
+  Calculator,
   Truck,
   Settings,
   Search,
@@ -55,9 +56,21 @@ import { auth, googleAuthProvider } from '@/lib/firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { KDS_STATUSES } from '@/components/OrderLiveTracker';
 import { ThermalReceiptModal } from '@/components/ThermalReceipt';
+import {
+  AdminCalculosHub,
+  IfoodDailyBatchWidget,
+  loadErpStateFromStorage,
+  persistErpStateToStorage,
+  ERP_SYNC_EVENT,
+  IFOOD_FEE_RATE,
+  detectChannelType,
+  matchesPeriodFilter,
+  getPeriodLabel,
+  UnifiedErpState,
+} from '@/components/AdminCalculosHub';
 
-type AdminNavTab = 'dashboard' | 'orders' | 'menu' | 'financials' | 'delivery' | 'settings';
-type PeriodFilter = 'today' | 'week' | 'month' | 'year' | 'all';
+export type AdminNavTab = 'dashboard' | 'orders' | 'calculos' | 'delivery' | 'settings';
+type PeriodFilter = 'today' | 'week' | 'month' | 'all';
 
 interface OrderItem {
   id: string;
@@ -73,7 +86,7 @@ interface OrderItem {
   notes?: string;
 }
 
-export function AdminDashboard() {
+export function AdminDashboard({ initialTab = 'dashboard' }: { initialTab?: AdminNavTab } = {}) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [ownerName, setOwnerName] = useState('Gabriel Olímpio');
   const [ownerEmail, setOwnerEmail] = useState('gabrielolimpiobsb@gmail.com');
@@ -88,8 +101,17 @@ export function AdminDashboard() {
   }, []);
 
   // Navigation & Filters
-  const [activeTab, setActiveTab] = useState<AdminNavTab>('dashboard');
-  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('month');
+  const [activeTab, setActiveTab] = useState<AdminNavTab>(initialTab);
+  const handleSwitchTab = (nextTab: AdminNavTab) => {
+    setActiveTab(nextTab);
+    if (typeof window !== 'undefined') {
+      const targetUrl = nextTab === 'calculos' ? '/admin-calculos' : '/admin';
+      if (window.location.pathname !== targetUrl) {
+        window.history.pushState(null, '', targetUrl);
+      }
+    }
+  };
+  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('today');
   const [globalSearch, setGlobalSearch] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -98,6 +120,22 @@ export function AdminDashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [adminData, setAdminData] = useState<any | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+  // Unified ERP & iFood Daily Sales State (shared with /admin-calculos)
+  const [erpState, setErpState] = useState<UnifiedErpState>(() => loadErpStateFromStorage());
+
+  const handleSaveErpFromDashboard = React.useCallback((next: UnifiedErpState) => {
+    setErpState(next);
+    persistErpStateToStorage(next);
+  }, []);
+
+  useEffect(() => {
+    const syncHandler = () => {
+      setErpState(loadErpStateFromStorage());
+    };
+    window.addEventListener(ERP_SYNC_EVENT, syncHandler);
+    return () => window.removeEventListener(ERP_SYNC_EVENT, syncHandler);
+  }, []);
 
   // Menu Management State
   const [menuItems, setMenuItems] = useState<MenuItem[]>(MENU_ITEMS);
@@ -392,38 +430,49 @@ export function AdminDashboard() {
     if (!allOrders.length) return [];
     if (periodFilter === 'all') return allOrders;
 
-    const now = new Date();
-    return allOrders.filter((order) => {
-      const orderDate = new Date(order.createdAt || now);
-      if (periodFilter === 'today') {
-        return (
-          orderDate.getDate() === now.getDate() &&
-          orderDate.getMonth() === now.getMonth() &&
-          orderDate.getFullYear() === now.getFullYear()
-        );
-      }
-      if (periodFilter === 'week') {
-        const diffMs = now.getTime() - orderDate.getTime();
-        return diffMs <= 7 * 24 * 60 * 60 * 1000;
-      }
-      if (periodFilter === 'month') {
-        return (
-          orderDate.getMonth() === now.getMonth() &&
-          orderDate.getFullYear() === now.getFullYear()
-        );
-      }
-      if (periodFilter === 'year') {
-        return orderDate.getFullYear() === now.getFullYear();
-      }
-      return true;
-    });
+    return allOrders.filter((order) => matchesPeriodFilter(order.createdAt, undefined, periodFilter));
   }, [allOrders, periodFilter]);
 
-  // Real financial aggregates
+  // Filter ERP logs (iFood daily batches & KDS completions) by the same periodFilter
+  const filteredErpLogs = useMemo(() => {
+    const logs = erpState?.logs || [];
+    if (!logs.length) return [];
+    if (periodFilter === 'all') return logs;
+
+    return logs.filter((log) => matchesPeriodFilter(log.timestamp, log.dateKey, periodFilter));
+  }, [erpState?.logs, periodFilter]);
+
+  // Pre-calculate sales counts for each period button (Hoje, 7d, Mês, Tudo)
+  const periodSalesCounts = useMemo(() => {
+    const logs = erpState?.logs || [];
+    const countForPeriod = (p: PeriodFilter) => {
+      const ordersInPeriod = allOrders.filter((o) => matchesPeriodFilter(o.createdAt, undefined, p)).length;
+      const erpUnitsInPeriod = logs
+        .filter((l) => matchesPeriodFilter(l.timestamp, l.dateKey, p))
+        .reduce((acc, l) => acc + Math.max(1, Number(l.qty || 1)), 0);
+      return ordersInPeriod + erpUnitsInPeriod;
+    };
+    return {
+      today: countForPeriod('today'),
+      week: countForPeriod('week'),
+      month: countForPeriod('month'),
+      all: countForPeriod('all'),
+    };
+  }, [allOrders, erpState?.logs]);
+
+  // Real financial aggregates separating Compras pelo Site (0% taxa iFood) vs Compras do iFood (26,2% taxa)
   const realFinancials = useMemo(() => {
-    let grossRev = 0;
-    let prodCost = 0;
+    // 1. COMPRAS PELO SITE (0% DE TAXA DO IFOOD)
+    let siteGrossRev = 0;
+    let siteProdCost = 0;
+    let siteOrdersCount = 0;
     let completedCount = 0;
+
+    // 2. COMPRAS DO IFOOD (COM TAXA OFICIAL DE 26,2% DO IFOOD)
+    let ifoodGrossRev = 0;
+    let ifoodFee262Total = 0;
+    let ifoodProdCost = 0;
+    let ifoodOrdersCount = 0;
 
     const paymentMap: Record<string, { count: number; total: number }> = {
       pix: { count: 0, total: 0 },
@@ -433,21 +482,20 @@ export function AdminDashboard() {
 
     const neighborhoodMap: Record<string, { count: number; revenue: number }> = {};
 
+    // Process orders placed directly on the Website (Sem taxa de 26,2% do iFood)
     filteredOrders.forEach((o) => {
       const orderTotal = (o.total || 0) / 100;
-      grossRev += orderTotal;
+      siteGrossRev += orderTotal;
+      siteOrdersCount += 1;
 
-      // Production cost & gross profit
       if (o.status === 'completed' || o.productionCost) {
         completedCount++;
         const cost = o.productionCost ? o.productionCost / 100 : Math.round(orderTotal * 0.35 * 100) / 100;
-        prodCost += cost;
+        siteProdCost += cost;
       } else {
-        // Estimated CMV for active orders
-        prodCost += Math.round(orderTotal * 0.35 * 100) / 100;
+        siteProdCost += Math.round(orderTotal * 0.35 * 100) / 100;
       }
 
-      // Payment method
       const method = (o.paymentMethod || 'pix').toLowerCase();
       if (method.includes('card') || method.includes('cartão') || method.includes('cartao')) {
         paymentMap.card.count++;
@@ -460,7 +508,6 @@ export function AdminDashboard() {
         paymentMap.pix.total += orderTotal;
       }
 
-      // Neighborhood mapping
       if (o.customerAddress) {
         let matched = 'Outros / Balcão';
         for (const hood of Object.keys(NEIGHBORHOOD_FEES)) {
@@ -478,11 +525,46 @@ export function AdminDashboard() {
       }
     });
 
-    const netProfit = Math.max(0, grossRev - prodCost);
-    const avgTicket = filteredOrders.length > 0 ? grossRev / filteredOrders.length : 0;
+    // Process daily sales deductions from ERP / Baixa Diária (iFood 26,2% vs Site 0%)
+    filteredErpLogs.forEach((log) => {
+      const cType = log.channelType || detectChannelType(log.channel);
+      const salesQty = log.salesCount || 1;
+      const rev = Number(log.revenue) || 0;
+      const cost = Number(log.totalCost) || 0;
+
+      if (cType === 'IFOOD') {
+        const fee = log.ifoodFee !== undefined ? Number(log.ifoodFee) : Math.round(rev * IFOOD_FEE_RATE * 100) / 100;
+        ifoodGrossRev += rev;
+        ifoodFee262Total += fee;
+        ifoodProdCost += cost;
+        ifoodOrdersCount += salesQty;
+        completedCount += salesQty;
+      } else {
+        // Baixa manual de vendas do Site (0% de taxa do iFood)
+        siteGrossRev += rev;
+        siteProdCost += cost;
+        siteOrdersCount += salesQty;
+        completedCount += salesQty;
+        paymentMap.pix.count += salesQty;
+        paymentMap.pix.total += rev;
+      }
+    });
+
+    // Lucro Líquido do Site (Sem taxa de 26,2% do iFood)
+    const siteNetProfit = Math.round((siteGrossRev - siteProdCost) * 100) / 100;
+    // Lucro Líquido do iFood (Descontando os 26,2% do iFood + CMV)
+    const ifoodNetRevenueAfterFee = Math.round((ifoodGrossRev - ifoodFee262Total) * 100) / 100;
+    const ifoodNetProfit = Math.round((ifoodGrossRev - ifoodFee262Total - ifoodProdCost) * 100) / 100;
+
+    // Cálculos Gerais Consolidados no Dashboard (Site + iFood)
+    const grossRev = Math.round((siteGrossRev + ifoodGrossRev) * 100) / 100;
+    const prodCost = Math.round((siteProdCost + ifoodProdCost) * 100) / 100;
+    const netProfit = Math.round((siteNetProfit + ifoodNetProfit) * 100) / 100;
+    const totalOrders = siteOrdersCount + ifoodOrdersCount;
+    const avgTicket = totalOrders > 0 ? grossRev / totalOrders : 0;
     const marginPercent = grossRev > 0 ? ((netProfit / grossRev) * 100).toFixed(1) : '0.0';
 
-    const totalPayRev = grossRev > 0 ? grossRev : 1;
+    const totalPayRev = siteGrossRev > 0 ? siteGrossRev : 1;
     const pixShare = Math.round((paymentMap.pix.total / totalPayRev) * 100);
     const cardShare = Math.round((paymentMap.card.total / totalPayRev) * 100);
     const cashShare = Math.max(0, 100 - pixShare - cardShare);
@@ -499,18 +581,33 @@ export function AdminDashboard() {
     return {
       grossRevenue: grossRev,
       productionCost: prodCost,
+      ifoodFeeTotal: Math.round(ifoodFee262Total * 100) / 100,
       netProfit,
       avgTicket,
       marginPercent,
-      totalOrders: filteredOrders.length,
+      totalOrders,
       completedCount,
+      siteStats: {
+        ordersCount: siteOrdersCount,
+        grossRevenue: Math.round(siteGrossRev * 100) / 100,
+        productionCost: Math.round(siteProdCost * 100) / 100,
+        netProfit: siteNetProfit,
+      },
+      ifoodStats: {
+        ordersCount: ifoodOrdersCount,
+        grossRevenue: Math.round(ifoodGrossRev * 100) / 100,
+        ifoodFee262: Math.round(ifoodFee262Total * 100) / 100,
+        netRevenueAfterFee: ifoodNetRevenueAfterFee,
+        productionCost: Math.round(ifoodProdCost * 100) / 100,
+        netProfit: ifoodNetProfit,
+      },
       paymentMap,
       pixShare,
       cardShare,
       cashShare,
       topHoods,
     };
-  }, [filteredOrders]);
+  }, [filteredOrders, filteredErpLogs]);
 
   // Filtered Menu Items
   const displayedMenuItems = useMemo(() => {
@@ -628,7 +725,7 @@ export function AdminDashboard() {
   return (
     <div className="min-h-screen bg-[#F5F5F5] flex font-sans selection:bg-[#F5CB5C] selection:text-black text-[#1C1C1C] w-full max-w-full overflow-x-hidden">
       {/* 1. LEFT SIDEBAR (OBSIDIAN DOCK MATCHING KITCHEN DISPLAY) */}
-      <aside className="w-64 shrink-0 bg-[#161616] text-white border-r border-black/20 flex flex-col justify-between p-4 hidden md:flex sticky top-0 h-screen z-30 shadow-xl">
+      <aside className="w-64 shrink-0 bg-[#161616] text-white border-r border-black/20 flex flex-col justify-between p-4 hidden md:flex fixed inset-y-0 left-0 h-screen z-40 shadow-xl overflow-y-auto">
         <div className="space-y-6">
           {/* Brand Header */}
           <div className="flex items-center gap-3 px-2 py-2 border-b border-white/10 pb-4">
@@ -658,8 +755,7 @@ export function AdminDashboard() {
             {[
               { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
               { id: 'orders', label: 'Pedidos / KDS', icon: ClipboardList, badge: allOrders.filter(o => o.status !== 'completed' && o.status !== 'cancelled').length },
-              { id: 'menu', label: 'Cardápio & Estoque (CMV)', icon: UtensilsCrossed },
-              { id: 'financials', label: 'Financeiro & Lucro', icon: CreditCard },
+              { id: 'calculos', label: 'Cardápio, Estoque & Cálculos (iFood)', icon: Calculator },
               { id: 'delivery', label: 'Bairros & Logística', icon: Truck },
               { id: 'settings', label: 'Configurações', icon: Settings },
             ].map((tab) => {
@@ -668,8 +764,8 @@ export function AdminDashboard() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as AdminNavTab)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                  onClick={() => handleSwitchTab(tab.id as AdminNavTab)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     isActive
                       ? 'bg-[#CD9C20]/20 text-[#F5CB5C] border border-[#CD9C20]/50 shadow-[0_0_12px_rgba(205,156,32,0.25)] font-bold'
                       : 'text-neutral-400 hover:text-white hover:bg-white/10'
@@ -677,7 +773,7 @@ export function AdminDashboard() {
                 >
                   <div className="flex items-center gap-3">
                     <Icon className={`w-4 h-4 ${isActive ? 'text-[#F5CB5C]' : 'text-neutral-400'}`} />
-                    <span>{tab.label}</span>
+                    <span className="text-left">{tab.label}</span>
                   </div>
                   {tab.badge !== undefined && tab.badge > 0 && (
                     <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? 'bg-[#F5CB5C] text-black' : 'bg-white/10 text-[#F5CB5C]'}`}>
@@ -694,26 +790,24 @@ export function AdminDashboard() {
         <div className="space-y-2 pt-4 border-t border-white/10">
           <Link
             href="/cozinha"
-            target="_blank"
             className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-200 text-xs font-medium border border-white/10 transition-colors"
           >
             <div className="flex items-center gap-2">
               <Flame className="w-3.5 h-3.5 text-[#F5CB5C]" />
               <span>Abrir Painel da Cozinha</span>
             </div>
-            <ExternalLink className="w-3 h-3 text-neutral-400" />
+            <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
           </Link>
 
           <Link
             href="/cardapio"
-            target="_blank"
             className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-200 text-xs font-medium border border-white/10 transition-colors"
           >
             <div className="flex items-center gap-2">
               <LaurelWreathIcon size={16} color="#CD9C20" />
               <span>Ver Cardápio do Cliente</span>
             </div>
-            <ExternalLink className="w-3 h-3 text-neutral-400" />
+            <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
           </Link>
 
           <button
@@ -727,7 +821,7 @@ export function AdminDashboard() {
       </aside>
 
       {/* 2. MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 md:ml-64">
         {/* Top Header */}
         <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#CD9C20]/20 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-4 shadow-xs">
           {/* Title & Mobile Selector */}
@@ -735,13 +829,12 @@ export function AdminDashboard() {
             <div className="md:hidden">
               <select
                 value={activeTab}
-                onChange={(e) => setActiveTab(e.target.value as AdminNavTab)}
+                onChange={(e) => handleSwitchTab(e.target.value as AdminNavTab)}
                 className="py-1.5 px-2.5 rounded-lg text-xs font-bold uppercase bg-white text-slate-800 border border-[#CD9C20]/40"
               >
                 <option value="dashboard">Dashboard</option>
                 <option value="orders">Pedidos / KDS</option>
-                <option value="menu">Cardápio & Estoque</option>
-                <option value="financials">Financeiro</option>
+                <option value="calculos">Cardápio, Estoque &amp; Cálculos</option>
                 <option value="delivery">Bairros</option>
                 <option value="settings">Configurações</option>
               </select>
@@ -751,8 +844,7 @@ export function AdminDashboard() {
                 <h2 className="font-extrabold text-base sm:text-lg uppercase tracking-wider text-[#161616] font-display">
                   {activeTab === 'dashboard' && 'PAINEL DE ADMINISTRAÇÃO'}
                   {activeTab === 'orders' && 'CONTROLE DE PEDIDOS & KDS'}
-                  {activeTab === 'menu' && 'GESTÃO DE CARDÁPIO & CMV'}
-                  {activeTab === 'financials' && 'RELATÓRIO FINANCEIRO'}
+                  {activeTab === 'calculos' && 'CARDÁPIO, ESTOQUE, CUSTOS & IFOOD (/ADMIN-CALCULOS)'}
                   {activeTab === 'delivery' && 'LOGÍSTICA POR BAIRRO'}
                   {activeTab === 'settings' && 'CONFIGURAÇÕES DA LOJA'}
                 </h2>
@@ -781,22 +873,39 @@ export function AdminDashboard() {
           <div className="flex items-center gap-2.5">
             {/* Period Filter Pills */}
             <div className="flex items-center gap-1 bg-[#F8F6F0] p-1 rounded-xl border border-[#CD9C20]/30 text-xs font-semibold">
-              {(['today', 'week', 'month', 'all'] as PeriodFilter[]).map((period) => (
-                <button
-                  key={period}
-                  onClick={() => setPeriodFilter(period)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-display font-bold uppercase transition-all ${
-                    periodFilter === period
-                      ? 'bg-[#161616] text-[#F5CB5C] shadow-sm ring-1 ring-[#CD9C20]'
-                      : 'text-neutral-600 hover:text-black hover:bg-white/60'
-                  }`}
-                >
-                  {period === 'today' && 'Hoje'}
-                  {period === 'week' && '7d'}
-                  {period === 'month' && 'Mês'}
-                  {period === 'all' && 'Tudo'}
-                </button>
-              ))}
+              {(['today', 'week', 'month', 'all'] as PeriodFilter[]).map((period) => {
+                const isActive = periodFilter === period;
+                const count = periodSalesCounts[period];
+                return (
+                  <button
+                    key={period}
+                    type="button"
+                    onClick={() => setPeriodFilter(period)}
+                    title={`Filtrar todo o sistema por: ${getPeriodLabel(period)} (${count} vendas)`}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-display font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer ${
+                      isActive
+                        ? 'bg-[#161616] text-[#F5CB5C] shadow-sm ring-1 ring-[#CD9C20]'
+                        : 'text-neutral-600 hover:text-black hover:bg-white/60'
+                    }`}
+                  >
+                    <span>
+                      {period === 'today' && 'Hoje'}
+                      {period === 'week' && '7d'}
+                      {period === 'month' && 'Mês'}
+                      {period === 'all' && 'Tudo'}
+                    </span>
+                    <span
+                      className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${
+                        isActive
+                          ? 'bg-[#CD9C20]/25 text-[#F5CB5C]'
+                          : 'bg-black/5 text-neutral-500'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Manual Refresh */}
@@ -827,31 +936,31 @@ export function AdminDashboard() {
         {/* TAB 1: DASHBOARD OVERVIEW */}
         {activeTab === 'dashboard' && (
           <div className="p-4 sm:p-8 space-y-6">
-            {/* Top 4 KPI Cards (Identidade Visual Teseu Burger) */}
+            {/* Top 4 Consolidated KPI Cards (Site 0% Taxa + iFood 26,2% Taxa) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Card 1: Receita Bruta */}
+              {/* Card 1: Receita Bruta Geral (Site + iFood) */}
               <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#CD9C20]/60 transition-all relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-1 bg-[#CD9C20]" />
                 <div className="flex items-center justify-between text-xs text-neutral-500 font-semibold mb-1">
-                  <span className="font-display uppercase tracking-wider text-[11px]">RECEITA BRUTA</span>
+                  <span className="font-display uppercase tracking-wider text-[11px]">RECEITA BRUTA ({getPeriodLabel(periodFilter).split(' ')[0].toUpperCase()})</span>
                   <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                    Vendas
+                    Site + iFood
                   </span>
                 </div>
                 <div className="font-extrabold text-2xl text-[#161616] mt-1 font-display">
                   R$ {realFinancials.grossRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-[11px] text-neutral-500 mt-1 flex items-center gap-1">
-                  <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Calculado sobre {realFinancials.totalOrders} pedidos</span>
+                <div className="text-[11px] text-neutral-600 mt-1.5 pt-1.5 border-t border-neutral-100 flex items-center justify-between font-mono">
+                  <span>Site: R$ {realFinancials.siteStats.grossRevenue.toFixed(2)}</span>
+                  <span>iFood: R$ {realFinancials.ifoodStats.grossRevenue.toFixed(2)}</span>
                 </div>
               </div>
 
-              {/* Card 2: Lucro Líquido Real (CMV Deduzido) */}
+              {/* Card 2: Lucro Líquido Real Geral (CMV Deduzido + 26,2% apenas no iFood) */}
               <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#CD9C20]/60 transition-all relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500" />
                 <div className="flex items-center justify-between text-xs text-neutral-500 font-semibold mb-1">
-                  <span className="font-display uppercase tracking-wider text-[11px]">LUCRO REAL (CMV DEDUZIDO)</span>
+                  <span className="font-display uppercase tracking-wider text-[11px]">LUCRO LÍQUIDO REAL</span>
                   <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold">
                     {realFinancials.marginPercent}% Margem
                   </span>
@@ -859,16 +968,17 @@ export function AdminDashboard() {
                 <div className="font-extrabold text-2xl text-emerald-700 mt-1 font-display">
                   R$ {realFinancials.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-[11px] text-neutral-500 mt-1">
-                  Custo Produção: R$ {realFinancials.productionCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                <div className="text-[11px] text-neutral-600 mt-1.5 pt-1.5 border-t border-neutral-100 flex items-center justify-between font-mono">
+                  <span>CMV: -R$ {realFinancials.productionCost.toFixed(2)}</span>
+                  <span className="text-amber-700">Taxa iFood: -R$ {realFinancials.ifoodFeeTotal.toFixed(2)}</span>
                 </div>
               </div>
 
-              {/* Card 3: Ticket Médio */}
+              {/* Card 3: Ticket Médio Geral */}
               <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#CD9C20]/60 transition-all relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-1 bg-[#F5CB5C]" />
                 <div className="flex items-center justify-between text-xs text-neutral-500 font-semibold mb-1">
-                  <span className="font-display uppercase tracking-wider text-[11px]">TICKET MÉDIO</span>
+                  <span className="font-display uppercase tracking-wider text-[11px]">TICKET MÉDIO GERAL</span>
                   <span className="text-[#CD9C20] bg-[#F8F6F0] border border-[#CD9C20]/30 px-2 py-0.5 rounded-full text-[10px] font-bold">
                     Médio
                   </span>
@@ -876,28 +986,139 @@ export function AdminDashboard() {
                 <div className="font-extrabold text-2xl text-[#161616] mt-1 font-display">
                   R$ {realFinancials.avgTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-[11px] text-neutral-500 mt-1">
-                  Por pedido finalizado
+                <div className="text-[11px] text-neutral-500 mt-1.5 pt-1.5 border-t border-neutral-100">
+                  Média por venda (Site + iFood)
                 </div>
               </div>
 
-              {/* Card 4: Total de Pedidos */}
+              {/* Card 4: Total de Vendas (Site + iFood) */}
               <div className="bg-white border border-[#CD9C20]/30 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#CD9C20]/60 transition-all relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[#2563EB]" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#161616]" />
                 <div className="flex items-center justify-between text-xs text-neutral-500 font-semibold mb-1">
-                  <span className="font-display uppercase tracking-wider text-[11px]">TOTAL DE PEDIDOS</span>
-                  <span className="text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                    {realFinancials.completedCount} Concluídos
+                  <span className="font-display uppercase tracking-wider text-[11px]">TOTAL DE VENDAS</span>
+                  <span className="text-[#161616] bg-[#F8F6F0] border border-[#CD9C20]/40 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                    {realFinancials.completedCount} Concluídas
                   </span>
                 </div>
                 <div className="font-extrabold text-2xl text-[#161616] mt-1 font-display">
                   {realFinancials.totalOrders}
                 </div>
-                <div className="text-[11px] text-neutral-500 mt-1">
-                  {allOrders.filter(o => o.status !== 'completed' && o.status !== 'cancelled').length} em andamento na chapa
+                <div className="text-[11px] text-neutral-600 mt-1.5 pt-1.5 border-t border-neutral-100 flex items-center justify-between font-bold">
+                  <span className="text-emerald-700">{realFinancials.siteStats.ordersCount} pelo Site (0%)</span>
+                  <span className="text-[#161616]">{realFinancials.ifoodStats.ordersCount} pelo iFood (26,2%)</span>
                 </div>
               </div>
             </div>
+
+            {/* SEPARAÇÃO CLARA DE CANAIS: COMPRAS PELO SITE (SEM TAXA 26,2%) vs. COMPRAS PELO IFOOD (COM TAXA 26,2%) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Canal 1: Compras pelo Site (Sem Taxa 26,2% do iFood) */}
+              <div className="bg-white border-2 border-emerald-500/40 rounded-2xl p-5 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
+                      <ShoppingBag className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700 block">
+                        CANAL DIRETO • ZERO TAXA DE APLICATIVO (0%)
+                      </span>
+                      <h3 className="font-extrabold text-base text-[#161616] font-display uppercase">
+                        Compras pelo Site (Sem Taxa de 26,2% do iFood)
+                      </h3>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">
+                    {realFinancials.siteStats.ordersCount} {realFinancials.siteStats.ordersCount === 1 ? 'venda' : 'vendas'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="bg-[#F8F6F0] p-3 rounded-xl border border-slate-200">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 block">Receita Bruta Site</span>
+                    <strong className="text-sm sm:text-base font-black text-slate-900 font-mono">
+                      R$ {realFinancials.siteStats.grossRevenue.toFixed(2)}
+                    </strong>
+                    <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">Taxa iFood: R$ 0,00</span>
+                  </div>
+                  <div className="bg-[#F8F6F0] p-3 rounded-xl border border-slate-200">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 block">Custo Insumos (CMV)</span>
+                    <strong className="text-sm sm:text-base font-black text-slate-700 font-mono">
+                      - R$ {realFinancials.siteStats.productionCost.toFixed(2)}
+                    </strong>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">Ficha Técnica</span>
+                  </div>
+                  <div className="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200">
+                    <span className="text-[10px] uppercase font-bold text-emerald-800 block">Lucro Líquido Site</span>
+                    <strong className="text-sm sm:text-base font-black text-emerald-700 font-mono">
+                      R$ {realFinancials.siteStats.netProfit.toFixed(2)}
+                    </strong>
+                    <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">100% Livre p/ Loja</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Canal 2: Compras pelo iFood (Com Taxa Oficial de 26,2% do iFood) */}
+              <div className="bg-white border-2 border-[#CD9C20]/60 rounded-2xl p-5 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#161616] border border-[#CD9C20] flex items-center justify-center text-[#F5CB5C] shrink-0">
+                      <Bike className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#CD9C20] block">
+                        CANAL PARCEIRO • TAXA ÚNICA DE 26,2% (CMV ÷ 0,783)
+                      </span>
+                      <h3 className="font-extrabold text-base text-[#161616] font-display uppercase">
+                        Compras pelo iFood (Com Taxa de 26,2%)
+                      </h3>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-[#161616] text-[#F5CB5C] border border-[#CD9C20]/40 text-xs font-extrabold">
+                    {realFinancials.ifoodStats.ordersCount} {realFinancials.ifoodStats.ordersCount === 1 ? 'venda' : 'vendas'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+                  <div className="bg-[#F8F6F0] p-3 rounded-xl border border-slate-200">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 block">Bruto iFood</span>
+                    <strong className="text-sm font-black text-slate-900 font-mono">
+                      R$ {realFinancials.ifoodStats.grossRevenue.toFixed(2)}
+                    </strong>
+                  </div>
+                  <div className="bg-[#F8F6F0] p-3 rounded-xl border border-amber-200">
+                    <span className="text-[10px] uppercase font-bold text-amber-800 block">Taxa iFood (26,2%)</span>
+                    <strong className="text-sm font-black text-amber-700 font-mono">
+                      - R$ {realFinancials.ifoodStats.ifoodFee262.toFixed(2)}
+                    </strong>
+                  </div>
+                  <div className="bg-[#F8F6F0] p-3 rounded-xl border border-slate-200">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 block">CMV iFood</span>
+                    <strong className="text-sm font-black text-slate-700 font-mono">
+                      - R$ {realFinancials.ifoodStats.productionCost.toFixed(2)}
+                    </strong>
+                  </div>
+                  <div className="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200">
+                    <span className="text-[10px] uppercase font-bold text-emerald-800 block">Lucro Real iFood</span>
+                    <strong className="text-sm font-black text-emerald-700 font-mono">
+                      R$ {realFinancials.ifoodStats.netProfit.toFixed(2)}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SISTEMA DIRETO NO DASHBOARD PARA DAR BAIXA DE QUANTAS VENDAS FEZ NO IFOOD NO DIA */}
+            <IfoodDailyBatchWidget
+              erpState={erpState}
+              onSaveErpState={handleSaveErpFromDashboard}
+              onNotify={(msg) => {
+                setActionSuccess(msg);
+                setTimeout(() => setActionSuccess(null), 5000);
+              }}
+              compact
+              activePeriodFilter={periodFilter}
+            />
 
             {/* Mid Section: Payment Methods + Delivery Neighborhoods + Real Orders */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1011,7 +1232,7 @@ export function AdminDashboard() {
                       <span>ESTOQUE RÁPIDO & CMV</span>
                     </h3>
                     <button
-                      onClick={() => setActiveTab('menu')}
+                      onClick={() => handleSwitchTab('calculos')}
                       className="text-xs text-[#CD9C20] font-bold hover:underline"
                     >
                       Ver Todos →
@@ -1062,10 +1283,10 @@ export function AdminDashboard() {
 
                 <div className="pt-3 mt-3 border-t border-neutral-100 text-center">
                   <button
-                    onClick={() => setActiveTab('menu')}
+                    onClick={() => handleSwitchTab('calculos')}
                     className="w-full py-2 bg-[#F8F6F0] hover:bg-[#161616] text-[#161616] hover:text-[#F5CB5C] border border-[#CD9C20]/30 text-xs font-bold font-display uppercase tracking-wider rounded-xl transition-all"
                   >
-                    Gerenciar Cardápio Completo
+                    Abrir Cardápio, Estoque &amp; Cálculos
                   </button>
                 </div>
               </div>
@@ -1091,11 +1312,11 @@ export function AdminDashboard() {
                 </button>
               </div>
 
-              {allOrders.length === 0 ? (
+              {filteredOrders.length === 0 ? (
                 <div className="py-12 text-center text-xs text-slate-400">
                   <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                  <p className="font-bold text-slate-600 text-sm">Nenhum pedido no banco de dados.</p>
-                  <p className="text-slate-400 mt-1">Faça um pedido de teste no site para visualizá-lo aqui e na cozinha.</p>
+                  <p className="font-bold text-slate-600 text-sm">Nenhum pedido direto do site neste período ({getPeriodLabel(periodFilter)}).</p>
+                  <p className="text-slate-400 mt-1">Altere o filtro acima (Hoje, 7d, Mês, Tudo) ou faça um pedido no site para visualizá-lo aqui.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -1112,7 +1333,7 @@ export function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {allOrders.slice(0, 6).map((order) => {
+                      {filteredOrders.slice(0, 6).map((order) => {
                         const statusObj = KDS_STATUSES.find(s => s.key === order.status);
                         const isCompleted = order.status === 'completed';
                         return (
@@ -1198,7 +1419,7 @@ export function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {allOrders.map((order) => {
+                    {filteredOrders.map((order) => {
                       const statusObj = KDS_STATUSES.find(s => s.key === order.status);
                       let items: any[] = [];
                       try {
@@ -1324,238 +1545,13 @@ export function AdminDashboard() {
           </div>
         )}
 
-        {/* TAB 3: MENU MANAGEMENT & COST (CMV) EDITING */}
-        {activeTab === 'menu' && (
-          <div className="p-4 sm:p-8 space-y-6">
-            {/* Header with Search and Category filters */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h3 className="font-extrabold text-lg text-slate-900 uppercase">
-                    Gestão de Cardápio, Estoque & Custos (CMV)
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Defina o custo de cada produto para calcular o lucro bruto real com precisão matemática.
-                  </p>
-                </div>
-
-                {/* Search */}
-                <div className="relative w-full sm:w-64">
-                  <input
-                    type="text"
-                    value={menuSearch}
-                    onChange={(e) => setMenuSearch(e.target.value)}
-                    placeholder="Filtrar produtos..."
-                    className="w-full py-2 pl-8 pr-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-amber-500"
-                  />
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Categories */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                {['all', 'legends', 'smash', 'especiais', 'combos', 'sides', 'bebidas', 'sobremesas'].map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-xl uppercase font-bold text-[11px] whitespace-nowrap transition-colors ${
-                      selectedCategory === cat
-                        ? 'bg-amber-600 text-white'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    {cat === 'all' && 'Todos os Itens'}
-                    {cat === 'legends' && 'As Lendas'}
-                    {cat === 'smash' && 'Smashes'}
-                    {cat === 'especiais' && 'Especiais'}
-                    {cat === 'combos' && 'Combos'}
-                    {cat === 'sides' && 'Acompanhamentos'}
-                    {cat === 'bebidas' && 'Bebidas'}
-                    {cat === 'sobremesas' && 'Sobremesas'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Menu Items Table */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold border-b border-slate-200">
-                    <tr>
-                      <th className="py-3 px-3">Produto</th>
-                      <th className="py-3 px-3">Categoria</th>
-                      <th className="py-3 px-3">Preço Venda</th>
-                      <th className="py-3 px-3">Custo Unitário (CMV)</th>
-                      <th className="py-3 px-3">Lucro Unitário</th>
-                      <th className="py-3 px-3">Margem %</th>
-                      <th className="py-3 px-3">Status Estoque</th>
-                      <th className="py-3 px-3 text-right">Ação</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {displayedMenuItems.map((item) => {
-                      const cost = item.costPrice !== undefined ? item.costPrice : Math.round(item.price * 0.35 * 100) / 100;
-                      const unitProfit = Math.max(0, item.price - cost);
-                      const margin = item.price > 0 ? ((unitProfit / item.price) * 100).toFixed(1) : '0.0';
-                      const isSoldOut = item.isAvailable === 0;
-
-                      return (
-                        <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="py-3 px-3">
-                            <p className="font-bold text-slate-900">{item.name}</p>
-                            <p className="text-[11px] text-slate-400 line-clamp-1">{item.description}</p>
-                          </td>
-                          <td className="py-3 px-3 uppercase text-[10px] font-bold text-slate-500">
-                            {item.category}
-                          </td>
-                          <td className="py-3 px-3 font-bold text-slate-900">
-                            R$ {item.price.toFixed(2)}
-                          </td>
-                          <td className="py-3 px-3 font-bold text-rose-700 bg-rose-50/50 rounded-lg">
-                            R$ {cost.toFixed(2)}
-                          </td>
-                          <td className="py-3 px-3 font-bold text-emerald-700 bg-emerald-50/50 rounded-lg">
-                            R$ {unitProfit.toFixed(2)}
-                          </td>
-                          <td className="py-3 px-3 font-extrabold text-slate-900">
-                            {margin}%
-                          </td>
-                          <td className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => handleToggleStock(item.id, item.isAvailable)}
-                              className={`px-3 py-1 rounded-xl text-xs font-bold uppercase transition-all flex items-center gap-1.5 ${
-                                isSoldOut
-                                  ? 'bg-rose-100 text-rose-700 hover:bg-rose-200'
-                                  : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                              }`}
-                            >
-                              <span className={`w-2 h-2 rounded-full ${isSoldOut ? 'bg-rose-600' : 'bg-emerald-600'}`} />
-                              <span>{isSoldOut ? 'Esgotado (OFF)' : 'Em Estoque (ON)'}</span>
-                            </button>
-                          </td>
-                          <td className="py-3 px-3 text-right">
-                            <button
-                              onClick={() => openEditModal(item)}
-                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-colors flex items-center gap-1 ml-auto"
-                            >
-                              <Edit3 className="w-3.5 h-3.5 text-amber-600" />
-                              <span>Editar Custo & Preço</span>
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 4: FINANCIALS & PROFIT REPORT */}
-        {activeTab === 'financials' && (
-          <div className="p-4 sm:p-8 space-y-6">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <h3 className="font-extrabold text-lg text-slate-900 uppercase">
-                Demonstrativo de Resultados Financeiros
-              </h3>
-              <p className="text-xs text-slate-500">
-                Auditoria de receita bruta, deduções de custo de mercadoria vendida (CMV) e lucro operacional real.
-              </p>
-            </div>
-
-            {/* Financial Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-                <span className="text-xs font-bold text-slate-500 uppercase">Receita Bruta Acumulada</span>
-                <p className="font-black text-2xl text-slate-900 mt-1">
-                  R$ {realFinancials.grossRevenue.toFixed(2)}
-                </p>
-                <span className="text-[11px] text-slate-400">Total transacionado</span>
-              </div>
-
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-                <span className="text-xs font-bold text-slate-500 uppercase">Custo Total de Produção (CMV)</span>
-                <p className="font-black text-2xl text-rose-700 mt-1">
-                  R$ {realFinancials.productionCost.toFixed(2)}
-                </p>
-                <span className="text-[11px] text-slate-400">Insumos, pães, carnes e embalagens</span>
-              </div>
-
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-                <span className="text-xs font-bold text-slate-500 uppercase">Lucro Líquido Real</span>
-                <p className="font-black text-2xl text-emerald-700 mt-1">
-                  R$ {realFinancials.netProfit.toFixed(2)}
-                </p>
-                <span className="text-[11px] text-emerald-600 font-bold">Margem líquida de {realFinancials.marginPercent}%</span>
-              </div>
-            </div>
-
-            {/* Financial Records List from completed orders */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-              <h4 className="font-bold text-sm text-slate-900 uppercase mb-3">
-                Histórico de Pedidos Concluídos com Auditoria Financeira
-              </h4>
-
-              {allOrders.filter(o => o.status === 'completed').length === 0 ? (
-                <div className="py-8 text-center text-xs text-slate-400">
-                  <Receipt className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                  <span>Nenhum pedido marcado como &quot;Concluído&quot; ainda. Na Cozinha ou na aba Pedidos, conclua um pedido para gravar o registro de lucro.</span>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold border-b border-slate-200">
-                      <tr>
-                        <th className="py-2.5 px-3">Pedido</th>
-                        <th className="py-2.5 px-3">Cliente</th>
-                        <th className="py-2.5 px-3">Receita Bruta</th>
-                        <th className="py-2.5 px-3">Custo Produção</th>
-                        <th className="py-2.5 px-3">Lucro Líquido</th>
-                        <th className="py-2.5 px-3">Margem</th>
-                        <th className="py-2.5 px-3">Pagamento</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {allOrders.filter(o => o.status === 'completed').map((order) => {
-                        const rev = order.total / 100;
-                        const cost = order.productionCost ? order.productionCost / 100 : rev * 0.35;
-                        const profit = order.grossProfit ? order.grossProfit / 100 : rev - cost;
-                        const margin = rev > 0 ? `${((profit / rev) * 100).toFixed(1)}%` : '0%';
-
-                        return (
-                          <tr key={order.id} className="hover:bg-slate-50 transition-colors">
-                            <td className="py-3 px-3 font-mono font-bold text-slate-900">
-                              #{order.orderNumber}
-                            </td>
-                            <td className="py-3 px-3 font-semibold text-slate-800">
-                              {order.customerName}
-                            </td>
-                            <td className="py-3 px-3 font-bold text-slate-900">
-                              R$ {rev.toFixed(2)}
-                            </td>
-                            <td className="py-3 px-3 text-rose-700 font-semibold">
-                              R$ {cost.toFixed(2)}
-                            </td>
-                            <td className="py-3 px-3 text-emerald-700 font-extrabold">
-                              R$ {profit.toFixed(2)}
-                            </td>
-                            <td className="py-3 px-3 font-bold text-slate-800">
-                              {order.profitMargin || margin}
-                            </td>
-                            <td className="py-3 px-3 uppercase text-slate-600">
-                              {order.paymentMethod}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+        {/* TAB 3 (UNIFIED): CARDÁPIO, ESTOQUE, CUSTOS & IFOOD (/admin-calculos) */}
+        {activeTab === 'calculos' && (
+          <div className="p-4 sm:p-8 space-y-8">
+            <AdminCalculosHub
+              periodFilter={periodFilter}
+              onPeriodFilterChange={(next) => setPeriodFilter(next)}
+            />
           </div>
         )}
 
@@ -1564,7 +1560,7 @@ export function AdminDashboard() {
           <div className="p-4 sm:p-8 space-y-6">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <h3 className="font-extrabold text-lg text-slate-900 uppercase">
-                Inteligência Geográfica & Logística de Entrega
+                Inteligência Geográfica & Logística de Entrega ({getPeriodLabel(periodFilter)})
               </h3>
               <p className="text-xs text-slate-500">
                 Ranking de bairros atendidos e taxas configuradas para tomadas de decisão comercial.
@@ -1581,7 +1577,7 @@ export function AdminDashboard() {
 
                 <div className="space-y-3">
                   {Object.entries(NEIGHBORHOOD_FEES).map(([name, fee]) => {
-                    const matchedCount = allOrders.filter(o => 
+                    const matchedCount = filteredOrders.filter(o => 
                       o.customerAddress && o.customerAddress.toLowerCase().includes(name.split('/')[0].trim().toLowerCase())
                     ).length;
 

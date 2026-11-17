@@ -2,13 +2,49 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { MenuItem, MeatDoneness } from '@/types/burger';
 import { DrinkOption, DRINK_OPTIONS, COMBO_FRIES_UPGRADES, ComboFriesUpgrade } from '@/lib/data';
-import { SweetCasinoRoulette } from '@/components/SweetCasinoRoulette';
 import { SpartanHelmetIcon } from '@/components/GreekOrnament';
-import { Check, CupSoda, Sparkles } from 'lucide-react';
+import { Check, CupSoda, Sparkles, Gift, ExternalLink } from 'lucide-react';
 
-// Seletor de Hambúrguer para Combo Casal com foto e nome na mesma linha / card (pelo menos 2 na mesma linha)
+// Os 4 doces de brinde disponíveis
+export const CASAL_SWEET_GIFTS = [
+  {
+    id: 'cookie-supremo',
+    name: 'Cookie Supremo',
+    tag: 'GOTAS BELGA',
+    subtitle: 'Massa artesanal com gotas de chocolate belga',
+    icon: '🍪',
+    badge: 'Mais Pedido',
+  },
+  {
+    id: 'brigadeiro-gourmet',
+    name: 'Brigadeiro Gourmet',
+    tag: 'CACAU 70%',
+    subtitle: 'Cacau puro nobre com granulado crocante',
+    icon: '🍫',
+    badge: 'Clássico',
+  },
+  {
+    id: 'brownie-intenso',
+    name: 'Brownie Supremo',
+    tag: 'FUDGE INTENSO',
+    subtitle: 'Casquinha crocante e interior cremoso',
+    icon: '🥮',
+    badge: 'Artesanal',
+  },
+  {
+    id: 'bombom-especial',
+    name: 'Bombom da Casa',
+    tag: 'RECHEIO NOBRE',
+    subtitle: 'Bombom recheado exclusivo do templo',
+    icon: '🍬',
+    badge: 'Especial',
+  },
+];
+
+// Seletor de Hambúrguer para Combo Casal com foto e nome na mesma linha / card (2 na mesma linha)
 function ComboBurgerCard({
   burger,
   isSelected,
@@ -178,33 +214,39 @@ function ComboFriesSelector({
     <div className="space-y-1">
       <div className="flex items-center justify-between">
         <span className="text-[10px] sm:text-[11px] font-ancient font-bold text-[#1c1c1c] uppercase">
-          {label}
+          {label}: <strong className="text-[#CD9C20]">{selected.name}</strong>
         </span>
-        <span className="text-[9.5px] text-[#CD9C20] font-black">
-          {selected.extraPrice === 0 ? 'Inclusa no Combo (+R$ 0)' : `+R$ ${selected.extraPrice.toFixed(2).replace('.', ',')}`}
+        <span className="text-[9px] text-neutral-500 font-ancient">
+          {selected.extraPrice === 0 ? 'Inclusa no Combo' : `+R$ ${selected.extraPrice.toFixed(2).replace('.', ',')}`}
         </span>
       </div>
 
       <div className="grid grid-cols-3 gap-1.5">
         {COMBO_FRIES_UPGRADES.map((opt) => {
-          const isSelected = selected.size === opt.size;
+          const isCurrent = selected.size === opt.size;
           return (
             <button
               key={opt.size}
               type="button"
               onClick={() => onSelect(opt)}
-              className={`p-1.5 sm:p-2 rounded-xl border text-center transition-all cursor-pointer ${
-                isSelected
+              className={`p-1.5 rounded-xl border text-center transition-all cursor-pointer ${
+                isCurrent
                   ? 'bg-[#F2ECDD] border-2 border-[#CD9C20] text-[#1c1c1c] shadow-xs ring-1 ring-[#CD9C20]'
                   : 'bg-white border-neutral-300 text-neutral-700 hover:border-[#CD9C20]'
               }`}
             >
-              <div className="text-[10px] sm:text-xs font-black uppercase text-[#1c1c1c]">
-                {opt.size === 'P' ? '🍟 Pequena (P)' : opt.size === 'M' ? '🍟 Média (M)' : '🍟 Grande (G)'}
-              </div>
-              <div className="text-[8.5px] text-neutral-500 font-ancient mt-0.5">
-                {opt.label}
-              </div>
+              <div className="text-base sm:text-lg mb-0.5">🍟</div>
+              <p className="text-[10px] sm:text-[11px] font-ancient font-bold uppercase truncate">
+                {opt.name.split(' ')[0]}
+              </p>
+              <p className="text-[8px] text-neutral-500 truncate">{opt.label}</p>
+              <span
+                className={`mt-1 inline-block text-[8px] font-black uppercase px-1 py-0.2 rounded ${
+                  isCurrent ? 'bg-[#CD9C20] text-white' : 'bg-neutral-100 text-neutral-600'
+                }`}
+              >
+                {opt.extraPrice === 0 ? 'Incluso' : `+R$ ${opt.extraPrice.toFixed(2).replace('.', ',')}`}
+              </span>
             </button>
           );
         })}
@@ -213,7 +255,7 @@ function ComboFriesSelector({
   );
 }
 
-export interface ComboCasalConfiguratorProps {
+interface ComboCasalConfiguratorProps {
   availableBurgers: MenuItem[];
   casalBurger1: MenuItem;
   setCasalBurger1: (b: MenuItem) => void;
@@ -231,8 +273,8 @@ export interface ComboCasalConfiguratorProps {
   setCasalFries1: (f: ComboFriesUpgrade) => void;
   casalFries2: ComboFriesUpgrade;
   setCasalFries2: (f: ComboFriesUpgrade) => void;
-  drawnSweetGift: string;
-  setDrawnSweetGift: (gift: string) => void;
+  drawnSweetGift: string | null;
+  setDrawnSweetGift: (s: string) => void;
   showToast: (msg: string) => void;
 }
 
@@ -258,9 +300,46 @@ export function ComboCasalConfigurator({
   setDrawnSweetGift,
   showToast,
 }: ComboCasalConfiguratorProps) {
+  // Se não houver brinde selecionado, padroniza para o primeiro
+  const currentGift = drawnSweetGift || CASAL_SWEET_GIFTS[0].name;
+
+  const handleSelectGift = (giftName: string) => {
+    setDrawnSweetGift(giftName);
+    showToast(`✓ Doce selecionado: ${giftName} (Incluso)`);
+  };
+
   return (
     <div className="space-y-4">
-      {/* 1. Escolha dos 2 Hambúrgueres Obrigatórios (pelo menos 2 na mesma linha) */}
+      {/* Banner Especial de Convite para o Jogo dos Brindes (/brindes) */}
+      <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-red-950 via-zinc-900 to-amber-950 border border-amber-500/50 shadow-md text-white flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-xl shrink-0 shadow-inner">
+            🎰
+          </div>
+          <div>
+            <div className="inline-flex items-center gap-1 text-[9px] uppercase font-black text-amber-300 tracking-wider">
+              <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
+              NOVO JOGO FORTUNE TESEU
+            </div>
+            <h4 className="text-xs sm:text-sm font-display font-black uppercase text-white leading-tight">
+              Quer sortear o doce na Máquina Caça-Níqueis?
+            </h4>
+            <p className="text-[10px] text-zinc-300">
+              Jogue na aba exclusiva de brindes com estilo Fortune Tiger e ganhe doces grátis!
+            </p>
+          </div>
+        </div>
+
+        <Link
+          href="/brindes"
+          className="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 text-zinc-950 font-black text-xs uppercase tracking-wider shadow hover:brightness-110 active:scale-[0.98] transition flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
+        >
+          <span>Jogar no Fortune Teseu 🎰</span>
+          <ExternalLink className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+
+      {/* 1. Escolha dos 2 Hambúrgueres Obrigatórios (2 na mesma linha) */}
       <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-b from-[#FAF8F3] to-[#F5EFE3] border-2 border-[#CD9C20]/50 shadow-xs space-y-4">
         <div className="flex items-center justify-between border-b border-[#CD9C20]/30 pb-2">
           <label className="text-xs sm:text-sm font-ancient font-black uppercase text-[#1c1c1c] tracking-wider flex items-center gap-2">
@@ -368,7 +447,7 @@ export function ComboCasalConfigurator({
         </div>
       </div>
 
-      {/* 3. Escolha das 2 Batatas Crocantes (P inclusa, P->M +1.50, M->G +3.50 => G +5.00) */}
+      {/* 3. Escolha das 2 Batatas Crocantes */}
       <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-[#CD9C20]/50 shadow-xs space-y-3.5">
         <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
           <label className="text-xs sm:text-sm font-ancient font-black uppercase text-[#1c1c1c] tracking-wider flex items-center gap-2">
@@ -395,16 +474,75 @@ export function ComboCasalConfigurator({
         </div>
       </div>
 
-      {/* 4. Roleta de Cassino do Doce Grátis (Exclusiva para o Combo Casal) */}
-      <div id="sorteio-brinde-area" className="scroll-mt-24">
-        <SweetCasinoRoulette
-          onClaimPrize={(prize) => {
-            setDrawnSweetGift(prize.name);
-            showToast(`🎰 Parabéns! Você ganhou: ${prize.name}! Adicione ao pedido.`);
-          }}
-          initialPrize={drawnSweetGift}
-        />
+      {/* 4. Escolha do Doce Brinde do Casal (Incluso) */}
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-white border-2 border-[#CD9C20]/50 shadow-xs space-y-3">
+        <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
+          <div className="flex items-center gap-2">
+            <Gift className="w-4 h-4 text-[#CD9C20]" />
+            <span className="text-xs sm:text-sm font-ancient font-black uppercase text-[#1c1c1c] tracking-wider">
+              4. Escolha o Doce Brinde do Casal
+            </span>
+          </div>
+          <span className="text-[9px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
+            Incluso (R$ 0,00)
+          </span>
+        </div>
+
+        <p className="text-[11px] text-neutral-600">
+          Selecione o doce artesanal cortesia que acompanhará o banquete do casal:
+        </p>
+
+        <div className="grid grid-cols-2 gap-2">
+          {CASAL_SWEET_GIFTS.map((sweet) => {
+            const isSelected = currentGift.toLowerCase().includes(sweet.name.toLowerCase()) ||
+              sweet.name.toLowerCase().includes(currentGift.toLowerCase());
+
+            return (
+              <button
+                key={sweet.id}
+                type="button"
+                onClick={() => handleSelectGift(sweet.name)}
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  isSelected
+                    ? 'bg-[#F2ECDD] border-2 border-[#CD9C20] text-[#1c1c1c] shadow-xs ring-1 ring-[#CD9C20]'
+                    : 'bg-white border-neutral-300 text-neutral-700 hover:border-[#CD9C20]'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <span className="text-2xl">{sweet.icon}</span>
+                  <div
+                    className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                      isSelected ? 'border-[#CD9C20] bg-[#CD9C20] text-white' : 'border-neutral-400'
+                    }`}
+                  >
+                    {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                  </div>
+                </div>
+
+                <div>
+                  <h6 className="text-[11px] font-display font-black uppercase text-[#1c1c1c] truncate">
+                    {sweet.name}
+                  </h6>
+                  <p className="text-[9px] text-neutral-500 line-clamp-1">
+                    {sweet.subtitle}
+                  </p>
+                </div>
+
+                <div className="mt-2 flex items-center justify-between border-t border-neutral-200/60 pt-1.5">
+                  <span className="text-[8px] font-ancient font-bold text-[#CD9C20] uppercase">
+                    {sweet.tag}
+                  </span>
+                  <span className="text-[8px] font-black uppercase text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                    R$ 0,00
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 }
+
+export default ComboCasalConfigurator;

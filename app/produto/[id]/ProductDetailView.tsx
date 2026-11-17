@@ -192,9 +192,9 @@ export function ProductDetailView({ item }: ProductDetailViewProps) {
   const totalPrice = unitPrice * quantity;
 
   const handleAdd = () => {
-    // Para o Combo Casal, o giro da roleta é obrigatório
+    // Para o Combo Casal, o sorteio na máquina caça-níqueis é obrigatório
     if (isComboCasal && !drawnSweetGift) {
-      showToast('🎰 Gire a Roleta Premiada de Cassino para resgatar seu Doce Grátis antes de pedir!');
+      showToast('🎰 Puxe a alavanca da Máquina Caça-Níqueis Retrô para resgatar seu Doce Grátis!');
       const el = document.getElementById('sorteio-brinde-area');
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -323,8 +323,8 @@ export function ProductDetailView({ item }: ProductDetailViewProps) {
               <Share2 className="w-3.5 h-3.5" />
             </button>
 
-            <button
-              onClick={() => setIsCartOpen(true)}
+            <Link
+              href="/carinho"
               className={`gold-gradient-bg text-[#0B0B0B] font-display font-black text-[10px] sm:text-xs px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full flex items-center gap-1 sm:gap-1.5 shadow-xs transition-all duration-300 ${
                 cartShake ? 'scale-125 ring-4 ring-[#CD9C20]/60 shadow-[0_0_22px_rgba(205,156,32,0.85)]' : ''
               }`}
@@ -334,7 +334,7 @@ export function ProductDetailView({ item }: ProductDetailViewProps) {
               <span suppressHydrationWarning className="font-bold">
                 {totalCartCount > 0 ? `R$ ${totalCartPrice.toFixed(2).replace('.', ',')}` : 'PEDIDO (0)'}
               </span>
-            </button>
+            </Link>
           </div>
         </div>
       </header>

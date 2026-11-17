@@ -170,15 +170,15 @@ export function FullMenu({
                 <motion.div
                   whileHover={{ y: item.isAvailable === 0 ? 0 : -4 }}
                   transition={{ duration: 0.2 }}
-                  className={`rounded-xl sm:rounded-2xl border p-2.5 sm:p-5 flex flex-col justify-between h-full transition-all shadow-[0_4px_20px_rgba(0,0,0,0.05)] ${
+                  className={`rounded-xl sm:rounded-2xl border p-2.5 sm:p-5 flex flex-col justify-between h-full transition-all shadow-[0_4px_20px_rgba(0,0,0,0.06)] ${
                     item.isAvailable === 0
-                      ? 'bg-neutral-100/90 border-neutral-300 opacity-75'
-                      : 'bg-white border-[#CD9C20]/30 group-hover:border-[#CD9C20] group-hover:shadow-[0_12px_30px_rgba(205,156,32,0.18)]'
+                      ? 'bg-neutral-100 border-neutral-300 opacity-75'
+                      : 'bg-white border-[#e2ddd3] group-hover:border-[#CD9C20] group-hover:shadow-[0_12px_30px_rgba(205,156,32,0.16)]'
                   }`}
                 >
                   {/* Top: Image or Inline Drink Card */}
                   {item.category === 'bebidas' ? (
-                    <div className="flex items-center gap-3 p-2.5 bg-[#FAF8F3] rounded-xl border border-[#CD9C20]/40 mb-3">
+                    <div className="flex items-center gap-3 p-2.5 bg-[#FAF8F5] rounded-xl border border-[#CD9C20]/25 mb-3 text-[#1c1c1c]">
                       <div className="relative w-10 h-10 rounded-lg bg-white border border-[#CD9C20]/30 flex items-center justify-center shrink-0 overflow-hidden">
                         <Image
                           src={item.image || '/coca.png'}
@@ -190,20 +190,20 @@ export function FullMenu({
                         />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-display text-xs sm:text-sm uppercase tracking-wide text-[#1c1c1c] group-hover:text-[#CD9C20] transition-colors truncate">
+                        <h3 className="font-display text-xs sm:text-sm uppercase tracking-wide text-[#1c1c1c] group-hover:text-[#996D09] transition-colors truncate">
                           {item.name}
                         </h3>
-                        <p className="text-[10px] text-neutral-500 font-ancient line-clamp-1">{item.description}</p>
+                        <p className="text-[10px] text-neutral-600 font-ancient line-clamp-1">{item.description}</p>
                       </div>
                     </div>
                   ) : (
-                    <div className="relative mb-2.5 sm:mb-4 overflow-hidden rounded-lg sm:rounded-xl">
+                    <div className="relative mb-2.5 sm:mb-4 overflow-hidden rounded-lg sm:rounded-xl bg-[#FAF8F5] border border-[#CD9C20]/25 p-1 flex items-center justify-center">
                       <ProductImage
                         src={item.image}
                         alt={item.name}
                         badge={item.isAvailable === 0 ? 'Esgotado' : undefined}
                         imageCodeHint={item.image || `/${item.imageType}.png`}
-                        className="w-full h-32 sm:h-44"
+                        className="w-full h-32 sm:h-44 bg-[#FAF8F5]"
                       />
                     </div>
                   )}
@@ -212,7 +212,7 @@ export function FullMenu({
                   {item.category !== 'bebidas' && (
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
-                        <h3 className="font-display text-xs sm:text-base uppercase tracking-wider text-[#1c1c1c] group-hover:text-[#CD9C20] transition-colors leading-tight line-clamp-1 sm:line-clamp-none">
+                        <h3 className="font-display text-xs sm:text-base uppercase tracking-wider text-[#1c1c1c] group-hover:text-[#996D09] transition-colors leading-tight line-clamp-1 sm:line-clamp-none">
                           {item.name}
                         </h3>
                         <p className="text-[10px] sm:text-xs text-neutral-600 leading-snug sm:leading-relaxed line-clamp-2 my-1.5 sm:mb-2 font-normal">
@@ -221,11 +221,11 @@ export function FullMenu({
 
                         {/* Ingredients Breakdown Tag */}
                         {item.isBurger && item.meat && (
-                          <div className="mb-2 p-1.5 bg-[#F9F7F1] rounded-lg border border-[#CD9C20]/20 text-[9px] sm:text-[10px] text-neutral-600 space-y-0.5 hidden sm:block">
-                            <p className="truncate"><strong className="text-neutral-800">Carne:</strong> {item.meat}</p>
-                            <p className="truncate"><strong className="text-neutral-800">Queijo:</strong> {item.cheese}</p>
+                          <div className="mb-2 p-1.5 bg-[#FAF8F5] rounded-lg border border-[#CD9C20]/25 text-[9px] sm:text-[10px] text-neutral-700 space-y-0.5 hidden sm:block">
+                            <p className="truncate"><strong className="text-[#996D09]">Carne:</strong> {item.meat}</p>
+                            <p className="truncate"><strong className="text-[#996D09]">Queijo:</strong> {item.cheese}</p>
                             {item.complements && (
-                              <p className="truncate"><strong className="text-neutral-800">Extras:</strong> {item.complements}</p>
+                              <p className="truncate"><strong className="text-[#996D09]">Extras:</strong> {item.complements}</p>
                             )}
                           </div>
                         )}
@@ -244,7 +244,7 @@ export function FullMenu({
 
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       {item.isAvailable === 0 ? (
-                        <span className="flex-1 sm:flex-none justify-center py-1.5 sm:py-2 px-2.5 sm:px-3 bg-neutral-300 text-neutral-600 font-display font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-md sm:rounded-lg flex items-center gap-1">
+                        <span className="flex-1 sm:flex-none justify-center py-1.5 sm:py-2 px-2.5 sm:px-3 bg-neutral-200 text-neutral-500 font-display font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-md sm:rounded-lg flex items-center gap-1">
                           <span>Esgotado</span>
                         </span>
                       ) : (

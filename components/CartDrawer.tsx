@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { CartItem, CustomerDetails, OrderType, PaymentMethod } from '@/types/burger';
-import { STORE_INFO, NEIGHBORHOOD_FEES, NEIGHBORHOOD_COUPONS } from '@/lib/data';
+import { STORE_INFO, NEIGHBORHOOD_FEES, NEIGHBORHOOD_COUPONS, getStoreWhatsAppUrl } from '@/lib/data';
 import { ProductImage } from '@/components/ProductImage';
 import { LaurelWreathIcon, SpartanHelmetIcon } from '@/components/GreekOrnament';
 import {
@@ -22,6 +23,7 @@ import {
   CreditCard,
   Banknote,
   AlertCircle,
+  AlertTriangle,
   Gift,
   Sparkles,
   MessageSquare,
@@ -97,6 +99,17 @@ export function CartDrawer({
   const total = Math.max(0, subtotal - discount + deliveryFee);
   const totalQuantity = items.reduce((acc, i) => acc + i.quantity, 0);
 
+  // Regra: Válido exclusivamente 1 brinde por compra de Combo Casal. Fora disso o brinde não é válido!
+  const hasStandaloneGift = items.some(
+    (item) =>
+      item.menuItemId.startsWith('brinde-') ||
+      (item.unitPrice === 0 && item.drawnSweetGift && !item.comboCasal)
+  );
+  const hasComboCasal = items.some(
+    (item) => Boolean(item.comboCasal) || item.menuItemId === 'combo-casal'
+  );
+  const needsComboCasalForGift = hasStandaloneGift && !hasComboCasal;
+
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError(null);
@@ -151,6 +164,10 @@ export function CartDrawer({
       setValidationError('Seu pedido está vazio.');
       return;
     }
+    if (needsComboCasalForGift) {
+      setValidationError('O brinde gratuito é válido exclusivamente na compra de 1 Combo Casal. Adicione 1 Combo Casal para continuar!');
+      return;
+    }
     setCurrentStep(2);
   };
 
@@ -186,7 +203,7 @@ export function CartDrawer({
         }
 
         if (item.drawnSweetGift) {
-          details += `\n   🎁 *Doce Brinde:* ${item.drawnSweetGift} (100% Grátis na Roleta)`;
+          details += `\n   🎁 *Doce Brinde:* ${item.drawnSweetGift} (100% Grátis no Caça-Níqueis)`;
         }
 
         if (item.notes) details += `\n   - Obs: "${item.notes}"`;
@@ -294,7 +311,7 @@ _Pedido enviado pelo cardápio digital do Teseu Burger._`;
     }
 
     // Build WhatsApp URL and open directly in a new window/tab
-    const waUrl = `https://wa.me/${STORE_INFO.whatsapp}?text=${generateWhatsAppMessage(orderId)}`;
+    const waUrl = getStoreWhatsAppUrl(generateWhatsAppMessage(orderId));
     window.open(waUrl, '_blank');
 
     setIsSubmittingOrder(false);
@@ -462,6 +479,29 @@ _Pedido enviado pelo cardápio digital do Teseu Burger._`;
                         Revise antes de avançar
                       </span>
                     </div>
+
+                    {/* Alerta de Regra: Brinde Condicionado ao Combo Casal */}
+                    {needsComboCasalForGift && (
+                      <div className="p-3 bg-amber-50 border-2 border-amber-400 rounded-xl flex items-start gap-2.5 text-xs text-amber-900 shadow-sm animate-pulse">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="font-bold text-amber-950 uppercase tracking-wide">
+                            Regra Oficial do Brinde:
+                          </p>
+                          <p className="text-[11px] text-amber-900 mt-0.5 leading-snug">
+                            Cada usuário pode ganhar só <strong>1 brinde por compra de Combo Casal</strong>. Fora da compra do combo, o brinde não é válido!
+                          </p>
+                          <Link
+                            href="/produto/combo-casal"
+                            onClick={onClose}
+                            className="mt-2 inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-amber-500 to-yellow-500 text-zinc-950 rounded-lg font-black text-[10px] uppercase tracking-wider hover:brightness-110 transition shadow-xs"
+                          >
+                            <span>Adicionar Combo Casal</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </Link>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Item Cards */}
                     <div className="space-y-3">

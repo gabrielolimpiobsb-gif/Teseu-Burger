@@ -1,7 +1,8 @@
 'use client';
-
+ 
 import React from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { CartDrawer } from '@/components/CartDrawer';
 import { OrderSuccessModal } from '@/components/OrderSuccessModal';
@@ -10,6 +11,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ProductImage } from '@/components/ProductImage';
 
 export function GlobalCartModals() {
+  const router = useRouter();
   const {
     cartItems,
     isCartOpen,
@@ -37,7 +39,7 @@ export function GlobalCartModals() {
 
   const handleOpenCartFromToast = () => {
     dismissAddedNotification();
-    setIsCartOpen(true);
+    router.push('/carinho');
   };
 
   return (

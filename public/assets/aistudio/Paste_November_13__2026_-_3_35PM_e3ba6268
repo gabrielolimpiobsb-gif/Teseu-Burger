@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teseu Burger — Sistema de Estoque, Fichas Técnicas & KDS</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Google Fonts: Cinzel (Clássico Grego-Romano) & Inter (Leitura SaaS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            teseu: {
+              crimson: '#710912',
+              crimsonDark: '#4e050b',
+              gold: '#C28D39',
+              goldLight: '#dfc18d',
+              cream: '#EFE5D2',
+              creamLight: '#F8F4EC',
+              dark: '#1A1615',
+              surface: '#241E1C'
+            }
+          },
+          fontFamily: {
+            display: ['Cinzel', 'serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #EFE5D2;
+      color: #1A1615;
+      font-family: 'Inter', sans-serif;
+    }
+    .font-olympus {
+      font-family: 'Cinzel', serif;
+    }
+    .gold-border {
+      border: 1px solid rgba(194, 141, 57, 0.45);
+    }
+    .gold-glow:hover {
+      box-shadow: 0 6px 20px -4px rgba(194, 141, 57, 0.35);
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #EFE5D2;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #C28D39;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #710912;
+    }
+    @keyframes pulseSubtle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    .animate-subtle {
+      animation: pulseSubtle 2.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-teseu-crimson selection:text-white">
+
+  <!-- TOP HEADER -->
+  <header class="bg-teseu-dark text-white border-b-2 border-teseu-gold sticky top-0 z-30 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      
+      <!-- Brand Identity -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-teseu-crimson border-2 border-teseu-gold flex items-center justify-center shadow-md">
+            <i class="fa-solid fa-fire-flame-curved text-teseu-gold text-xl"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-olympus text-xl sm:text-2xl font-bold tracking-wider text-teseu-gold">TESEU BURGER</h1>
+              <span class="text-[11px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-teseu-crimson text-teseu-cream border border-teseu-gold/50 font-semibold">Admin ERP</span>
+            </div>
+            <p class="text-xs text-stone-300">Controle de Insumos por Grama/Quilo/ML/Unidade & Baixa Automática KDS</p>
+          </div>
+        </div>
+
+        <!-- Mobile Reset Button -->
+        <button onclick="openResetModal()" title="Restaurar dados de fábrica" class="md:hidden text-xs px-2.5 py-1.5 rounded-lg border border-teseu-gold/40 text-teseu-gold hover:bg-teseu-gold/10">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+      </div>
+
+      <!-- Quick Live Metrics Bar -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-4">
+        <div class="bg-teseu-surface px-3 py-1.5 rounded-xl border border-teseu-gold/30 flex items-center gap-2.5">
+          <i class="fa-solid fa-Triangle-exclamation text-amber-400 text-sm" id="headerAlertIcon"></i>
+          <div class="text-xs">
+            <span class="text-stone-400 block">Alertas Críticos</span>
+            <span id="headerCriticalCount" class="font-bold text-white">0 insumos</span>
+          </div>
+        </div>
+
+        <div class="bg-teseu-surface px-3 py-1.5 rounded-xl border border-teseu-gold/30 flex items-center gap-2.5">
+          <i class="fa-solid fa-sack-dollar text-teseu-gold text-sm"></i>
+          <div class="text-xs">
+            <span class="text-stone-400 block">Valor em Estoque</span>
+            <span id="headerTotalStockValue" class="font-bold text-teseu-gold">R$ 0,00</span>
+          </div>
+        </div>
+
+        <div class="bg-teseu-surface px-3 py-1.5 rounded-xl border border-teseu-gold/30 flex items-center gap-2.5">
+          <i class="fa-solid fa-receipt text-emerald-400 text-sm"></i>
+          <div class="text-xs">
+            <span class="text-stone-400 block">Gasto Hoje (CMV)</span>
+            <span id="headerTodayCost" class="font-bold text-emerald-400">R$ 0,00</span>
+          </div>
+        </div>
+
+        <button onclick="openResetModal()" class="hidden md:inline-flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border border-teseu-gold/40 text-stone-300 hover:text-white hover:bg-teseu-crimson/60 transition">
+          <i class="fa-solid fa-rotate-left text-teseu-gold"></i>
+          <span>Resetar Demo</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-teseu-surface/95 border-t border-teseu-gold/20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto py-2" aria-label="Tabs">
+          <button onclick="switchTab('kds')" id="tab-btn-kds" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm whitespace-nowrap transition-all">
+            <i class="fa-solid fa-kitchen-set"></i>
+            <span>1. Cozinha / KDS (Baixa Automática)</span>
+            <span id="kdsQueueBadge" class="ml-1 px-2 py-0.5 text-[11px] rounded-full bg-teseu-gold text-teseu-dark font-bold">3</span>
+          </button>
+
+          <button onclick="switchTab('inventory')" id="tab-btn-inventory" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm whitespace-nowrap transition-all">
+            <i class="fa-solid fa-boxes-stacked"></i>
+            <span>2. Estoque de Insumos (g, kg, ml, un)</span>
+          </button>
+
+          <button onclick="switchTab('recipes')" id="tab-btn-recipes" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm whitespace-nowrap transition-all">
+            <i class="fa-solid fa-burger"></i>
+            <span>3. Fichas Técnicas (Cardápio Teseu)</span>
+          </button>
+
+          <button onclick="switchTab('reports')" id="tab-btn-reports" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm whitespace-nowrap transition-all">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>4. Relatórios de Gastos (Dia/Sem/Mês/Ano)</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ========================================================== -->
+    <!-- MODULE 1: COZINHA / SIMULADOR KDS (BAIXA AUTOMÁTICA)       -->
+    <!-- ========================================================== -->
+    <section id="tab-kds" class="tab-section space-y-6">
+      <!-- Explainer Banner -->
+      <div class="bg-gradient-to-r from-teseu-crimson to-teseu-dark text-white rounded-2xl p-5 shadow-md border border-teseu-gold flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-teseu-gold font-bold">
+            <i class="fa-solid fa-bolt"></i> Integração Cozinha &rarr; Estoque em Tempo Real
+          </div>
+          <h2 class="font-olympus text-xl sm:text-2xl font-bold">Simulador de Pedidos na Cozinha (KDS)</h2>
+          <p class="text-xs sm:text-sm text-stone-200 max-w-3xl">
+            Quando um pedido sai na cozinha, o sistema converte e desconta automaticamente cada ingrediente na medida exata (ex: desconta <strong>250g</strong> dos <strong>2kg de batata</strong>, <strong>10g de tomate</strong>, <strong>1 un de carne</strong>) e registra o custo no relatório financeiro.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 shrink-0">
+          <button onclick="addSimulatedQueueOrder()" class="px-4 py-2.5 rounded-xl bg-teseu-gold text-teseu-dark font-bold text-xs sm:text-sm hover:bg-teseu-goldLight transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle"></i> Gerar Pedido Aleatório na Fila
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Custom Order Builder (5 cols) -->
+        <div class="lg:col-span-5 bg-teseu-creamLight rounded-2xl p-5 gold-border shadow-sm flex flex-col justify-between space-y-4">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-teseu-gold/30 pb-3">
+              <div>
+                <h3 class="font-olympus font-bold text-lg text-teseu-crimson flex items-center gap-2">
+                  <i class="fa-solid fa-cash-register text-teseu-gold"></i> Lançar Pedido Manual / PDV
+                </h3>
+                <p class="text-xs text-stone-600">Monte uma comanda e veja a prévia exata do desconto no estoque</p>
+              </div>
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-teseu-crimson/10 text-teseu-crimson" id="builderOrderNumber">#1042</span>
+            </div>
+
+            <!-- Customer / Table Input -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 mb-1">Cliente / Identificação</label>
+                <input type="text" id="kdsCustomerName" value="Mesa 07 - Perseu" placeholder="Ex: Mesa 04 / iFood" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:border-teseu-crimson" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 mb-1">Canal do Pedido</label>
+                <select id="kdsOrderChannel" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:border-teseu-crimson">
+                  <option value="Salão Olímpico">Salão Olímpico</option>
+                  <option value="Delivery App">Delivery App</option>
+                  <option value="Retirada Balcão">Retirada Balcão</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Select Menu Items -->
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1.5">Adicionar Itens do Cardápio Teseu</label>
+              <div class="flex gap-2">
+                <select id="kdsRecipeSelect" class="flex-1 px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:border-teseu-crimson"></select>
+                <input type="number" id="kdsRecipeQty" value="1" min="1" max="20" class="w-16 px-2 py-2 rounded-xl border border-stone-300 bg-white text-center text-sm font-bold" />
+                <button onclick="addItemToBuilder()" class="px-3.5 py-2 rounded-xl bg-teseu-crimson text-white font-semibold text-sm hover:bg-teseu-crimsonDark transition flex items-center gap-1">
+                  <i class="fa-solid fa-plus"></i> Add
+                </button>
+              </div>
+            </div>
+
+            <!-- Current Cart List -->
+            <div class="bg-white rounded-xl p-3 border border-stone-200 space-y-2 max-h-48 overflow-y-auto" id="kdsBuilderCartList">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Real-time Stock Deduction Preview -->
+            <div class="bg-teseu-dark text-white rounded-xl p-3.5 border border-teseu-gold/50 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-teseu-gold flex items-center gap-1.5">
+                  <i class="fa-solid fa-scale-balanced"></i> Prévia de Desconto no Estoque:
+                </span>
+                <span id="kdsPreviewTotalCost" class="text-xs font-bold text-emerald-400">CMV Total: R$ 0,00</span>
+              </div>
+              <div id="kdsDeductionPreviewList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1 text-xs">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button onclick="sendBuilderToQueue()" class="w-full py-2.5 px-4 rounded-xl border-2 border-teseu-crimson text-teseu-crimson font-bold text-xs sm:text-sm hover:bg-teseu-crimson hover:text-white transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-clock"></i> Enviar p/ Fila KDS
+            </button>
+            <button onclick="dispatchBuilderImmediately()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-700 text-white font-bold text-xs sm:text-sm hover:bg-emerald-800 transition shadow flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check-double"></i> Dar Saída Agora
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Active KDS Kitchen Tickets + Live Log (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+          
+          <!-- Active Kitchen Queue -->
+          <div class="bg-teseu-creamLight rounded-2xl p-5 gold-border shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-teseu-gold/30 pb-3">
+              <div>
+                <h3 class="font-olympus font-bold text-lg text-teseu-dark flex items-center gap-2">
+                  <i class="fa-solid fa-fire-burner text-teseu-crimson"></i> Comandas na Cozinha (Aguardando Saída)
+                </h3>
+                <p class="text-xs text-stone-600">Clique em <strong>"Dar Saída & Descontar Estoque"</strong> quando o pedido ficar pronto</p>
+              </div>
+              <button onclick="dispatchAllKdsQueue()" id="btnDispatchAll" class="text-xs px-3 py-1.5 rounded-xl bg-teseu-crimson text-white font-semibold hover:bg-teseu-crimsonDark transition self-start sm:self-auto">
+                <i class="fa-solid fa-bolt mr-1"></i> Despachar Todos da Fila
+              </button>
+            </div>
+
+            <div id="kdsActiveQueueContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Active Tickets Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Recent Deductions Feed -->
+          <div class="bg-teseu-dark text-white rounded-2xl p-5 border border-teseu-gold/40 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-olympus text-sm font-bold text-teseu-gold flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left"></i> Últimas Baixas Automáticas Realizadas
+              </h4>
+              <button onclick="switchTab('reports')" class="text-xs text-teseu-goldLight underline hover:text-white">
+                Ver Relatório Completo &rarr;
+              </button>
+            </div>
+            <div id="kdsRecentLogsContainer" class="space-y-2 max-h-52 overflow-y-auto pr-1">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- MODULE 2: ESTOQUE DE INSUMOS (CONVERSÃO INTELIGENTE)       -->
+    <!-- ========================================================== -->
+    <section id="tab-inventory" class="tab-section hidden space-y-6">
+      
+      <!-- Top Controls & Smart Unit Explanation -->
+      <div class="bg-teseu-creamLight rounded-2xl p-5 gold-border shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teseu-crimson text-white">Motor de Conversão Automática</span>
+            <span class="text-xs text-stone-600 font-medium">1 kg = 1.000 g &bull; 1 L = 1.000 ml &bull; un = unidade</span>
+          </div>
+          <h2 class="font-olympus text-xl sm:text-2xl font-bold text-teseu-dark">Estoque de Insumos & Matéria-Prima</h2>
+          <p class="text-xs sm:text-sm text-stone-600">
+            Cadastre seus produtos em <strong>Quilos (kg)</strong>, <strong>Gramas (g)</strong>, <strong>Litros (L)</strong>, <strong>Mililitros (ml)</strong> ou <strong>Unidades (un)</strong>. Se você tiver 2kg de batata e sair um pedido com 250g, o estoque passa para <strong>1,75 kg (1.750 g)</strong> automaticamente.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+          <button onclick="openNewIngredientModal()" class="px-4 py-2.5 rounded-xl bg-teseu-crimson text-white font-bold text-xs sm:text-sm hover:bg-teseu-crimsonDark transition shadow flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Cadastrar Novo Insumo
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter & Search Bar -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl gold-border">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-sm"></i>
+          <input type="text" id="inventorySearchInput" oninput="renderInventory()" placeholder="Buscar insumo (ex: carne, batata, tomate, cheddar, pão...)" class="w-full pl-9 pr-4 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-teseu-crimson" />
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="inventoryCategoryFilter" onchange="renderInventory()" class="px-3 py-2 rounded-xl border border-stone-200 text-xs sm:text-sm bg-white font-medium">
+            <option value="ALL">Todas as Categorias</option>
+            <option value="Carnes & Proteínas">Carnes & Proteínas</option>
+            <option value="Pães & Massas">Pães & Massas</option>
+            <option value="Queijos & Laticínios">Queijos & Laticínios</option>
+            <option value="Hortifruti">Hortifruti</option>
+            <option value="Congelados & Fritos">Congelados & Fritos</option>
+            <option value="Molhos & Condimentos">Molhos & Condimentos</option>
+            <option value="Embalagens">Embalagens</option>
+          </select>
+
+          <select id="inventoryStatusFilter" onchange="renderInventory()" class="px-3 py-2 rounded-xl border border-stone-200 text-xs sm:text-sm bg-white font-medium">
+            <option value="ALL">Todos os Status</option>
+            <option value="CRITICAL">Apenas Estoque Crítico / Baixo</option>
+            <option value="OK">Estoque Normal</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Inventory Table -->
+      <div class="bg-white rounded-2xl gold-border shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-teseu-dark text-teseu-gold text-xs uppercase tracking-wider">
+                <th class="py-3.5 px-4 font-semibold">Insumo / Categoria</th>
+                <th class="py-3.5 px-4 font-semibold">Saldo Atual (Principal)</th>
+                <th class="py-3.5 px-4 font-semibold">Conversão Base (g/ml/un)</th>
+                <th class="py-3.5 px-4 font-semibold">Mínimo Alerta</th>
+                <th class="py-3.5 px-4 font-semibold">Custo Pago</th>
+                <th class="py-3.5 px-4 font-semibold">Valor em Estoque</th>
+                <th class="py-3.5 px-4 font-semibold text-right">Ações Rápidas</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody" class="divide-y divide-stone-200 text-sm">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- MODULE 3: FICHAS TÉCNICAS (CARDÁPIO TESEU BURGER)          -->
+    <!-- ========================================================== -->
+    <section id="tab-recipes" class="tab-section hidden space-y-6">
+      <div class="bg-teseu-creamLight rounded-2xl p-5 gold-border shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teseu-gold text-teseu-dark">Engenharia de Cardápio & CMV</span>
+          <h2 class="font-olympus text-xl sm:text-2xl font-bold text-teseu-dark">Fichas Técnicas — Lanches & Porções Teseu Burger</h2>
+          <p class="text-xs sm:text-sm text-stone-600">
+            Configure exatamente quantas <strong>gramas (g)</strong>, <strong>mililitros (ml)</strong> ou <strong>unidades (un)</strong> cada produto consome quando é vendido. O cálculo de CMV (Custo de Mercadoria Vendida) e margem é atualizado automaticamente.
+          </p>
+        </div>
+
+        <button onclick="openRecipeModal()" class="px-4 py-2.5 rounded-xl bg-teseu-crimson text-white font-bold text-xs sm:text-sm hover:bg-teseu-crimsonDark transition shadow flex items-center gap-2 self-start lg:self-auto shrink-0">
+          <i class="fa-solid fa-plus"></i> Nova Ficha Técnica (Produto)
+        </button>
+      </div>
+
+      <!-- Recipes Grid -->
+      <div id="recipesGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- MODULE 4: RELATÓRIOS DE GASTOS (DIÁRIO, SEMANAL, MENSAL, ANUAL) -->
+    <!-- ========================================================== -->
+    <section id="tab-reports" class="tab-section hidden space-y-6">
+      
+      <!-- Period Selector Header -->
+      <div class="bg-teseu-dark text-white rounded-2xl p-5 border border-teseu-gold shadow-md flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-teseu-gold font-bold">Auditoria Financeira de Insumos</span>
+          <h2 class="font-olympus text-xl sm:text-2xl font-bold">Relatório de Gastos & Consumo de Estoque</h2>
+          <p class="text-xs sm:text-sm text-stone-300">
+            Acompanhe quanto você está gastando em mercadoria consumida por período: <strong>Diário, Semanal, Mensal e Anual</strong>.
+          </p>
+        </div>
+
+        <!-- Period Filter Buttons -->
+        <div class="flex flex-wrap items-center gap-1.5 bg-teseu-surface p-1.5 rounded-xl border border-teseu-gold/40">
+          <button onclick="setReportPeriod('DAILY')" id="period-btn-DAILY" class="period-btn px-3.5 py-2 rounded-lg text-xs font-bold transition">
+            Hoje (Diário)
+          </button>
+          <button onclick="setReportPeriod('WEEKLY')" id="period-btn-WEEKLY" class="period-btn px-3.5 py-2 rounded-lg text-xs font-bold transition">
+            7 Dias (Semanal)
+          </button>
+          <button onclick="setReportPeriod('MONTHLY')" id="period-btn-MONTHLY" class="period-btn px-3.5 py-2 rounded-lg text-xs font-bold transition">
+            30 Dias (Mensal)
+          </button>
+          <button onclick="setReportPeriod('YEARLY')" id="period-btn-YEARLY" class="period-btn px-3.5 py-2 rounded-lg text-xs font-bold transition">
+            12 Meses (Anual)
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-2xl gold-border shadow-sm">
+          <div class="flex items-center justify-between text-xs text-stone-500 font-semibold mb-1">
+            <span id="kpiPeriodLabelCost">GASTO DE INSUMOS (PERÍODO)</span>
+            <i class="fa-solid fa-coins text-teseu-crimson text-base"></i>
+          </div>
+          <div id="kpiTotalCost" class="text-2xl font-extrabold text-teseu-crimson">R$ 0,00</div>
+          <p class="text-[11px] text-stone-500 mt-1">Soma exata dos ingredientes descontados</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl gold-border shadow-sm">
+          <div class="flex items-center justify-between text-xs text-stone-500 font-semibold mb-1">
+            <span>RECEITA BRUTA DOS PEDIDOS</span>
+            <i class="fa-solid fa-cash-register text-emerald-600 text-base"></i>
+          </div>
+          <div id="kpiTotalRevenue" class="text-2xl font-extrabold text-emerald-700">R$ 0,00</div>
+          <p id="kpiCmvPercentage" class="text-[11px] text-stone-500 mt-1">CMV Médio: 0%</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl gold-border shadow-sm">
+          <div class="flex items-center justify-between text-xs text-stone-500 font-semibold mb-1">
+            <span>PEDIDOS DESPACHADOS</span>
+            <i class="fa-solid fa-utensils text-teseu-gold text-base"></i>
+          </div>
+          <div id="kpiOrdersCount" class="text-2xl font-extrabold text-teseu-dark">0 pedidos</div>
+          <p id="kpiItemsCount" class="text-[11px] text-stone-500 mt-1">0 lanches/porções produzidos</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl gold-border shadow-sm">
+          <div class="flex items-center justify-between text-xs text-stone-500 font-semibold mb-1">
+            <span>MAIOR GASTO POR INSUMO</span>
+            <i class="fa-solid fa-ranking-star text-amber-600 text-base"></i>
+          </div>
+          <div id="kpiTopIngredientName" class="text-base font-extrabold text-teseu-dark truncate">—</div>
+          <p id="kpiTopIngredientValue" class="text-xs font-bold text-teseu-crimson mt-1">R$ 0,00 consumidos</p>
+        </div>
+      </div>
+
+      <!-- Comparison Summary Bar (Diário vs Semanal vs Mensal vs Anual at a glance) -->
+      <div class="bg-teseu-creamLight rounded-2xl p-4 gold-border grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-white p-3 rounded-xl border border-stone-200 flex items-center justify-between">
+          <div>
+            <span class="text-[11px] uppercase font-bold text-stone-400 block">Gasto Hoje (Diário)</span>
+            <span id="summaryBoxDaily" class="text-base font-extrabold text-teseu-dark">R$ 0,00</span>
+          </div>
+          <span class="text-xs px-2 py-1 rounded-lg bg-stone-100 text-stone-600 font-semibold">24h</span>
+        </div>
+        <div class="bg-white p-3 rounded-xl border border-stone-200 flex items-center justify-between">
+          <div>
+            <span class="text-[11px] uppercase font-bold text-stone-400 block">Gasto Semanal</span>
+            <span id="summaryBoxWeekly" class="text-base font-extrabold text-teseu-dark">R$ 0,00</span>
+          </div>
+          <span class="text-xs px-2 py-1 rounded-lg bg-stone-100 text-stone-600 font-semibold">7 dias</span>
+        </div>
+        <div class="bg-white p-3 rounded-xl border border-stone-200 flex items-center justify-between">
+          <div>
+            <span class="text-[11px] uppercase font-bold text-stone-400 block">Gasto Mensal</span>
+            <span id="summaryBoxMonthly" class="text-base font-extrabold text-teseu-dark">R$ 0,00</span>
+          </div>
+          <span class="text-xs px-2 py-1 rounded-lg bg-stone-100 text-stone-600 font-semibold">30 dias</span>
+        </div>
+        <div class="bg-white p-3 rounded-xl border border-stone-200 flex items-center justify-between">
+          <div>
+            <span class="text-[11px] uppercase font-bold text-stone-400 block">Gasto Anual</span>
+            <span id="summaryBoxYearly" class="text-base font-extrabold text-teseu-crimson">R$ 0,00</span>
+          </div>
+          <span class="text-xs px-2 py-1 rounded-lg bg-teseu-crimson/10 text-teseu-crimson font-semibold">365 dias</span>
+        </div>
+      </div>
+
+      <!-- Breakdown by Ingredient + Visual Chart -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Ingredient Consumption Breakdown (7 cols) -->
+        <div class="lg:col-span-7 bg-white rounded-2xl p-5 gold-border shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+            <div>
+              <h3 class="font-olympus font-bold text-base sm:text-lg text-teseu-dark">Consumo Acumulado por Insumo no Período</h3>
+              <p class="text-xs text-stone-500">Quantidade total descontada (g, kg, ml, un) e respectivo custo em R$</p>
+            </div>
+            <button onclick="exportReportCSV()" class="text-xs px-3 py-1.5 rounded-xl border border-teseu-gold text-teseu-dark font-semibold hover:bg-teseu-cream transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-csv text-teseu-crimson"></i> Exportar CSV
+            </button>
+          </div>
+
+          <div id="reportIngredientBreakdown" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Detailed Ledger of Orders (5 cols) -->
+        <div class="lg:col-span-5 bg-white rounded-2xl p-5 gold-border shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+            <div>
+              <h3 class="font-olympus font-bold text-base sm:text-lg text-teseu-dark">Histórico de Pedidos & Baixas</h3>
+              <p class="text-xs text-stone-500">Registro cronológico de cada saída da cozinha</p>
+            </div>
+            <button onclick="simulateHistoricalBatch()" title="Gerar vendas simuladas para testar gráficos" class="text-xs px-2.5 py-1.5 rounded-xl bg-teseu-gold/20 text-teseu-dark font-semibold hover:bg-teseu-gold/40 transition">
+              + Simular Lote
+            </button>
+          </div>
+
+          <div id="reportLedgerList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================== -->
+  <!-- MODAL 1: CADASTRAR / EDITAR INSUMO DO ESTOQUE              -->
+  <!-- ========================================================== -->
+  <div id="ingredientModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-teseu-creamLight w-full max-w-lg rounded-2xl gold-border shadow-2xl overflow-hidden">
+      <div class="bg-teseu-dark text-white px-5 py-4 flex items-center justify-between border-b border-teseu-gold">
+        <h3 id="ingredientModalTitle" class="font-olympus font-bold text-lg text-teseu-gold">Cadastrar Novo Insumo</h3>
+        <button onclick="closeIngredientModal()" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form onsubmit="saveIngredientForm(event)" class="p-5 space-y-4">
+        <input type="hidden" id="ingFormId" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-stone-700 mb-1">Nome do Insumo *</label>
+            <input type="text" id="ingFormName" required placeholder="Ex: Batata Palito Congelada" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Categoria</label>
+            <select id="ingFormCategory" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm">
+              <option value="Carnes & Proteínas">Carnes & Proteínas</option>
+              <option value="Pães & Massas">Pães & Massas</option>
+              <option value="Queijos & Laticínios">Queijos & Laticínios</option>
+              <option value="Hortifruti">Hortifruti</option>
+              <option value="Congelados & Fritos">Congelados & Fritos</option>
+              <option value="Molhos & Condimentos">Molhos & Condimentos</option>
+              <option value="Embalagens">Embalagens</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-3.5 rounded-xl border border-stone-200">
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Unidade de Medida *</label>
+            <select id="ingFormUnit" onchange="updateUnitHelperText()" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-stone-50 text-sm font-bold text-teseu-crimson">
+              <option value="kg">Quilo (kg)</option>
+              <option value="g">Grama (g)</option>
+              <option value="L">Litro (L)</option>
+              <option value="ml">Mililitro (ml)</option>
+              <option value="un">Unidade (un)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Qtd. em Estoque *</label>
+            <input type="number" step="0.001" min="0" id="ingFormQty" required placeholder="Ex: 2" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm font-bold" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Alerta Mínimo *</label>
+            <input type="number" step="0.001" min="0" id="ingFormMinQty" required placeholder="Ex: 0.5" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm" />
+          </div>
+        </div>
+
+        <div class="bg-white p-3.5 rounded-xl border border-stone-200 space-y-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+            <div>
+              <label id="ingFormCostLabel" class="block text-xs font-bold text-stone-700 mb-1">Custo por Quilo (R$ / kg) *</label>
+              <input type="number" step="0.01" min="0.01" id="ingFormCost" required placeholder="Ex: 18.00" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm font-bold text-emerald-700" />
+            </div>
+            <div class="text-xs text-stone-600 bg-stone-50 p-2.5 rounded-lg border border-stone-200" id="ingFormConversionPreview">
+              O sistema converterá automaticamente <strong>kg &harr; g</strong> nos pedidos da cozinha.
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" onclick="closeIngredientModal()" class="px-4 py-2 rounded-xl border border-stone-300 text-stone-700 text-xs font-bold hover:bg-stone-200">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-teseu-crimson text-white text-xs font-bold hover:bg-teseu-crimsonDark shadow">Salvar Insumo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================== -->
+  <!-- MODAL 2: REPOR ESTOQUE (+ ENTRADA DE MERCADORIA)           -->
+  <!-- ========================================================== -->
+  <div id="restockModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-teseu-creamLight w-full max-w-md rounded-2xl gold-border shadow-2xl overflow-hidden">
+      <div class="bg-teseu-dark text-white px-5 py-4 flex items-center justify-between border-b border-teseu-gold">
+        <h3 class="font-olympus font-bold text-lg text-teseu-gold">Entrada de Mercadoria</h3>
+        <button onclick="closeRestockModal()" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form onsubmit="confirmRestock(event)" class="p-5 space-y-4">
+        <input type="hidden" id="restockIngId" />
+        <div class="bg-white p-3 rounded-xl border border-stone-200">
+          <span class="text-xs text-stone-500 block">Insumo Selecionado</span>
+          <strong id="restockIngName" class="text-base text-teseu-dark">Batata Palito</strong>
+          <span id="restockCurrentBalance" class="text-xs text-teseu-crimson block mt-0.5">Saldo atual: 2 kg (2000 g)</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Qtd. a Adicionar *</label>
+            <input type="number" step="0.001" min="0.001" id="restockQty" required placeholder="Ex: 5" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm font-bold" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Unidade da Entrada</label>
+            <select id="restockUnit" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm font-bold text-teseu-crimson"></select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" onclick="closeRestockModal()" class="px-4 py-2 rounded-xl border border-stone-300 text-stone-700 text-xs font-bold">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 shadow">
+            <i class="fa-solid fa-plus mr-1"></i> Somar ao Estoque
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================== -->
+  <!-- MODAL 3: CRIAR / EDITAR FICHA TÉCNICA                      -->
+  <!-- ========================================================== -->
+  <div id="recipeModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-teseu-creamLight w-full max-w-2xl rounded-2xl gold-border shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div class="bg-teseu-dark text-white px-5 py-4 flex items-center justify-between border-b border-teseu-gold">
+        <h3 id="recipeModalTitle" class="font-olympus font-bold text-lg text-teseu-gold">Configurar Ficha Técnica</h3>
+        <button onclick="closeRecipeModal()" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form onsubmit="saveRecipeForm(event)" class="p-5 space-y-4 overflow-y-auto flex-1">
+        <input type="hidden" id="recipeFormId" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-stone-700 mb-1">Nome do Lanche / Produto *</label>
+            <input type="text" id="recipeFormName" required placeholder="Ex: Teseu Zeus Duplo" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm font-bold" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Preço de Venda (R$) *</label>
+            <input type="number" step="0.01" min="1" id="recipeFormPrice" required placeholder="Ex: 39.90" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm font-bold text-emerald-700" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Descrição Curta</label>
+          <input type="text" id="recipeFormDesc" placeholder="Ex: Pão brioche, 2x blend 160g, cheddar, bacon e batata 250g" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white text-sm" />
+        </div>
+
+        <!-- Add Ingredient to Recipe -->
+        <div class="bg-white p-3.5 rounded-xl border border-stone-200 space-y-3">
+          <label class="block text-xs font-bold text-teseu-crimson uppercase tracking-wider">Adicionar Insumo que será Descontado por Pedido</label>
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+            <select id="recipeIngSelect" onchange="syncRecipeIngUnitOptions()" class="sm:col-span-6 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50 text-xs sm:text-sm font-medium"></select>
+            <input type="number" step="0.01" min="0.01" id="recipeIngQty" placeholder="Qtd (ex: 250)" class="sm:col-span-3 px-3 py-2 rounded-xl border border-stone-300 bg-white text-xs sm:text-sm font-bold" />
+            <select id="recipeIngUnit" class="sm:col-span-2 px-2 py-2 rounded-xl border border-stone-300 bg-stone-50 text-xs sm:text-sm font-bold text-teseu-crimson"></select>
+            <button type="button" onclick="addIngredientToRecipeDraft()" class="sm:col-span-1 py-2 rounded-xl bg-teseu-crimson text-white font-bold text-xs hover:bg-teseu-crimsonDark">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+
+          <div id="recipeDraftItemsList" class="divide-y divide-stone-200 max-h-48 overflow-y-auto">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-stone-300">
+          <div class="text-xs">
+            <span class="text-stone-500">Custo de Insumos (CMV):</span>
+            <strong id="recipeModalLiveCmv" class="text-teseu-crimson text-sm ml-1">R$ 0,00</strong>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" onclick="closeRecipeModal()" class="px-4 py-2 rounded-xl border border-stone-300 text-stone-700 text-xs font-bold">Cancelar</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-teseu-crimson text-white text-xs font-bold hover:bg-teseu-crimsonDark shadow">Salvar Ficha Técnica</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================== -->
+  <!-- MODAL 4: CONFIRMAÇÃO DE RESET DEMO                         -->
+  <!-- ========================================================== -->
+  <div id="resetModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl gold-border p-5 shadow-2xl space-y-4 text-center">
+      <div class="w-12 h-12 rounded-full bg-teseu-crimson/10 text-teseu-crimson mx-auto flex items-center justify-center">
+        <i class="fa-solid fa-rotate-left text-xl"></i>
+      </div>
+      <h3 class="font-olympus font-bold text-lg text-teseu-dark">Restaurar Estoque Padrão?</h3>
+      <p class="text-xs text-stone-600">
+        Isso restaurará os insumos iniciais (2kg de batata, 5 carnes de hambúrguer, tomate, queijos, etc.) e o histórico de demonstração do Teseu Burger.
+      </p>
+      <div class="flex gap-2 justify-center pt-2">
+        <button onclick="closeResetModal()" class="px-4 py-2 rounded-xl border border-stone-300 text-xs font-bold text-stone-700">Cancelar</button>
+        <button onclick="confirmResetDemo()" class="px-4 py-2 rounded-xl bg-teseu-crimson text-white text-xs font-bold hover:bg-teseu-crimsonDark">Sim, Restaurar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- ========================================================== -->
+  <!-- APPLICATION JAVASCRIPT & SMART UNIT ENGINE                 -->
+  <!-- ========================================================== -->
+  <script>
+    const STORAGE_KEY = 'TESEU_BURGER_ERP_V1';
+
+    // Current UI states
+    let activeTab = 'kds';
+    let activeReportPeriod = 'DAILY';
+    let kdsBuilderCart = [];
+    let recipeModalDraftItems = [];
+
+    // ============================================================================
+    // 1. CONVERSOR INTELIGENTE DE MEDIDAS (g <-> kg, ml <-> L, un)
+    // ============================================================================
+    function getBaseType(unit) {
+      if (unit === 'kg' || unit === 'g') return 'mass';     // Base interna: gramas (g)
+      if (unit === 'L' || unit === 'ml') return 'volume';   // Base interna: mililitros (ml)
+      return 'unit';                                        // Base interna: unidades (un)
+    }
+
+    function toBaseAmount(qty, unit) {
+      const n = parseFloat(qty) || 0;
+      if (unit === 'kg' || unit === 'L') return Math.round(n * 1000 * 100) / 100;
+      return Math.round(n * 100) / 100;
+    }
+
+    function fromBaseAmount(baseQty, displayUnit) {
+      const n = parseFloat(baseQty) || 0;
+      if (displayUnit === 'kg' || displayUnit === 'L') {
+        return Math.round((n / 1000) * 1000) / 1000;
+      }
+      return Math.round(n * 100) / 100;
+    }
+
+    function getBaseUnitSymbol(baseType) {
+      if (baseType === 'mass') return 'g';
+      if (baseType === 'volume') return 'ml';
+      return 'un';
+    }
+
+    // Formata exibições amigáveis como "1,75 kg (1.750 g)"
+    function formatDualStock(baseQty, preferredUnit, baseType) {
+      const baseSymbol = getBaseUnitSymbol(baseType);
+      if (preferredUnit === 'kg' || preferredUnit === 'L') {
+        const mainVal = (baseQty / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+        const subVal = Math.round(baseQty).toLocaleString('pt-BR');
+        return {
+          primary: `${mainVal} ${preferredUnit}`,
+          secondary: `${subVal} ${baseSymbol}`
+        };
+      } else {
+        const subVal = Math.round(baseQty).toLocaleString('pt-BR');
+        if (baseType === 'mass' && baseQty >= 1000) {
+          const kgVal = (baseQty / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+          return { primary: `${subVal} g`, secondary: `equiv. ${kgVal} kg` };
+        }
+        if (baseType === 'volume' && baseQty >= 1000) {
+          const lVal = (baseQty / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+          return { primary: `${subVal} ml`, secondary: `equiv. ${lVal} L` };
+        }
+        return { primary: `${subVal} ${baseSymbol}`, secondary: `Medida exata` };
+      }
+    }
+
+    function formatCurrency(val) {
+      return (parseFloat(val) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    // ============================================================================
+    // 2. DADOS INICIAIS REALISTAS (INCLUINDO O EXEMPLO EXATO DO USUÁRIO)
+    // ============================================================================
+    function getInitialData() {
+      const now = Date.now();
+      const hour = 3600 * 1000;
+      const day = 24 * hour;
+
+      // Insumos pré-cadastrados (incluindo 5 carnes de hambúrguer, 2kg de batata, tomate em gramas, etc.)
+      const ingredients = [
+        {
+          id: 'ing_carne',
+          name: 'Carne de Hambúrguer (Blend 160g)',
+          category: 'Carnes & Proteínas',
+          baseType: 'unit',
+          displayUnit: 'un',
+          stockBase: 5,           // Exemplo exato do usuário: 5 carnes de hambúrguer no estoque
+          minBase: 10,            // Já começa com alerta para demonstrar reposição ou consumo
+          costPerBase: 6.50       // R$ 6,50 por unidade
+        },
+        {
+          id: 'ing_batata',
+          name: 'Batata Palito Congelada',
+          category: 'Congelados & Fritos',
+          baseType: 'mass',
+          displayUnit: 'kg',
+          stockBase: 2000,        // Exemplo exato do usuário: 2kg (2000g) de batata no estoque
+          minBase: 1000,          // 1kg mínimo
+          costPerBase: 0.018      // R$ 18,00 por kg (R$ 0,018 por grama)
+        },
+        {
+          id: 'ing_tomate',
+          name: 'Tomate Italiano Fatiado',
+          category: 'Hortifruti',
+          baseType: 'mass',
+          displayUnit: 'g',
+          stockBase: 850,         // 850g no estoque (desconta 10g por pedido conforme exemplo)
+          minBase: 300,
+          costPerBase: 0.009      // R$ 9,00 / kg
+        },
+        {
+          id: 'ing_pao',
+          name: 'Pão Brioche Artesanal Selado',
+          category: 'Pães & Massas',
+          baseType: 'unit',
+          displayUnit: 'un',
+          stockBase: 24,
+          minBase: 8,
+          costPerBase: 2.20
+        },
+        {
+          id: 'ing_cheddar',
+          name: 'Queijo Cheddar Inglês',
+          category: 'Queijos & Laticínios',
+          baseType: 'mass',
+          displayUnit: 'kg',
+          stockBase: 1500,        // 1.5 kg
+          minBase: 400,
+          costPerBase: 0.048      // R$ 48,00 / kg
+        },
+        {
+          id: 'ing_bacon',
+          name: 'Bacon Defumado em Tiras',
+          category: 'Carnes & Proteínas',
+          baseType: 'mass',
+          displayUnit: 'kg',
+          stockBase: 1200,        // 1.2 kg
+          minBase: 400,
+          costPerBase: 0.042      // R$ 42,00 / kg
+        },
+        {
+          id: 'ing_maionese',
+          name: 'Maionese Temperada Teseu',
+          category: 'Molhos & Condimentos',
+          baseType: 'volume',
+          displayUnit: 'L',
+          stockBase: 1800,        // 1.8 Litros (1800 ml)
+          minBase: 500,
+          costPerBase: 0.025      // R$ 25,00 / Litro
+        },
+        {
+          id: 'ing_alface',
+          name: 'Alface Americana Crocante',
+          category: 'Hortifruti',
+          baseType: 'mass',
+          displayUnit: 'g',
+          stockBase: 600,
+          minBase: 200,
+          costPerBase: 0.012
+        },
+        {
+          id: 'ing_embalagem',
+          name: 'Kit Embalagem Térmica Teseu',
+          category: 'Embalagens',
+          baseType: 'unit',
+          displayUnit: 'un',
+          stockBase: 45,
+          minBase: 15,
+          costPerBase: 1.40
+        }
+      ];
+
+      // Fichas Técnicas do Cardápio Teseu Burger
+      const recipes = [
+        {
+          id: 'rec_teseu_combo',
+          name: 'Combo Clássico Teseu + Batata',
+          price: 38.90,
+          description: '1 Carne, 250g de Batata, 10g de Tomate, Pão Brioche, Cheddar e Maionese (Exemplo exato)',
+          items: [
+            { ingredientId: 'ing_carne', qty: 1, unit: 'un' },
+            { ingredientId: 'ing_batata', qty: 250, unit: 'g' },
+            { ingredientId: 'ing_tomate', qty: 10, unit: 'g' },
+            { ingredientId: 'ing_pao', qty: 1, unit: 'un' },
+            { ingredientId: 'ing_cheddar', qty: 30, unit: 'g' },
+            { ingredientId: 'ing_maionese', qty: 20, unit: 'ml' },
+            { ingredientId: 'ing_embalagem', qty: 1, unit: 'un' }
+          ]
+        },
+        {
+          id: 'rec_zeus',
+          name: 'Zeus Duplo Bacon',
+          price: 44.90,
+          description: '2 Carnes 160g, Pão Brioche, 40g Cheddar, 35g Bacon, 10g Tomate e 25ml Maionese da Casa',
+          items: [
+            { ingredientId: 'ing_pao', qty: 1, unit: 'un' },
+            { ingredientId: 'ing_carne', qty: 2, unit: 'un' },
+            { ingredientId: 'ing_cheddar', qty: 40, unit: 'g' },
+            { ingredientId: 'ing_bacon', qty: 35, unit: 'g' },
+            { ingredientId: 'ing_tomate', qty: 10, unit: 'g' },
+            { ingredientId: 'ing_maionese', qty: 25, unit: 'ml' },
+            { ingredientId: 'ing_embalagem', qty: 1, unit: 'un' }
+          ]
+        },
+        {
+          id: 'rec_atena',
+          name: 'Atena Salad Burger',
+          price: 32.90,
+          description: '1 Carne 160g, Pão Brioche, 30g Cheddar, 10g Tomate, 15g Alface e 20ml Maionese',
+          items: [
+            { ingredientId: 'ing_pao', qty: 1, unit: 'un' },
+            { ingredientId: 'ing_carne', qty: 1, unit: 'un' },
+            { ingredientId: 'ing_cheddar', qty: 30, unit: 'g' },
+            { ingredientId: 'ing_tomate', qty: 10, unit: 'g' },
+            { ingredientId: 'ing_alface', qty: 15, unit: 'g' },
+            { ingredientId: 'ing_maionese', qty: 20, unit: 'ml' },
+            { ingredientId: 'ing_embalagem', qty: 1, unit: 'un' }
+          ]
+        },
+        {
+          id: 'rec_batata_olimpica',
+          name: 'Porção Batata Olímpica (250g)',
+          price: 19.90,
+          description: '250g de Batata Palito Crocante + 30ml Maionese Artesanal Teseu',
+          items: [
+            { ingredientId: 'ing_batata', qty: 250, unit: 'g' },
+            { ingredientId: 'ing_maionese', qty: 30, unit: 'ml' },
+            { ingredientId: 'ing_embalagem', qty: 1, unit: 'un' }
+          ]
+        },
+        {
+          id: 'rec_hercules',
+          name: 'Hércules Cheddar Bacon + Batata',
+          price: 42.00,
+          description: '1 Carne, 40g Cheddar, 40g Bacon, 10g Tomate + 250g de Batata Frita',
+          items: [
+            { ingredientId: 'ing_pao', qty: 1, unit: 'un' },
+            { ingredientId: 'ing_carne', qty: 1, unit: 'un' },
+            { ingredientId: 'ing_cheddar', qty: 40, unit: 'g' },
+            { ingredientId: 'ing_bacon', qty: 40, unit: 'g' },
+            { ingredientId: 'ing_tomate', qty: 10, unit: 'g' },
+            { ingredientId: 'ing_batata', qty: 250, unit: 'g' },
+            { ingredientId: 'ing_embalagem', qty: 1, unit: 'un' }
+          ]
+        }
+      ];
+
+      // Comandas aguardando na fila da cozinha para o usuário testar com 1 clique
+      const kdsQueue = [
+        {
+          id: 'q_101',
+          orderNumber: '#1039',
+          customer: 'Mesa 02 - Aquiles',
+          channel: 'Salão Olímpico',
+          createdAt: now - (8 * 60 * 1000),
+          items: [
+            { recipeId: 'rec_teseu_combo', qty: 1 }
+          ]
+        },
+        {
+          id: 'q_102',
+          orderNumber: '#1040',
+          customer: 'iFood - Helena de Troia',
+          channel: 'Delivery App',
+          createdAt: now - (4 * 60 * 1000),
+          items: [
+            { recipeId: 'rec_atena', qty: 1 },
+            { recipeId: 'rec_batata_olimpica', qty: 1 }
+          ]
+        }
+      ];
+
+      // Histórico de consumo pré-populado para os relatórios Diário, Semanal, Mensal e Anual funcionarem de imediato
+      const logs = [
+        {
+          id: 'log_1',
+          orderNumber: '#1038',
+          customer: 'Mesa 05 - Ulisses',
+          channel: 'Salão Olímpico',
+          timestamp: now - (2 * hour), // Hoje
+          revenue: 38.90,
+          totalCost: 16.53,
+          itemsSummary: '1x Combo Clássico Teseu + Batata',
+          deductions: [
+            { ingredientId: 'ing_carne', name: 'Carne de Hambúrguer (Blend 160g)', baseType: 'unit', baseDeducted: 1, displayDeducted: '1 un', cost: 6.50 },
+            { ingredientId: 'ing_batata', name: 'Batata Palito Congelada', baseType: 'mass', baseDeducted: 250, displayDeducted: '250 g', cost: 4.50 },
+            { ingredientId: 'ing_tomate', name: 'Tomate Italiano Fatiado', baseType: 'mass', baseDeducted: 10, displayDeducted: '10 g', cost: 0.09 },
+            { ingredientId: 'ing_pao', name: 'Pão Brioche Artesanal Selado', baseType: 'unit', baseDeducted: 1, displayDeducted: '1 un', cost: 2.20 },
+            { ingredientId: 'ing_cheddar', name: 'Queijo Cheddar Inglês', baseType: 'mass', baseDeducted: 30, displayDeducted: '30 g', cost: 1.44 },
+            { ingredientId: 'ing_maionese', name: 'Maionese Temperada Teseu', baseType: 'volume', baseDeducted: 20, displayDeducted: '20 ml', cost: 0.50 },
+            { ingredientId: 'ing_embalagem', name: 'Kit Embalagem Térmica Teseu', baseType: 'unit', baseDeducted: 1, displayDeducted: '1 un', cost: 1.30 }
+          ]
+        },
+        {
+          id: 'log_2',
+          orderNumber: '#1021',
+          customer: 'Delivery - Orfeu',
+          channel: 'Delivery App',
+          timestamp: now - (3 * day), // Essa semana (3 dias atrás)
+          revenue: 83.80,
+          totalCost: 35.80,
+          itemsSummary: '1x Zeus Duplo Bacon, 1x Combo Clássico Teseu + Batata',
+          deductions: [
+            { ingredientId: 'ing_carne', name: 'Carne de Hambúrguer (Blend 160g)', baseType: 'unit', baseDeducted: 3, displayDeducted: '3 un', cost: 19.50 },
+            { ingredientId: 'ing_batata', name: 'Batata Palito Congelada', baseType: 'mass', baseDeducted: 250, displayDeducted: '250 g', cost: 4.50 },
+            { ingredientId: 'ing_tomate', name: 'Tomate Italiano Fatiado', baseType: 'mass', baseDeducted: 20, displayDeducted: '20 g', cost: 0.18 },
+            { ingredientId: 'ing_pao', name: 'Pão Brioche Artesanal Selado', baseType: 'unit', baseDeducted: 2, displayDeducted: '2 un', cost: 4.40 },
+            { ingredientId: 'ing_cheddar', name: 'Queijo Cheddar Inglês', baseType: 'mass', baseDeducted: 70, displayDeducted: '70 g', cost: 3.36 },
+            { ingredientId: 'ing_bacon', name: 'Bacon Defumado em Tiras', baseType: 'mass', baseDeducted: 35, displayDeducted: '35 g', cost: 1.47 },
+            { ingredientId: 'ing_maionese', name: 'Maionese Temperada Teseu', baseType: 'volume', baseDeducted: 45, displayDeducted: '45 ml', cost: 1.12 },
+            { ingredientId: 'ing_embalagem', name: 'Kit Embalagem Térmica Teseu', baseType: 'unit', baseDeducted: 1, displayDeducted: '1 un', cost: 1.27 }
+          ]
+        },
+        {
+          id: 'log_3',
+          orderNumber: '#0984',
+          customer: 'Evento Esparta (Lote Semanal)',
+          channel: 'Salão Olímpico',
+          timestamp: now - (14 * day), // Este Mês (14 dias atrás)
+          revenue: 389.00,
+          totalCost: 164.30,
+          itemsSummary: '10x Combo Clássico Teseu + Batata',
+          deductions: [
+            { ingredientId: 'ing_carne', name: 'Carne de Hambúrguer (Blend 160g)', baseType: 'unit', baseDeducted: 10, displayDeducted: '10 un', cost: 65.00 },
+            { ingredientId: 'ing_batata', name: 'Batata Palito Congelada', baseType: 'mass', baseDeducted: 2500, displayDeducted: '2.500 g (2,5 kg)', cost: 45.00 },
+            { ingredientId: 'ing_tomate', name: 'Tomate Italiano Fatiado', baseType: 'mass', baseDeducted: 100, displayDeducted: '100 g', cost: 0.90 },
+            { ingredientId: 'ing_pao', name: 'Pão Brioche Artesanal Selado', baseType: 'unit', baseDeducted: 10, displayDeducted: '10 un', cost: 22.00 },
+            { ingredientId: 'ing_cheddar', name: 'Queijo Cheddar Inglês', baseType: 'mass', baseDeducted: 300, displayDeducted: '300 g', cost: 14.40 },
+            { ingredientId: 'ing_maionese', name: 'Maionese Temperada Teseu', baseType: 'volume', baseDeducted: 200, displayDeducted: '200 ml', cost: 5.00 },
+            { ingredientId: 'ing_embalagem', name: 'Kit Embalagem Térmica Teseu', baseType: 'unit', baseDeducted: 10, displayDeducted: '10 un', cost: 12.00 }
+          ]
+        },
+        {
+          id: 'log_4',
+          orderNumber: '#0412',
+          customer: 'Fechamento Trimestral Olimpo',
+          channel: 'Salão Olímpico',
+          timestamp: now - (120 * day), // Este Ano (4 meses atrás)
+          revenue: 1556.00,
+          totalCost: 657.20,
+          itemsSummary: '40x Combo Clássico Teseu + Batata',
+          deductions: [
+            { ingredientId: 'ing_carne', name: 'Carne de Hambúrguer (Blend 160g)', baseType: 'unit', baseDeducted: 40, displayDeducted: '40 un', cost: 260.00 },
+            { ingredientId: 'ing_batata', name: 'Batata Palito Congelada', baseType: 'mass', baseDeducted: 10000, displayDeducted: '10.000 g (10 kg)', cost: 180.00 },
+            { ingredientId: 'ing_tomate', name: 'Tomate Italiano Fatiado', baseType: 'mass', baseDeducted: 400, displayDeducted: '400 g', cost: 3.60 },
+            { ingredientId: 'ing_pao', name: 'Pão Brioche Artesanal Selado', baseType: 'unit', baseDeducted: 40, displayDeducted: '40 un', cost: 88.00 },
+            { ingredientId: 'ing_cheddar', name: 'Queijo Cheddar Inglês', baseType: 'mass', baseDeducted: 1200, displayDeducted: '1.200 g', cost: 57.60 },
+            { ingredientId: 'ing_maionese', name: 'Maionese Temperada Teseu', baseType: 'volume', baseDeducted: 800, displayDeducted: '800 ml', cost: 20.00 },
+            { ingredientId: 'ing_embalagem', name: 'Kit Embalagem Térmica Teseu', baseType: 'unit', baseDeducted: 40, displayDeducted: '40 un', cost: 48.00 }
+          ]
+        }
+      ];
+
+      return {
+        nextOrderCounter: 1041,
+        ingredients,
+        recipes,
+        kdsQueue,
+        logs
+      };
+    }
+
+    let appState = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          return JSON.parse(raw);
+        }
+      } catch (e) {
+        console.error('Erro ao ler localStorage:', e);
+      }
+      const initial = getInitialData();
+      saveState(initial);
+      return initial;
+    }
+
+    function saveState(stateToSave = appState) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+      } catch (e) {
+        console.error('Erro ao salvar localStorage:', e);
+      }
+    }
+
+    // ============================================================================
+    // 3. NAVEGAÇÃO ENTRE ABAS & ATUALIZAÇÃO GERAL
+    // ============================================================================
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = 'tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm whitespace-nowrap transition-all text-stone-300 hover:text-white hover:bg-white/5';
+      });
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.className = 'tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm whitespace-nowrap transition-all bg-teseu-crimson text-white border border-teseu-gold shadow-md';
+      }
+
+      refreshAllViews();
+    }
+
+    function refreshAllViews() {
+      updateHeaderMetrics();
+      renderKdsSection();
+      renderInventory();
+      renderRecipes();
+      renderReports();
+    }
+
+    function updateHeaderMetrics() {
+      // Critical stock count
+      const criticalCount = appState.ingredients.filter(i => i.stockBase <= i.minBase).length;
+      const critEl = document.getElementById('headerCriticalCount');
+      const critIcon = document.getElementById('headerAlertIcon');
+      critEl.textContent = `${criticalCount} ${criticalCount === 1 ? 'insumo' : 'insumos'}`;
+      if (criticalCount > 0) {
+        critEl.className = 'font-bold text-amber-400';
+        critIcon.className = 'fa-solid fa-triangle-exclamation text-amber-400 text-sm animate-bounce';
+      } else {
+        critEl.className = 'font-bold text-emerald-400';
+        critIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-sm';
+      }
+
+      // Total financial value currently in stock
+      const totalStockVal = appState.ingredients.reduce((acc, ing) => acc + (ing.stockBase * ing.costPerBase), 0);
+      document.getElementById('headerTotalStockValue').textContent = formatCurrency(totalStockVal);
+
+      // Today's CMV cost
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const todayLogs = appState.logs.filter(l => l.timestamp >= startOfDay.getTime());
+      const todayCost = todayLogs.reduce((acc, l) => acc + l.totalCost, 0);
+      document.getElementById('headerTodayCost').textContent = formatCurrency(todayCost);
+
+      // Queue badge
+      const badge = document.getElementById('kdsQueueBadge');
+      badge.textContent = appState.kdsQueue.length;
+    }
+
+    // ============================================================================
+    // 4. LÓGICA DO KDS / COZINHA E DESCONTO AUTOMÁTICO DE ESTOQUE
+    // ============================================================================
+    function calculateRecipeCMV(recipe) {
+      let total = 0;
+      recipe.items.forEach(item => {
+        const ing = appState.ingredients.find(i => i.id === item.ingredientId);
+        if (ing) {
+          const baseNeed = toBaseAmount(item.qty, item.unit);
+          total += baseNeed * ing.costPerBase;
+        }
+      });
+      return total;
+    }
+
+    // Calcula todos os insumos necessários para uma lista de [{recipeId, qty}]
+    function aggregateOrderIngredients(orderItems) {
+      const map = {};
+      orderItems.forEach(orderItem => {
+        const recipe = appState.recipes.find(r => r.id === orderItem.recipeId);
+        if (!recipe) return;
+        recipe.items.forEach(rItem => {
+          const ing = appState.ingredients.find(i => i.id === rItem.ingredientId);
+          if (!ing) return;
+          const baseQtyNeeded = toBaseAmount(rItem.qty, rItem.unit) * orderItem.qty;
+          if (!map[ing.id]) {
+            map[ing.id] = {
+              ingredient: ing,
+              baseNeeded: 0
+            };
+          }
+          map[ing.id].baseNeeded += baseQtyNeeded;
+        });
+      });
+
+      return Object.values(map).map(entry => {
+        const ing = entry.ingredient;
+        const currentBase = ing.stockBase;
+        const remainingBase = currentBase - entry.baseNeeded;
+        const cost = entry.baseNeeded * ing.costPerBase;
+        return {
+          ingredient: ing,
+          baseNeeded: entry.baseNeeded,
+          currentBase,
+          remainingBase,
+          cost,
+          hasEnough: remainingBase >= 0
+        };
+      });
+    }
+
+    function renderKdsSection() {
+      document.getElementById('builderOrderNumber').textContent = `#${appState.nextOrderCounter}`;
+
+      // Populate recipe dropdown in builder
+      const select = document.getElementById('kdsRecipeSelect');
+      const prevVal = select.value;
+      select.innerHTML = appState.recipes.map(r => {
+        const cmv = calculateRecipeCMV(r);
+        return `<option value="${r.id}">${r.name} — Venda: ${formatCurrency(r.price)} (CMV: ${formatCurrency(cmv)})</option>`;
+      }).join('');
+      if (prevVal && appState.recipes.some(r => r.id === prevVal)) {
+        select.value = prevVal;
+      }
+
+      // Initialize default builder cart if empty on first load
+      if (kdsBuilderCart.length === 0 && appState.recipes.length > 0) {
+        kdsBuilderCart = [{ recipeId: appState.recipes[0].id, qty: 1 }];
+      }
+
+      renderBuilderCartAndPreview();
+      renderActiveKdsQueue();
+      renderRecentKdsLogs();
+    }
+
+    function renderBuilderCartAndPreview() {
+      const cartEl = document.getElementById('kdsBuilderCartList');
+      if (kdsBuilderCart.length === 0) {
+        cartEl.innerHTML = `<p class="text-xs text-stone-400 text-center py-3">Nenhum item adicionado na comanda.</p>`;
+      } else {
+        cartEl.innerHTML = kdsBuilderCart.map((cItem, idx) => {
+          const rec = appState.recipes.find(r => r.id === cItem.recipeId);
+          if (!rec) return '';
+          return `
+            <div class="flex items-center justify-between bg-stone-50 px-3 py-2 rounded-lg border border-stone-200 text-xs">
+              <div>
+                <span class="font-bold text-teseu-crimson">${cItem.qty}x</span>
+                <strong class="text-stone-800 ml-1">${rec.name}</strong>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-stone-600 font-semibold">${formatCurrency(rec.price * cItem.qty)}</span>
+                <button onclick="removeItemFromBuilder(${idx})" class="text-stone-400 hover:text-red-600">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Live Deduction Preview
+      const previewEl = document.getElementById('kdsDeductionPreviewList');
+      const breakdown = aggregateOrderIngredients(kdsBuilderCart);
+      let totalCost = 0;
+
+      if (breakdown.length === 0) {
+        previewEl.innerHTML = `<p class="text-stone-400">Adicione um lanche acima para ver o cálculo de insumos.</p>`;
+      } else {
+        previewEl.innerHTML = breakdown.map(item => {
+          totalCost += item.cost;
+          const ing = item.ingredient;
+          const baseUnit = getBaseUnitSymbol(ing.baseType);
+          const beforeFormatted = formatDualStock(item.currentBase, ing.displayUnit, ing.baseType).primary;
+          const afterFormatted = formatDualStock(Math.max(0, item.remainingBase), ing.displayUnit, ing.baseType).primary;
+
+          return `
+            <div class="flex items-center justify-between py-1 border-b border-stone-700/60 last:border-none">
+              <div>
+                <span class="text-stone-200 font-medium">${ing.name}</span>
+                <span class="block text-[11px] text-stone-400">
+                  Estoque: ${beforeFormatted} &rarr; <strong class="${item.hasEnough ? 'text-emerald-400' : 'text-red-400'}">${afterFormatted}</strong>
+                </span>
+              </div>
+              <div class="text-right">
+                <span class="px-2 py-0.5 rounded bg-teseu-crimson text-teseu-goldLight font-bold">
+                  -${item.baseNeeded.toLocaleString('pt-BR')} ${baseUnit}
+                </span>
+                <span class="block text-[10px] text-stone-400 mt-0.5">${formatCurrency(item.cost)}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('kdsPreviewTotalCost').textContent = `CMV do Pedido: ${formatCurrency(totalCost)}`;
+    }
+
+    function addItemToBuilder() {
+      const select = document.getElementById('kdsRecipeSelect');
+      const qtyInput = document.getElementById('kdsRecipeQty');
+      const recipeId = select.value;
+      const qty = Math.max(1, parseInt(qtyInput.value) || 1);
+
+      const existing = kdsBuilderCart.find(i => i.recipeId === recipeId);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        kdsBuilderCart.push({ recipeId, qty });
+      }
+      qtyInput.value = 1;
+      renderBuilderCartAndPreview();
+    }
+
+    function removeItemFromBuilder(idx) {
+      kdsBuilderCart.splice(idx, 1);
+      renderBuilderCartAndPreview();
+    }
+
+    function sendBuilderToQueue() {
+      if (kdsBuilderCart.length === 0) {
+        showToast('Adicione pelo menos 1 item ao pedido!', 'warning');
+        return;
+      }
+      const customer = document.getElementById('kdsCustomerName').value.trim() || 'Balcão Teseu';
+      const channel = document.getElementById('kdsOrderChannel').value;
+
+      appState.kdsQueue.push({
+        id: 'q_' + Date.now(),
+        orderNumber: `#${appState.nextOrderCounter++}`,
+        customer,
+        channel,
+        createdAt: Date.now(),
+        items: JSON.parse(JSON.stringify(kdsBuilderCart))
+      });
+
+      saveState();
+      refreshAllViews();
+      showToast('Comanda enviada para a fila da Cozinha (KDS)!', 'info');
+    }
+
+    function dispatchBuilderImmediately() {
+      if (kdsBuilderCart.length === 0) {
+        showToast('Adicione pelo menos 1 item ao pedido!', 'warning');
+        return;
+      }
+      const customer = document.getElementById('kdsCustomerName').value.trim() || 'Balcão Rápido';
+      const channel = document.getElementById('kdsOrderChannel').value;
+      const tempOrder = {
+        id: 'direct_' + Date.now(),
+        orderNumber: `#${appState.nextOrderCounter++}`,
+        customer,
+        channel,
+        createdAt: Date.now(),
+        items: JSON.parse(JSON.stringify(kdsBuilderCart))
+      };
+
+      executeOrderStockDeduction(tempOrder);
+    }
+
+    // Executa a baixa automática no estoque e grava no histórico financeiro
+    function executeOrderStockDeduction(order) {
+      const breakdown = aggregateOrderIngredients(order.items);
+      let totalCost = 0;
+      const deductionsLog = [];
+
+      // Desconta cada ingrediente do estoque
+      breakdown.forEach(entry => {
+        const ing = entry.ingredient;
+        ing.stockBase = Math.max(0, Math.round((ing.stockBase - entry.baseNeeded) * 100) / 100);
+        totalCost += entry.cost;
+
+        const baseSymbol = getBaseUnitSymbol(ing.baseType);
+        deductionsLog.push({
+          ingredientId: ing.id,
+          name: ing.name,
+          baseType: ing.baseType,
+          baseDeducted: entry.baseNeeded,
+          displayDeducted: `${entry.baseNeeded.toLocaleString('pt-BR')} ${baseSymbol}`,
+          cost: Math.round(entry.cost * 100) / 100
+        });
+      });
+
+      // Calcula receita bruta e resumo dos itens
+      let revenue = 0;
+      const summaryParts = [];
+      order.items.forEach(oi => {
+        const rec = appState.recipes.find(r => r.id === oi.recipeId);
+        if (rec) {
+          revenue += rec.price * oi.qty;
+          summaryParts.push(`${oi.qty}x ${rec.name}`);
+        }
+      });
+
+      // Registra no Ledger de Relatórios
+      appState.logs.unshift({
+        id: 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        orderNumber: order.orderNumber,
+        customer: order.customer,
+        channel: order.channel,
+        timestamp: Date.now(),
+        revenue: Math.round(revenue * 100) / 100,
+        totalCost: Math.round(totalCost * 100) / 100,
+        itemsSummary: summaryParts.join(', '),
+        deductions: deductionsLog
+      });
+
+      // Remove da fila se estava na fila
+      appState.kdsQueue = appState.kdsQueue.filter(q => q.id !== order.id);
+
+      saveState();
+      refreshAllViews();
+
+      // Mostra notificação detalhada
+      const sampleDeductions = deductionsLog.slice(0, 3).map(d => `-${d.displayDeducted} ${d.name.split(' ')[0]}`).join(', ');
+      showToast(
+        `Pedido ${order.orderNumber} despachado! Estoque atualizado (${sampleDeductions}...) • CMV: ${formatCurrency(totalCost)}`,
+        'success'
+      );
+    }
+
+    function renderActiveKdsQueue() {
+      const container = document.getElementById('kdsActiveQueueContainer');
+      const btnAll = document.getElementById('btnDispatchAll');
+
+      if (appState.kdsQueue.length === 0) {
+        btnAll.classList.add('hidden');
+        container.innerHTML = `
+          <div class="md:col-span-2 bg-white rounded-xl p-8 text-center border border-dashed border-stone-300 space-y-2">
+            <i class="fa-solid fa-check-circle text-3xl text-emerald-600"></i>
+            <h4 class="font-olympus font-bold text-base text-teseu-dark">Fila da Cozinha Limpa!</h4>
+            <p class="text-xs text-stone-500">Todos os pedidos já tiveram baixa no estoque. Gere um pedido aleatório ou lance ao lado.</p>
+          </div>
+        `;
+        return;
+      }
+
+      btnAll.classList.remove('hidden');
+
+      container.innerHTML = appState.kdsQueue.map(ticket => {
+        const breakdown = aggregateOrderIngredients(ticket.items);
+        const totalCmv = breakdown.reduce((acc, b) => acc + b.cost, 0);
+
+        const itemsHtml = ticket.items.map(ti => {
+          const rec = appState.recipes.find(r => r.id === ti.recipeId);
+          return rec ? `<div class="text-xs font-bold text-teseu-dark">&bull; ${ti.qty}x ${rec.name}</div>` : '';
+        }).join('');
+
+        const chipsHtml = breakdown.map(b => {
+          const unitSym = getBaseUnitSymbol(b.ingredient.baseType);
+          return `<span class="inline-block text-[11px] px-2 py-0.5 rounded bg-stone-100 border border-stone-300 text-stone-700 font-medium">
+            -${b.baseNeeded}${unitSym} ${b.ingredient.name.split(' ')[0]}
+          </span>`;
+        }).join(' ');
+
+        return `
+          <div class="bg-white rounded-xl p-4 border-2 border-teseu-gold/50 shadow-sm flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between border-b border-stone-200 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-lg bg-teseu-crimson text-white font-bold text-xs">${ticket.orderNumber}</span>
+                  <strong class="text-xs sm:text-sm text-teseu-dark truncate">${ticket.customer}</strong>
+                </div>
+                <span class="text-[11px] font-semibold text-stone-500">${ticket.channel}</span>
+              </div>
+
+              <div class="space-y-1 py-1">
+                ${itemsHtml}
+              </div>
+
+              <div class="bg-stone-50 p-2.5 rounded-lg border border-stone-200 space-y-1">
+                <div class="flex items-center justify-between text-[11px] text-stone-500 font-semibold">
+                  <span>Insumos a descontar:</span>
+                  <span class="text-teseu-crimson font-bold">Custo: ${formatCurrency(totalCmv)}</span>
+                </div>
+                <div class="flex flex-wrap gap-1 pt-0.5">
+                  ${chipsHtml}
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+              <button onclick="dispatchQueueTicket('${ticket.id}')" class="flex-1 py-2 px-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition shadow flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-fire-burner"></i> Dar Saída & Descontar Estoque
+              </button>
+              <button onclick="cancelQueueTicket('${ticket.id}')" title="Cancelar comanda" class="p-2 rounded-xl border border-stone-200 text-stone-400 hover:text-red-600 hover:border-red-200">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function dispatchQueueTicket(ticketId) {
+      const ticket = appState.kdsQueue.find(q => q.id === ticketId);
+      if (ticket) {
+        executeOrderStockDeduction(ticket);
+      }
+    }
+
+    function dispatchAllKdsQueue() {
+      const queueCopy = [...appState.kdsQueue];
+      queueCopy.forEach(ticket => executeOrderStockDeduction(ticket));
+    }
+
+    function cancelQueueTicket(ticketId) {
+      appState.kdsQueue = appState.kdsQueue.filter(q => q.id !== ticketId);
+      saveState();
+      refreshAllViews();
+      showToast('Comanda removida da fila sem descontar estoque.', 'info');
+    }
+
+    function addSimulatedQueueOrder() {
+      if (appState.recipes.length === 0) return;
+      const names = ['Mesa 09 - Dionísio', 'iFood - Ártemis', 'Balcão - Hermes', 'Mesa 12 - Apolo', 'Delivery - Afrodite'];
+      const channels = ['Salão Olímpico', 'Delivery App', 'Retirada Balcão'];
+      const randomRec = appState.recipes[Math.floor(Math.random() * appState.recipes.length)];
+
+      appState.kdsQueue.push({
+        id: 'q_' + Date.now(),
+        orderNumber: `#${appState.nextOrderCounter++}`,
+        customer: names[Math.floor(Math.random() * names.length)],
+        channel: channels[Math.floor(Math.random() * channels.length)],
+        createdAt: Date.now(),
+        items: [{ recipeId: randomRec.id, qty: 1 }]
+      });
+
+      saveState();
+      refreshAllViews();
+      showToast(`Nova comanda gerada na fila da cozinha (${randomRec.name})!`, 'info');
+    }
+
+    function renderRecentKdsLogs() {
+      const container = document.getElementById('kdsRecentLogsContainer');
+      const recent = appState.logs.slice(0, 6);
+
+      if (recent.length === 0) {
+        container.innerHTML = `<p class="text-xs text-stone-400">Nenhuma baixa realizada ainda.</p>`;
+        return;
+      }
+
+      container.innerHTML = recent.map(log => {
+        const dateStr = new Date(log.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const pills = log.deductions.map(d => `<span class="text-[11px] px-1.5 py-0.5 rounded bg-white/10 text-teseu-goldLight">-${d.displayDeducted} ${d.name.split(' ')[0]}</span>`).join(' ');
+        return `
+          <div class="bg-teseu-surface p-3 rounded-xl border border-teseu-gold/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-teseu-gold">${log.orderNumber}</span>
+                <span class="text-white font-semibold">${log.itemsSummary}</span>
+                <span class="text-stone-400 text-[11px]">(${dateStr})</span>
+              </div>
+              <div class="flex flex-wrap gap-1">${pills}</div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-[11px] text-stone-400 block">Custo Descontado</span>
+              <strong class="text-emerald-400 text-sm">${formatCurrency(log.totalCost)}</strong>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ============================================================================
+    // 5. MÓDULO DE ESTOQUE DE INSUMOS (TABELA, ENTRADA E EDIÇÃO)
+    // ============================================================================
+    function renderInventory() {
+      const search = (document.getElementById('inventorySearchInput')?.value || '').toLowerCase();
+      const catFilter = document.getElementById('inventoryCategoryFilter')?.value || 'ALL';
+      const statusFilter = document.getElementById('inventoryStatusFilter')?.value || 'ALL';
+
+      const filtered = appState.ingredients.filter(ing => {
+        const matchesSearch = ing.name.toLowerCase().includes(search) || ing.category.toLowerCase().includes(search);
+        const matchesCat = catFilter === 'ALL' || ing.category === catFilter;
+        const isCritical = ing.stockBase <= ing.minBase;
+        const matchesStatus = statusFilter === 'ALL' || (statusFilter === 'CRITICAL' && isCritical) || (statusFilter === 'OK' && !isCritical);
+        return matchesSearch && matchesCat && matchesStatus;
+      });
+
+      const tbody = document.getElementById('inventoryTableBody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-stone-500 text-sm">Nenhum insumo encontrado com os filtros atuais.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(ing => {
+        const dual = formatDualStock(ing.stockBase, ing.displayUnit, ing.baseType);
+        const minDual = formatDualStock(ing.minBase, ing.displayUnit, ing.baseType);
+        const isCritical = ing.stockBase <= ing.minBase;
+
+        // Cost display in user's preferred unit
+        const costInDisplayUnit = (ing.displayUnit === 'kg' || ing.displayUnit === 'L')
+          ? ing.costPerBase * 1000
+          : ing.costPerBase;
+        const totalStockValue = ing.stockBase * ing.costPerBase;
+
+        return `
+          <tr class="hover:bg-stone-50 transition">
+            <td class="py-3.5 px-4">
+              <div class="font-bold text-teseu-dark">${ing.name}</div>
+              <span class="text-xs text-stone-500">${ing.category}</span>
+            </td>
+            <td class="py-3.5 px-4">
+              <div class="flex items-center gap-2">
+                <span class="text-base font-extrabold ${isCritical ? 'text-red-600' : 'text-teseu-dark'}">${dual.primary}</span>
+                ${isCritical
+                  ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300">ESTOQUE BAIXO</span>`
+                  : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">OK</span>`
+                }
+              </div>
+            </td>
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-1 rounded-lg bg-stone-100 border border-stone-200 text-xs font-semibold text-stone-700">
+                ${dual.secondary}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-xs text-stone-600 font-medium">
+              ${minDual.primary}
+            </td>
+            <td class="py-3.5 px-4 text-xs font-semibold text-stone-700">
+              ${formatCurrency(costInDisplayUnit)} / ${ing.displayUnit}
+            </td>
+            <td class="py-3.5 px-4 font-bold text-emerald-700">
+              ${formatCurrency(totalStockValue)}
+            </td>
+            <td class="py-3.5 px-4 text-right space-x-1 whitespace-nowrap">
+              <button onclick="openRestockModal('${ing.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition" title="Adicionar Entrada de Estoque">
+                <i class="fa-solid fa-plus"></i> Repor
+              </button>
+              <button onclick="openEditIngredientModal('${ing.id}')" class="px-2.5 py-1.5 rounded-lg border border-stone-300 text-stone-700 text-xs font-semibold hover:bg-stone-100 transition" title="Editar Insumo">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button onclick="deleteIngredient('${ing.id}')" class="px-2.5 py-1.5 rounded-lg border border-stone-200 text-stone-400 hover:text-red-600 text-xs transition" title="Excluir Insumo">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateUnitHelperText() {
+      const unit = document.getElementById('ingFormUnit').value;
+      const costLabel = document.getElementById('ingFormCostLabel');
+      const preview = document.getElementById('ingFormConversionPreview');
+
+      const labels = {
+        'kg': 'Custo por Quilo (R$ / kg) *',
+        'g': 'Custo por Grama (R$ / g) *',
+        'L': 'Custo por Litro (R$ / L) *',
+        'ml': 'Custo por Mililitro (R$ / ml) *',
+        'un': 'Custo por Unidade (R$ / un) *'
+      };
+      costLabel.textContent = labels[unit] || 'Custo Unitário (R$) *';
+
+      if (unit === 'kg') {
+        preview.innerHTML = `Cadastrando em <strong>kg</strong>: se você colocar <strong>2</strong>, o sistema registra <strong>2.000g</strong> internos para descontar pedidos em gramas.`;
+      } else if (unit === 'g') {
+        preview.innerHTML = `Cadastrando em <strong>gramas (g)</strong>: ideal para porções e hortifruti como tomate, alface e temperos.`;
+      } else if (unit === 'L') {
+        preview.innerHTML = `Cadastrando em <strong>Litros (L)</strong>: cada 1 L equivale a <strong>1.000 ml</strong> para descontar molhos em ml.`;
+      } else if (unit === 'ml') {
+        preview.innerHTML = `Cadastrando em <strong>Mililitros (ml)</strong>: desconto direto por ml em cada pedido.`;
+      } else {
+        preview.innerHTML = `Cadastrando por <strong>Unidade (un)</strong>: ideal para carnes de hambúrguer, pães e embalagens.`;
+      }
+    }
+
+    function openNewIngredientModal() {
+      document.getElementById('ingredientModalTitle').textContent = 'Cadastrar Novo Insumo no Estoque';
+      document.getElementById('ingFormId').value = '';
+      document.getElementById('ingFormName').value = '';
+      document.getElementById('ingFormCategory').value = 'Carnes & Proteínas';
+      document.getElementById('ingFormUnit').value = 'kg';
+      document.getElementById('ingFormQty').value = '';
+      document.getElementById('ingFormMinQty').value = '';
+      document.getElementById('ingFormCost').value = '';
+      updateUnitHelperText();
+
+      const modal = document.getElementById('ingredientModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function openEditIngredientModal(ingId) {
+      const ing = appState.ingredients.find(i => i.id === ingId);
+      if (!ing) return;
+
+      document.getElementById('ingredientModalTitle').textContent = 'Editar Insumo';
+      document.getElementById('ingFormId').value = ing.id;
+      document.getElementById('ingFormName').value = ing.name;
+      document.getElementById('ingFormCategory').value = ing.category;
+      document.getElementById('ingFormUnit').value = ing.displayUnit;
+      document.getElementById('ingFormQty').value = fromBaseAmount(ing.stockBase, ing.displayUnit);
+      document.getElementById('ingFormMinQty').value = fromBaseAmount(ing.minBase, ing.displayUnit);
+
+      const displayCost = (ing.displayUnit === 'kg' || ing.displayUnit === 'L')
+        ? Math.round(ing.costPerBase * 1000 * 100) / 100
+        : Math.round(ing.costPerBase * 1000) / 1000;
+      document.getElementById('ingFormCost').value = displayCost;
+
+      updateUnitHelperText();
+      const modal = document.getElementById('ingredientModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeIngredientModal() {
+      const modal = document.getElementById('ingredientModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveIngredientForm(e) {
+      e.preventDefault();
+      const id = document.getElementById('ingFormId').value;
+      const name = document.getElementById('ingFormName').value.trim();
+      const category = document.getElementById('ingFormCategory').value;
+      const displayUnit = document.getElementById('ingFormUnit').value;
+      const qtyInput = parseFloat(document.getElementById('ingFormQty').value) || 0;
+      const minInput = parseFloat(document.getElementById('ingFormMinQty').value) || 0;
+      const costInput = parseFloat(document.getElementById('ingFormCost').value) || 0;
+
+      const baseType = getBaseType(displayUnit);
+      const stockBase = toBaseAmount(qtyInput, displayUnit);
+      const minBase = toBaseAmount(minInput, displayUnit);
+      const costPerBase = (displayUnit === 'kg' || displayUnit === 'L') ? (costInput / 1000) : costInput;
+
+      if (id) {
+        const existing = appState.ingredients.find(i => i.id === id);
+        if (existing) {
+          existing.name = name;
+          existing.category = category;
+          existing.baseType = baseType;
+          existing.displayUnit = displayUnit;
+          existing.stockBase = stockBase;
+          existing.minBase = minBase;
+          existing.costPerBase = costPerBase;
+        }
+        showToast(`Insumo "${name}" atualizado com sucesso!`, 'success');
+      } else {
+        appState.ingredients.push({
+          id: 'ing_' + Date.now(),
+          name,
+          category,
+          baseType,
+          displayUnit,
+          stockBase,
+          minBase,
+          costPerBase
+        });
+        showToast(`Novo insumo "${name}" adicionado ao estoque!`, 'success');
+      }
+
+      saveState();
+      closeIngredientModal();
+      refreshAllViews();
+    }
+
+    function openRestockModal(ingId) {
+      const ing = appState.ingredients.find(i => i.id === ingId);
+      if (!ing) return;
+
+      document.getElementById('restockIngId').value = ing.id;
+      document.getElementById('restockIngName').textContent = ing.name;
+      const dual = formatDualStock(ing.stockBase, ing.displayUnit, ing.baseType);
+      document.getElementById('restockCurrentBalance').textContent = `Saldo atual: ${dual.primary} (${dual.secondary})`;
+      document.getElementById('restockQty').value = '';
+
+      const unitSelect = document.getElementById('restockUnit');
+      if (ing.baseType === 'mass') {
+        unitSelect.innerHTML = `<option value="kg">Quilos (kg)</option><option value="g">Gramas (g)</option>`;
+      } else if (ing.baseType === 'volume') {
+        unitSelect.innerHTML = `<option value="L">Litros (L)</option><option value="ml">Mililitros (ml)</option>`;
+      } else {
+        unitSelect.innerHTML = `<option value="un">Unidades (un)</option>`;
+      }
+      unitSelect.value = ing.displayUnit;
+
+      const modal = document.getElementById('restockModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeRestockModal() {
+      const modal = document.getElementById('restockModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function confirmRestock(e) {
+      e.preventDefault();
+      const ingId = document.getElementById('restockIngId').value;
+      const qty = parseFloat(document.getElementById('restockQty').value) || 0;
+      const unit = document.getElementById('restockUnit').value;
+
+      const ing = appState.ingredients.find(i => i.id === ingId);
+      if (!ing || qty <= 0) return;
+
+      const addedBase = toBaseAmount(qty, unit);
+      ing.stockBase = Math.round((ing.stockBase + addedBase) * 100) / 100;
+
+      saveState();
+      closeRestockModal();
+      refreshAllViews();
+
+      const dual = formatDualStock(ing.stockBase, ing.displayUnit, ing.baseType);
+      showToast(`Entrada registrada! Novo saldo de ${ing.name}: ${dual.primary}`, 'success');
+    }
+
+    function deleteIngredient(ingId) {
+      const ing = appState.ingredients.find(i => i.id === ingId);
+      if (!ing) return;
+      appState.ingredients = appState.ingredients.filter(i => i.id !== ingId);
+      saveState();
+      refreshAllViews();
+      showToast(`Insumo "${ing.name}" removido do estoque.`, 'info');
+    }
+
+    // ============================================================================
+    // 6. MÓDULO DE FICHAS TÉCNICAS (RECEITAS DO CARDÁPIO)
+    // ============================================================================
+    function renderRecipes() {
+      const grid = document.getElementById('recipesGridContainer');
+      if (appState.recipes.length === 0) {
+        grid.innerHTML = `<p class="text-sm text-stone-500">Nenhuma ficha técnica cadastrada.</p>`;
+        return;
+      }
+
+      grid.innerHTML = appState.recipes.map(rec => {
+        const cmv = calculateRecipeCMV(rec);
+        const profit = rec.price - cmv;
+        const cmvPct = rec.price > 0 ? Math.round((cmv / rec.price) * 100) : 0;
+
+        const itemsListHtml = rec.items.map(item => {
+          const ing = appState.ingredients.find(i => i.id === item.ingredientId);
+          if (!ing) return '';
+          const baseNeed = toBaseAmount(item.qty, item.unit);
+          const itemCost = baseNeed * ing.costPerBase;
+          return `
+            <li class="flex items-center justify-between py-1.5 text-xs border-b border-stone-100 last:border-none">
+              <span class="text-stone-700 font-medium">${ing.name}</span>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded bg-teseu-cream text-teseu-dark font-bold">${item.qty} ${item.unit}</span>
+                <span class="text-stone-400 text-[11px] w-14 text-right">${formatCurrency(itemCost)}</span>
+              </div>
+            </li>
+          `;
+        }).join('');
+
+        return `
+          <div class="bg-white rounded-2xl gold-border shadow-sm p-5 flex flex-col justify-between space-y-4 gold-glow transition">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-2 border-b border-stone-200 pb-3">
+                <div>
+                  <h3 class="font-olympus font-bold text-lg text-teseu-crimson">${rec.name}</h3>
+                  <p class="text-xs text-stone-500 line-clamp-2">${rec.description || 'Ficha técnica padronizada Teseu Burger'}</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-xl bg-teseu-dark text-teseu-gold font-bold text-sm shrink-0">
+                  ${formatCurrency(rec.price)}
+                </span>
+              </div>
+
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-400 block mb-1">Composição (Baixa por Venda):</span>
+                <ul class="bg-stone-50 rounded-xl p-2.5 border border-stone-200">
+                  ${itemsListHtml}
+                </ul>
+              </div>
+            </div>
+
+            <div class="space-y-3 pt-2 border-t border-stone-200">
+              <div class="grid grid-cols-3 gap-2 text-center bg-teseu-creamLight p-2.5 rounded-xl border border-teseu-gold/30">
+                <div>
+                  <span class="text-[10px] uppercase text-stone-500 block">Custo (CMV)</span>
+                  <strong class="text-xs sm:text-sm text-teseu-crimson">${formatCurrency(cmv)}</strong>
+                </div>
+                <div>
+                  <span class="text-[10px] uppercase text-stone-500 block">Lucro Bruto</span>
+                  <strong class="text-xs sm:text-sm text-emerald-700">${formatCurrency(profit)}</strong>
+                </div>
+                <div>
+                  <span class="text-[10px] uppercase text-stone-500 block">Índice CMV</span>
+                  <strong class="text-xs sm:text-sm text-teseu-dark">${cmvPct}%</strong>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-2">
+                <button onclick="quickSimulateRecipeSale('${rec.id}')" class="flex-1 py-2 px-3 rounded-xl bg-teseu-crimson text-white font-bold text-xs hover:bg-teseu-crimsonDark transition flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-bolt"></i> Simular Saída (1x)
+                </button>
+                <button onclick="openEditRecipeModal('${rec.id}')" class="py-2 px-3 rounded-xl border border-stone-300 text-stone-700 font-bold text-xs hover:bg-stone-100">
+                  <i class="fa-solid fa-pen"></i> Editar
+                </button>
+                <button onclick="deleteRecipe('${rec.id}')" class="py-2 px-2.5 rounded-xl border border-stone-200 text-stone-400 hover:text-red-600 text-xs">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function quickSimulateRecipeSale(recipeId) {
+      const rec = appState.recipes.find(r => r.id === recipeId);
+      if (!rec) return;
+      executeOrderStockDeduction({
+        id: 'quick_' + Date.now(),
+        orderNumber: `#${appState.nextOrderCounter++}`,
+        customer: 'Venda Rápida Cardápio',
+        channel: 'Balcão Teseu',
+        createdAt: Date.now(),
+        items: [{ recipeId: rec.id, qty: 1 }]
+      });
+    }
+
+    function openRecipeModal() {
+      document.getElementById('recipeModalTitle').textContent = 'Nova Ficha Técnica Teseu Burger';
+      document.getElementById('recipeFormId').value = '';
+      document.getElementById('recipeFormName').value = '';
+      document.getElementById('recipeFormPrice').value = '';
+      document.getElementById('recipeFormDesc').value = '';
+      recipeModalDraftItems = [];
+
+      populateRecipeIngSelector();
+      renderRecipeDraftItems();
+
+      const modal = document.getElementById('recipeModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function openEditRecipeModal(recipeId) {
+      const rec = appState.recipes.find(r => r.id === recipeId);
+      if (!rec) return;
+
+      document.getElementById('recipeModalTitle').textContent = `Editar Ficha: ${rec.name}`;
+      document.getElementById('recipeFormId').value = rec.id;
+      document.getElementById('recipeFormName').value = rec.name;
+      document.getElementById('recipeFormPrice').value = rec.price;
+      document.getElementById('recipeFormDesc').value = rec.description || '';
+      recipeModalDraftItems = JSON.parse(JSON.stringify(rec.items));
+
+      populateRecipeIngSelector();
+      renderRecipeDraftItems();
+
+      const modal = document.getElementById('recipeModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeRecipeModal() {
+      const modal = document.getElementById('recipeModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function populateRecipeIngSelector() {
+      const sel = document.getElementById('recipeIngSelect');
+      sel.innerHTML = appState.ingredients.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
+      syncRecipeIngUnitOptions();
+    }
+
+    function syncRecipeIngUnitOptions() {
+      const ingId = document.getElementById('recipeIngSelect').value;
+      const ing = appState.ingredients.find(i => i.id === ingId);
+      const unitSel = document.getElementById('recipeIngUnit');
+      if (!ing) return;
+
+      if (ing.baseType === 'mass') {
+        unitSel.innerHTML = `<option value="g">g (gramas)</option><option value="kg">kg (quilos)</option>`;
+        unitSel.value = 'g';
+      } else if (ing.baseType === 'volume') {
+        unitSel.innerHTML = `<option value="ml">ml (mililitros)</option><option value="L">L (litros)</option>`;
+        unitSel.value = 'ml';
+      } else {
+        unitSel.innerHTML = `<option value="un">un (unidade)</option>`;
+        unitSel.value = 'un';
+      }
+    }
+
+    function addIngredientToRecipeDraft() {
+      const ingredientId = document.getElementById('recipeIngSelect').value;
+      const qty = parseFloat(document.getElementById('recipeIngQty').value) || 0;
+      const unit = document.getElementById('recipeIngUnit').value;
+      if (!ingredientId || qty <= 0) {
+        showToast('Informe a quantidade do insumo a ser descontada!', 'warning');
+        return;
+      }
+
+      const existing = recipeModalDraftItems.find(i => i.ingredientId === ingredientId);
+      if (existing) {
+        existing.qty = qty;
+        existing.unit = unit;
+      } else {
+        recipeModalDraftItems.push({ ingredientId, qty, unit });
+      }
+      document.getElementById('recipeIngQty').value = '';
+      renderRecipeDraftItems();
+    }
+
+    function removeRecipeDraftItem(idx) {
+      recipeModalDraftItems.splice(idx, 1);
+      renderRecipeDraftItems();
+    }
+
+    function renderRecipeDraftItems() {
+      const listEl = document.getElementById('recipeDraftItemsList');
+      let totalCmv = 0;
+
+      if (recipeModalDraftItems.length === 0) {
+        listEl.innerHTML = `<p class="text-xs text-stone-400 py-3 text-center">Nenhum ingrediente vinculado ainda.</p>`;
+      } else {
+        listEl.innerHTML = recipeModalDraftItems.map((item, idx) => {
+          const ing = appState.ingredients.find(i => i.id === item.ingredientId);
+          if (!ing) return '';
+          const baseNeed = toBaseAmount(item.qty, item.unit);
+          const cost = baseNeed * ing.costPerBase;
+          totalCmv += cost;
+          return `
+            <div class="flex items-center justify-between py-2 text-xs">
+              <div>
+                <strong class="text-teseu-dark">${ing.name}</strong>
+                <span class="ml-2 px-2 py-0.5 rounded bg-stone-100 font-bold text-teseu-crimson">-${item.qty} ${item.unit}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-semibold text-stone-600">${formatCurrency(cost)}</span>
+                <button type="button" onclick="removeRecipeDraftItem(${idx})" class="text-stone-400 hover:text-red-600">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('recipeModalLiveCmv').textContent = formatCurrency(totalCmv);
+    }
+
+    function saveRecipeForm(e) {
+      e.preventDefault();
+      if (recipeModalDraftItems.length === 0) {
+        showToast('Adicione pelo menos 1 insumo na ficha técnica!', 'warning');
+        return;
+      }
+
+      const id = document.getElementById('recipeFormId').value;
+      const name = document.getElementById('recipeFormName').value.trim();
+      const price = parseFloat(document.getElementById('recipeFormPrice').value) || 0;
+      const description = document.getElementById('recipeFormDesc').value.trim();
+
+      if (id) {
+        const rec = appState.recipes.find(r => r.id === id);
+        if (rec) {
+          rec.name = name;
+          rec.price = price;
+          rec.description = description;
+          rec.items = JSON.parse(JSON.stringify(recipeModalDraftItems));
+        }
+        showToast(`Ficha Técnica "${name}" atualizada!`, 'success');
+      } else {
+        appState.recipes.push({
+          id: 'rec_' + Date.now(),
+          name,
+          price,
+          description,
+          items: JSON.parse(JSON.stringify(recipeModalDraftItems))
+        });
+        showToast(`Nova Ficha Técnica "${name}" criada!`, 'success');
+      }
+
+      saveState();
+      closeRecipeModal();
+      refreshAllViews();
+    }
+
+    function deleteRecipe(recipeId) {
+      appState.recipes = appState.recipes.filter(r => r.id !== recipeId);
+      saveState();
+      refreshAllViews();
+      showToast('Ficha técnica removida.', 'info');
+    }
+
+    // ============================================================================
+    // 7. MÓDULO DE RELATÓRIOS (DIÁRIO, SEMANAL, MENSAL E ANUAL)
+    // ============================================================================
+    function setReportPeriod(period) {
+      activeReportPeriod = period;
+      renderReports();
+    }
+
+    function getLogsForPeriod(periodKey) {
+      const now = Date.now();
+      const day = 24 * 3600 * 1000;
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+
+      if (periodKey === 'DAILY') {
+        return appState.logs.filter(l => l.timestamp >= startOfToday.getTime());
+      }
+      if (periodKey === 'WEEKLY') {
+        return appState.logs.filter(l => l.timestamp >= (now - 7 * day));
+      }
+      if (periodKey === 'MONTHLY') {
+        return appState.logs.filter(l => l.timestamp >= (now - 30 * day));
+      }
+      // YEARLY (365 days)
+      return appState.logs.filter(l => l.timestamp >= (now - 365 * day));
+    }
+
+    function renderReports() {
+      // Highlight period button
+      ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'].forEach(p => {
+        const btn = document.getElementById(`period-btn-${p}`);
+        if (!btn) return;
+        if (p === activeReportPeriod) {
+          btn.className = 'period-btn px-3.5 py-2 rounded-lg text-xs font-bold transition bg-teseu-gold text-teseu-dark shadow';
+        } else {
+          btn.className = 'period-btn px-3.5 py-2 rounded-lg text-xs font-bold transition text-stone-300 hover:text-white';
+        }
+      });
+
+      // Update the 4 summary boxes (Diário, Semanal, Mensal, Anual simultaneously)
+      const sumCost = logs => logs.reduce((acc, l) => acc + l.totalCost, 0);
+      document.getElementById('summaryBoxDaily').textContent = formatCurrency(sumCost(getLogsForPeriod('DAILY')));
+      document.getElementById('summaryBoxWeekly').textContent = formatCurrency(sumCost(getLogsForPeriod('WEEKLY')));
+      document.getElementById('summaryBoxMonthly').textContent = formatCurrency(sumCost(getLogsForPeriod('MONTHLY')));
+      document.getElementById('summaryBoxYearly').textContent = formatCurrency(sumCost(getLogsForPeriod('YEARLY')));
+
+      const periodLogs = getLogsForPeriod(activeReportPeriod);
+      const totalCost = sumCost(periodLogs);
+      const totalRevenue = periodLogs.reduce((acc, l) => acc + (l.revenue || 0), 0);
+      const cmvPct = totalRevenue > 0 ? Math.round((totalCost / totalRevenue) * 100) : 0;
+
+      const labelMap = {
+        DAILY: 'GASTO HOJE (DIÁRIO)',
+        WEEKLY: 'GASTO 7 DIAS (SEMANAL)',
+        MONTHLY: 'GASTO 30 DIAS (MENSAL)',
+        YEARLY: 'GASTO 12 MESES (ANUAL)'
+      };
+      document.getElementById('kpiPeriodLabelCost').textContent = labelMap[activeReportPeriod];
+      document.getElementById('kpiTotalCost').textContent = formatCurrency(totalCost);
+      document.getElementById('kpiTotalRevenue').textContent = formatCurrency(totalRevenue);
+      document.getElementById('kpiCmvPercentage').textContent = `CMV Médio no período: ${cmvPct}%`;
+      document.getElementById('kpiOrdersCount').textContent = `${periodLogs.length} ${periodLogs.length === 1 ? 'pedido' : 'pedidos'}`;
+
+      // Aggregate ingredient consumption across periodLogs
+      const ingUsageMap = {};
+      periodLogs.forEach(log => {
+        log.deductions.forEach(d => {
+          if (!ingUsageMap[d.ingredientId]) {
+            ingUsageMap[d.ingredientId] = {
+              name: d.name,
+              baseType: d.baseType,
+              totalBaseDeducted: 0,
+              totalCost: 0
+            };
+          }
+          ingUsageMap[d.ingredientId].totalBaseDeducted += d.baseDeducted;
+          ingUsageMap[d.ingredientId].totalCost += d.cost;
+        });
+      });
+
+      const usageList = Object.values(ingUsageMap).sort((a, b) => b.totalCost - a.totalCost);
+
+      // Top ingredient KPI
+      if (usageList.length > 0) {
+        document.getElementById('kpiTopIngredientName').textContent = usageList[0].name;
+        document.getElementById('kpiTopIngredientValue').textContent = `${formatCurrency(usageList[0].totalCost)} consumidos`;
+      } else {
+        document.getElementById('kpiTopIngredientName').textContent = 'Nenhum consumo';
+        document.getElementById('kpiTopIngredientValue').textContent = 'R$ 0,00';
+      }
+
+      // Render Ingredient Breakdown Bar Chart
+      const breakdownEl = document.getElementById('reportIngredientBreakdown');
+      if (usageList.length === 0) {
+        breakdownEl.innerHTML = `<p class="text-xs text-stone-400 py-6 text-center">Nenhum insumo descontado neste período.</p>`;
+      } else {
+        const maxCost = Math.max(...usageList.map(u => u.totalCost), 1);
+        breakdownEl.innerHTML = usageList.map(u => {
+          const pct = Math.min(100, Math.round((u.totalCost / maxCost) * 100));
+          const baseSym = getBaseUnitSymbol(u.baseType);
+          let qtyFormatted = `${u.totalBaseDeducted.toLocaleString('pt-BR')} ${baseSym}`;
+          if (u.baseType === 'mass' && u.totalBaseDeducted >= 1000) {
+            qtyFormatted += ` (${(u.totalBaseDeducted / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} kg)`;
+          } else if (u.baseType === 'volume' && u.totalBaseDeducted >= 1000) {
+            qtyFormatted += ` (${(u.totalBaseDeducted / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} L)`;
+          }
+
+          return `
+            <div class="space-y-1 bg-stone-50 p-3 rounded-xl border border-stone-200">
+              <div class="flex items-center justify-between text-xs">
+                <strong class="text-teseu-dark">${u.name}</strong>
+                <span class="font-extrabold text-teseu-crimson">${formatCurrency(u.totalCost)}</span>
+              </div>
+              <div class="w-full bg-stone-200 h-2 rounded-full overflow-hidden">
+                <div class="bg-teseu-crimson h-full rounded-full" style="width: ${pct}%"></div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-stone-500">
+                <span>Total Descontado: <strong class="text-stone-700">${qtyFormatted}</strong></span>
+                <span>${Math.round((u.totalCost / (totalCost || 1)) * 100)}% do gasto do período</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Render Ledger List
+      const ledgerEl = document.getElementById('reportLedgerList');
+      if (periodLogs.length === 0) {
+        ledgerEl.innerHTML = `<p class="text-xs text-stone-400 py-6 text-center">Nenhum pedido registrado neste período.</p>`;
+      } else {
+        ledgerEl.innerHTML = periodLogs.map(log => {
+          const dt = new Date(log.timestamp);
+          const dateFormatted = dt.toLocaleDateString('pt-BR') + ' às ' + dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          const deductionsText = log.deductions.map(d => `-${d.displayDeducted} ${d.name.split(' ')[0]}`).join(' • ');
+
+          return `
+            <div class="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-1 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-teseu-crimson">${log.orderNumber} — ${log.customer}</span>
+                <strong class="text-teseu-dark">CMV: ${formatCurrency(log.totalCost)}</strong>
+              </div>
+              <div class="text-stone-700 font-medium">${log.itemsSummary}</div>
+              <div class="text-[11px] text-stone-500">${deductionsText}</div>
+              <div class="text-[10px] text-stone-400 pt-0.5">${dateFormatted} &bull; Venda: ${formatCurrency(log.revenue)}</div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function simulateHistoricalBatch() {
+      if (appState.recipes.length === 0) return;
+      const rec = appState.recipes[0];
+      executeOrderStockDeduction({
+        id: 'sim_' + Date.now(),
+        orderNumber: `#${appState.nextOrderCounter++}`,
+        customer: 'Simulação Rápida Relatório',
+        channel: 'Salão Olímpico',
+        createdAt: Date.now(),
+        items: [{ recipeId: rec.id, qty: 2 }]
+      });
+    }
+
+    function exportReportCSV() {
+      const periodLogs = getLogsForPeriod(activeReportPeriod);
+      if (periodLogs.length === 0) {
+        showToast('Não há registros neste período para exportar.', 'warning');
+        return;
+      }
+
+      let csv = 'Pedido,Data,Cliente,Itens,Custo_Insumos_R$,Venda_Bruta_R$,Insumos_Descontados\n';
+      periodLogs.forEach(l => {
+        const dt = new Date(l.timestamp).toLocaleString('pt-BR');
+        const deds = l.deductions.map(d => `${d.displayDeducted} ${d.name}`).join(' | ');
+        csv += `"${l.orderNumber}","${dt}","${l.customer}","${l.itemsSummary}","${l.totalCost.toFixed(2)}","${(l.revenue || 0).toFixed(2)}","${deds}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `relatorio_estoque_teseu_${activeReportPeriod.toLowerCase()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Planilha CSV exportada com sucesso!', 'success');
+    }
+
+    // ============================================================================
+    // 8. RESET DEMO & NOTIFICAÇÕES TOAST
+    // ============================================================================
+    function openResetModal() {
+      const m = document.getElementById('resetModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeResetModal() {
+      const m = document.getElementById('resetModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function confirmResetDemo() {
+      appState = getInitialData();
+      kdsBuilderCart = [];
+      saveState(appState);
+      closeResetModal();
+      refreshAllViews();
+      showToast('Dados de demonstração restaurados (5 carnes, 2kg de batata, etc.)!', 'success');
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+
+      const styles = {
+        success: 'bg-teseu-dark border-l-4 border-emerald-500 text-white',
+        warning: 'bg-teseu-dark border-l-4 border-amber-500 text-white',
+        info: 'bg-teseu-dark border-l-4 border-teseu-gold text-white'
+      };
+      const icons = {
+        success: 'fa-circle-check text-emerald-400',
+        warning: 'fa-triangle-exclamation text-amber-400',
+        info: 'fa-bell text-teseu-gold'
+      };
+
+      toast.className = `${styles[type] || styles.success} p-3.5 rounded-xl shadow-xl flex items-start gap-3 pointer-events-auto transition-all duration-300`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icons[type] || icons.success} mt-0.5 text-base"></i>
+        <div class="text-xs leading-relaxed flex-1">${message}</div>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 4200);
+    }
+
+    // Inicializa na carga da janela
+    window.onload = function () {
+      switchTab('kds');
+    };
+  </script>
+</body>
+</html>

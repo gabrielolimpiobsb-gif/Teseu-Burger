@@ -68,7 +68,7 @@ export function Footer() {
             </h4>
             <div className="flex items-center gap-4 text-neutral-800">
               <a
-                href={`https://wa.me/${STORE_INFO.whatsapp}`}
+                href={STORE_INFO.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-medium"

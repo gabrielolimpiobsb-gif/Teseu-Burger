@@ -7,7 +7,6 @@ import { ProductImage } from '@/components/ProductImage';
 import { LaurelWreathIcon, AmphoraIcon } from '@/components/GreekOrnament';
 import { Sparkles, ArrowRight, Gift } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { RouletteTourMiniAnimation } from '@/components/RouletteTourMiniAnimation';
 
 interface MeetTheLegendsProps {
   legends?: MenuItem[];
@@ -62,11 +61,6 @@ export function MeetTheLegends({ legends, combos }: MeetTheLegendsProps) {
           </h2>
 
           <div className="w-24 sm:w-28 h-0.5 bg-gradient-to-r from-transparent via-[#CD9C20] to-transparent mx-auto my-2.5 sm:my-3" />
-
-          {/* Animação de Tour de como a Roleta funciona */}
-          <div className="mt-2 sm:mt-3">
-            <RouletteTourMiniAnimation />
-          </div>
         </div>
 
         {/* 1 ÚNICO COMBO CASAL DESTACADO (OTIMIZADO PARA MOBILE & DESKTOP) */}
@@ -77,55 +71,55 @@ export function MeetTheLegends({ legends, combos }: MeetTheLegendsProps) {
             return (
               <div
                 key={item.id}
-                className="bg-gradient-to-b from-[#221B12] via-[#1A1610] to-[#14110C] rounded-2xl overflow-hidden shadow-xl border-2 border-[#CD9C20] hover:border-[#F5CB5C] flex flex-col md:flex-row transition-all relative group"
+                className="bg-white text-[#1c1c1c] rounded-2xl overflow-hidden shadow-xl border-2 border-[#CD9C20] hover:border-[#F5CB5C] flex flex-col md:flex-row transition-all relative group"
               >
-                {/* Preview Image (Selector 2) */}
+                {/* Preview Image (Selector 10) */}
                 <Link
                   href={targetUrl}
                   onClick={() => startNavigation(item.name)}
-                  className="block relative p-2.5 sm:p-4 md:w-[42%] flex flex-col items-center justify-center cursor-pointer bg-black/40 shrink-0"
+                  className="block relative p-2.5 sm:p-4 md:w-[42%] flex flex-col items-center justify-center cursor-pointer bg-white shrink-0"
                 >
-                  <div className="w-full my-0.5 sm:my-1">
+                  <div className="w-full my-0.5 sm:my-1 rounded-xl bg-[#FAF8F5]">
                     <ProductImage
                       src={item.image}
                       alt={item.name}
                       imageCodeHint={item.image || '/combocasal.png'}
-                      className="w-full h-36 sm:h-40 md:h-44 shadow-md"
+                      className="w-full h-36 sm:h-40 md:h-44 shadow-sm bg-[#FAF8F5]"
                     />
                   </div>
                 </Link>
 
-                {/* Card Content & Highlights (Selector 1) */}
-                <div className="p-3.5 sm:p-4 md:p-5 md:w-[58%] flex-1 flex flex-col justify-between bg-[#191919] border-t md:border-t-0 md:border-l border-[#CD9C20]/40">
+                {/* Card Content & Highlights (Selector 9) */}
+                <div className="p-3.5 sm:p-4 md:p-5 md:w-[58%] flex-1 flex flex-col justify-between bg-white border-t md:border-t-0 md:border-l border-[#CD9C20]/30">
                   <div>
                     <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                      <span className="inline-flex items-center gap-1 bg-[#CD9C20]/20 border border-[#CD9C20]/60 text-[#F5CB5C] text-[10px] font-ancient font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        <Gift className="w-3 h-3 text-[#F5CB5C]" />
+                      <span className="inline-flex items-center gap-1 bg-[#FDF8EB] border border-[#CD9C20]/50 text-[#996D09] text-[10px] font-ancient font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        <Gift className="w-3 h-3 text-[#CD9C20]" />
                         Exclusivo Casal
                       </span>
-                      <span className="text-[11px] text-neutral-400 font-ancient">Serve 2 pessoas</span>
+                      <span className="text-[11px] text-neutral-500 font-ancient">Serve 2 pessoas</span>
                     </div>
 
                     <Link
                       href={targetUrl}
                       onClick={() => startNavigation(item.name)}
-                      className="block group-hover:text-white"
+                      className="block group-hover:text-[#996D09]"
                     >
-                      <h3 className="font-display text-sm sm:text-base md:text-lg uppercase tracking-wider text-[#F5CB5C] leading-snug transition-colors">
+                      <h3 className="font-display text-sm sm:text-base md:text-lg uppercase tracking-wider text-[#1c1c1c] group-hover:text-[#996D09] leading-snug transition-colors">
                         {item.name}
                       </h3>
 
-                      <p className="text-[11px] sm:text-xs text-neutral-300 mt-1 sm:mt-1.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
+                      <p className="text-[11px] sm:text-xs text-neutral-600 mt-1 sm:mt-1.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
                         {item.description}
                       </p>
                     </Link>
                   </div>
 
                   {/* Bottom: Price & Button */}
-                  <div className="pt-2.5 mt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                  <div className="pt-2.5 mt-3 border-t border-neutral-200 flex items-center justify-between gap-2">
                     <div>
-                      <span className="text-[8px] sm:text-[9px] text-neutral-400 uppercase font-ancient block">Preço do Combo</span>
-                      <span className="font-sans font-black text-base sm:text-xl text-white whitespace-nowrap">
+                      <span className="text-[8px] sm:text-[9px] text-neutral-500 uppercase font-ancient block">Preço do Combo</span>
+                      <span className="font-sans font-black text-base sm:text-xl text-[#1c1c1c] whitespace-nowrap">
                         R$ {item.price.toFixed(2).replace('.', ',')}
                       </span>
                     </div>

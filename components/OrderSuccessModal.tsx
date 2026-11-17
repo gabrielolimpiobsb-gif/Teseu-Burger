@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CartItem, CustomerDetails } from '@/types/burger';
-import { STORE_INFO, NEIGHBORHOOD_COUPONS } from '@/lib/data';
+import { STORE_INFO, NEIGHBORHOOD_COUPONS, getStoreWhatsAppUrl } from '@/lib/data';
 import { LaurelWreathIcon, SpartanHelmetIcon, ParthenonIcon } from '@/components/GreekOrnament';
 import { Check, MessageSquare, X, Sparkles, Gift } from 'lucide-react';
 
@@ -53,7 +53,7 @@ export function OrderSuccessModal({ orderData, isOpen, onClose }: OrderSuccessMo
         }
 
         if (item.drawnSweetGift) {
-          details += `\n   🎁 *Doce Brinde Sorteado:* ${item.drawnSweetGift} (100% Grátis na Roleta)`;
+          details += `\n   🎁 *Doce Brinde Sorteado:* ${item.drawnSweetGift} (100% Grátis no Caça-Níqueis)`;
         }
         if (item.isComboUpgrade && !item.comboCasal) {
           details += `\n   - Combo: Batatas + ${item.comboDrink || 'Bebida'}`;
@@ -105,7 +105,7 @@ _Enviado com a bênção dos deuses do smash!_`;
     return encodeURIComponent(rawMessage);
   };
 
-  const whatsappUrl = `https://wa.me/${STORE_INFO.whatsapp}?text=${generateWhatsAppMessage()}`;
+  const whatsappUrl = getStoreWhatsAppUrl(generateWhatsAppMessage());
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">

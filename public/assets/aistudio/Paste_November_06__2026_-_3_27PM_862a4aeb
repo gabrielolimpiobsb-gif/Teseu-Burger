@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teseu Burger - Admin Financeiro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        .hide { display: none !important; }
+        .toast { transition: opacity 0.3s ease, transform 0.3s ease; }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' } /* Amber/Burger theme */
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-gray-100 h-screen overflow-hidden flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-full shrink-0">
+        <div class="p-6 flex items-center gap-3 border-b border-gray-800">
+            <div class="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center text-gray-900 font-bold text-xl">
+                <i class="ph-fill ph-hamburger"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-white tracking-tight">Teseu Burger</h1>
+                <p class="text-xs text-gray-400">Admin Financeiro</p>
+            </div>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 px-3">
+                <li>
+                    <button onclick="nav('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors text-sm font-medium">
+                        <i class="ph ph-squares-four text-lg"></i> Dashboard
+                    </button>
+                </li>
+                <li>
+                    <button onclick="nav('custos')" id="nav-custos" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors text-sm font-medium">
+                        <i class="ph ph-money text-lg"></i> Custos Fixos
+                    </button>
+                </li>
+                <li>
+                    <button onclick="nav('insumos')" id="nav-insumos" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors text-sm font-medium">
+                        <i class="ph ph-package text-lg"></i> Insumos
+                    </button>
+                </li>
+                <li>
+                    <button onclick="nav('fichas')" id="nav-fichas" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors text-sm font-medium">
+                        <i class="ph ph-cooking-pot text-lg"></i> Fichas Técnicas
+                    </button>
+                </li>
+                <li>
+                    <button onclick="nav('precificacao')" id="nav-precificacao" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors text-sm font-medium">
+                        <i class="ph ph-tag text-lg"></i> Combos & Precificação
+                    </button>
+                </li>
+            </ul>
+        </nav>
+        <div class="p-4 border-t border-gray-800 text-xs text-gray-500 text-center">
+            &copy; 2026 Teseu Burger
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto bg-gray-950 relative">
+        
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+        <div class="p-8 max-w-6xl mx-auto">
+            
+            <!-- VIEW: DASHBOARD -->
+            <section id="view-dashboard" class="view-section">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-white">Visão Geral</h2>
+                    <p class="text-gray-400">Resumo financeiro e operacional da hamburgueria.</p>
+                </header>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-medium text-gray-400">Custo Fixo Mensal</h3>
+                            <i class="ph ph-chart-line-down text-brand-500 text-xl"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="dash-cf-valor">R$ 0,00</p>
+                        <p class="text-xs text-gray-500 mt-1" id="dash-cf-perc">0% do faturamento</p>
+                    </div>
+                    
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-medium text-gray-400">Total de Insumos</h3>
+                            <i class="ph ph-package text-blue-500 text-xl"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="dash-insumos">0</p>
+                        <p class="text-xs text-gray-500 mt-1">Cadastrados</p>
+                    </div>
+
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-medium text-gray-400">Fichas Técnicas</h3>
+                            <i class="ph ph-cooking-pot text-green-500 text-xl"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="dash-fichas">0</p>
+                        <p class="text-xs text-gray-500 mt-1">Produtos montados</p>
+                    </div>
+
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-medium text-gray-400">Combos Ativos</h3>
+                            <i class="ph ph-tag text-purple-500 text-xl"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="dash-combos">0</p>
+                        <p class="text-xs text-gray-500 mt-1">Prontos para venda</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: CUSTOS FIXOS -->
+            <section id="view-custos" class="view-section hide">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-white">Custos Fixos</h2>
+                    <p class="text-gray-400">Defina suas despesas mensais para calcular o rateio nos produtos.</p>
+                </header>
+
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-sm">
+                    <form id="form-custos" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Aluguel (R$)</label>
+                                <input type="number" step="0.01" id="cf-aluguel" required class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Energia / Água / Internet (R$)</label>
+                                <input type="number" step="0.01" id="cf-energia" required class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Salários e Encargos (R$)</label>
+                                <input type="number" step="0.01" id="cf-salarios" required class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Faturamento Médio Mensal (R$)</label>
+                                <input type="number" step="0.01" id="cf-faturamento" required class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-brand-400 font-semibold focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-gray-800 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-400">Porcentagem de Custo Fixo a ratear:</p>
+                                <p class="text-xl font-bold text-white" id="cf-resultado">0.00%</p>
+                            </div>
+                            <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-gray-900 font-semibold py-2 px-6 rounded-lg transition-colors">
+                                Salvar Custos
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- VIEW: INSUMOS -->
+            <section id="view-insumos" class="view-section hide">
+                <header class="mb-8 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Insumos e Embalagens</h2>
+                        <p class="text-gray-400">Cadastre pães, carnes, molhos, sachês, etc.</p>
+                    </div>
+                </header>
+
+                <!-- Form Insumos -->
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-sm mb-6">
+                    <form id="form-insumos" class="flex flex-wrap items-end gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Nome do Insumo</label>
+                            <input type="text" id="ins-nome" required placeholder="Ex: Pão Brioche" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div class="w-32">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Unidade</label>
+                            <select id="ins-und" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                                <option value="un">Unidade (un)</option>
+                                <option value="g">Gramas (g)</option>
+                                <option value="kg">Quilos (kg)</option>
+                                <option value="ml">Mililitros (ml)</option>
+                                <option value="l">Litros (L)</option>
+                            </select>
+                        </div>
+                        <div class="w-40">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Preço Pacote (R$)</label>
+                            <input type="number" step="0.01" id="ins-preco" required placeholder="0.00" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div class="w-40">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Qtd no Pacote</label>
+                            <input type="number" step="0.01" id="ins-qtd" required placeholder="Ex: 30" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                        <button type="submit" class="bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-lg transition-colors border border-gray-700 h-[42px]">
+                            Adicionar
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Table Insumos -->
+                <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-sm text-gray-400">
+                        <thead class="bg-gray-800/50 text-gray-300 uppercase font-medium">
+                            <tr>
+                                <th class="px-6 py-3">Insumo</th>
+                                <th class="px-6 py-3">Unidade</th>
+                                <th class="px-6 py-3">Preço / Pacote</th>
+                                <th class="px-6 py-3">Custo Unitário</th>
+                                <th class="px-6 py-3 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-insumos" class="divide-y divide-gray-800">
+                            <!-- JS popula aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- VIEW: FICHAS TÉCNICAS -->
+            <section id="view-fichas" class="view-section hide">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-white">Fichas Técnicas</h2>
+                    <p class="text-gray-400">Monte seus hambúrgueres e porções somando os insumos.</p>
+                </header>
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    
+                    <!-- Criador de Fichas -->
+                    <div class="xl:col-span-1 bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-bold text-white mb-4">Nova Ficha</h3>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Nome do Produto</label>
+                            <input type="text" id="ficha-nome" placeholder="Ex: Hércules Duplo" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <div class="p-4 bg-gray-950 rounded-lg border border-gray-800 mb-4">
+                            <h4 class="text-sm font-medium text-gray-300 mb-3">Adicionar Ingrediente</h4>
+                            <div class="space-y-3">
+                                <select id="ficha-insumo-select" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
+                                    <!-- JS -->
+                                </select>
+                                <div class="flex gap-2">
+                                    <input type="number" step="0.01" id="ficha-insumo-qtd" placeholder="Qtd usada" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
+                                    <button type="button" onclick="addInsumoToFichaTemp()" class="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-lg text-white transition border border-gray-700">
+                                        <i class="ph ph-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Composição atual:</h4>
+                            <ul id="ficha-temp-list" class="space-y-2 text-sm text-gray-300 min-h-[100px] max-h-[200px] overflow-y-auto">
+                                <!-- JS -->
+                            </ul>
+                            <div class="mt-4 pt-3 border-t border-gray-800 flex justify-between items-center">
+                                <span class="text-gray-400 text-sm">Custo Direto:</span>
+                                <span class="text-lg font-bold text-brand-400" id="ficha-temp-total">R$ 0,00</span>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="saveFicha()" class="w-full bg-brand-500 hover:bg-brand-600 text-gray-900 font-bold py-2 rounded-lg transition-colors">
+                            Salvar Ficha Técnica
+                        </button>
+                    </div>
+
+                    <!-- Lista de Fichas -->
+                    <div class="xl:col-span-2 space-y-4" id="lista-fichas">
+                        <!-- JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: PRECIFICAÇÃO E COMBOS -->
+            <section id="view-precificacao" class="view-section hide">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-white">Combos e Precificação</h2>
+                    <p class="text-gray-400">Agrupe fichas, defina margens e simule promoções.</p>
+                </header>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <!-- Calculadora/Criador -->
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-bold text-white mb-6">Criar/Precificar Item Final</h3>
+                        
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Nome de Venda (Combo/Produto)</label>
+                                <input type="text" id="combo-nome" placeholder="Ex: Combo Hércules + Fritas + Refri" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                            </div>
+
+                            <div class="p-4 bg-gray-950 rounded-lg border border-gray-800">
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Composição (Selecione as Fichas)</label>
+                                <div class="flex gap-2 mb-3">
+                                    <select id="combo-ficha-select" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
+                                        <!-- JS -->
+                                    </select>
+                                    <button type="button" onclick="addFichaToComboTemp()" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-white border border-gray-700 transition">
+                                        Adicionar
+                                    </button>
+                                </div>
+                                <ul id="combo-temp-list" class="space-y-1 text-sm text-gray-300"></ul>
+                                <div class="mt-3 pt-2 border-t border-gray-800 text-right">
+                                    <span class="text-xs text-gray-500">Custo Total dos Itens: </span>
+                                    <span class="text-sm font-bold text-white" id="combo-custo-total">R$ 0,00</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">Margem de Lucro Desejada (%)</label>
+                                    <input type="number" step="0.1" id="combo-margem" value="20" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">Taxas de Venda/iFood (%)</label>
+                                    <input type="number" step="0.1" id="combo-taxa" value="15" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                                </div>
+                            </div>
+
+                            <div class="bg-brand-500/10 border border-brand-500/20 rounded-lg p-4 flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-brand-300">Preço Sugerido (Markup)</p>
+                                    <p class="text-xs text-brand-300/70" id="combo-cf-info">Custo Fixo atual: 0%</p>
+                                </div>
+                                <p class="text-2xl font-bold text-brand-400" id="combo-preco-sugerido">R$ 0,00</p>
+                            </div>
+
+                            <!-- Simulação de Preço -->
+                            <div class="pt-4 border-t border-gray-800">
+                                <h4 class="text-sm font-medium text-gray-300 mb-3">Simular Preço Promocional/Real</h4>
+                                <div class="flex gap-4 items-center">
+                                    <div class="flex-1">
+                                        <input type="number" step="0.01" id="combo-preco-real" placeholder="Preço final de venda" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-green-500">
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-400">Lucro Líquido Real</p>
+                                        <p class="text-lg font-bold text-green-500" id="combo-lucro-real">R$ 0,00 (0%)</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="saveCombo()" class="w-full bg-gray-100 hover:bg-white text-gray-900 font-bold py-3 rounded-lg transition-colors mt-4">
+                                Salvar no Catálogo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Produtos Finalizados -->
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-4">Catálogo Precificado</h3>
+                        <div class="space-y-4" id="lista-combos">
+                            <!-- JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // State Management
+        let state = {
+            fixedCosts: { aluguel: 0, energia: 0, salarios: 0, faturamento: 1, percentual: 0 },
+            insumos: [], // { id, nome, und, preco, qtd, custoUnit }
+            fichas: [],  // { id, nome, itens: [{id, nome, qtd, custo}], custoTotal }
+            combos: []   // { id, nome, fichas: [{id, nome, custo}], custoTotal, margem, taxa, precoSugerido, precoReal, lucroReal, lucroPerc }
+        };
+
+        // Temporary Builders
+        let tempFichaItens = [];
+        let tempComboFichas = [];
+
+        // Formatting Helpers
+        const formatMoney = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
+        const generateId = () => Math.random().toString(36).substr(2, 9);
+
+        // Toast System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-600' : 'bg-gray-700');
+            
+            toast.className = `toast ${bgClass} text-white px-4 py-3 rounded-lg shadow-lg text-sm font-medium flex items-center gap-2 transform translate-x-10 opacity-0`;
+            toast.innerHTML = `<i class="ph-fill ${type === 'success' ? 'ph-check-circle' : 'ph-warning-circle'} text-lg"></i> ${message}`;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-10', 'opacity-0');
+            }, 10);
+
+            // Animate out
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Navigation
+        function nav(section) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hide'));
+            document.getElementById(`view-${section}`).classList.remove('hide');
+            
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-gray-800', 'text-white', 'border-l-2', 'border-brand-500');
+                el.classList.add('text-gray-300');
+            });
+            
+            const activeBtn = document.getElementById(`nav-${section}`);
+            activeBtn.classList.add('bg-gray-800', 'text-white', 'border-l-2', 'border-brand-500');
+            activeBtn.classList.remove('text-gray-300');
+
+            if(section === 'dashboard') updateDashboard();
+            if(section === 'fichas') populateInsumosSelect();
+            if(section === 'precificacao') {
+                populateFichasSelect();
+                document.getElementById('combo-cf-info').innerText = `Custo Fixo rateado: ${state.fixedCosts.percentual.toFixed(2)}%`;
+            }
+        }
+
+        // Data Persistence
+        function loadData() {
+            const saved = localStorage.getItem('teseuBurgerData');
+            if (saved) {
+                state = JSON.parse(saved);
+            }
+            updateAllViews();
+        }
+
+        function saveData() {
+            localStorage.setItem('teseuBurgerData', JSON.stringify(state));
+            updateDashboard();
+        }
+
+        // View Updaters
+        function updateAllViews() {
+            // Custos Fixos
+            document.getElementById('cf-aluguel').value = state.fixedCosts.aluguel || '';
+            document.getElementById('cf-energia').value = state.fixedCosts.energia || '';
+            document.getElementById('cf-salarios').value = state.fixedCosts.salarios || '';
+            document.getElementById('cf-faturamento').value = state.fixedCosts.faturamento || '';
+            document.getElementById('cf-resultado').innerText = (state.fixedCosts.percentual || 0).toFixed(2) + '%';
+            
+            renderInsumos();
+            renderFichas();
+            renderCombos();
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            document.getElementById('dash-cf-valor').innerText = formatMoney(state.fixedCosts.aluguel + state.fixedCosts.energia + state.fixedCosts.salarios);
+            document.getElementById('dash-cf-perc').innerText = `${state.fixedCosts.percentual.toFixed(2)}% do faturamento`;
+            document.getElementById('dash-insumos').innerText = state.insumos.length;
+            document.getElementById('dash-fichas').innerText = state.fichas.length;
+            document.getElementById('dash-combos').innerText = state.combos.length;
+        }
+
+        // ================= CUSTOS FIXOS =================
+        document.getElementById('form-custos').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const aluguel = parseFloat(document.getElementById('cf-aluguel').value) || 0;
+            const energia = parseFloat(document.getElementById('cf-energia').value) || 0;
+            const salarios = parseFloat(document.getElementById('cf-salarios').value) || 0;
+            const faturamento = parseFloat(document.getElementById('cf-faturamento').value) || 1; // previne div por 0
+
+            const totalCF = aluguel + energia + salarios;
+            const percentual = (totalCF / faturamento) * 100;
+
+            state.fixedCosts = { aluguel, energia, salarios, faturamento, percentual };
+            document.getElementById('cf-resultado').innerText = percentual.toFixed(2) + '%';
+            saveData();
+            showToast('Custos fixos atualizados!');
+            
+            // Recalculate combos suggestions based on new fixed cost
+            recalcAllCombos(); 
+        });
+
+        // ================= INSUMOS =================
+        document.getElementById('form-insumos').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('ins-nome').value;
+            const und = document.getElementById('ins-und').value;
+            const preco = parseFloat(document.getElementById('ins-preco').value);
+            const qtd = parseFloat(document.getElementById('ins-qtd').value);
+            const custoUnit = preco / qtd;
+
+            state.insumos.push({ id: generateId(), nome, und, preco, qtd, custoUnit });
+            saveData();
+            renderInsumos();
+            e.target.reset();
+            showToast('Insumo adicionado!');
+        });
+
+        function renderInsumos() {
+            const list = document.getElementById('lista-insumos');
+            list.innerHTML = state.insumos.map(i => `
+                <tr class="hover:bg-gray-800/30 transition-colors">
+                    <td class="px-6 py-4 font-medium text-white">${i.nome}</td>
+                    <td class="px-6 py-4">${i.und}</td>
+                    <td class="px-6 py-4">${formatMoney(i.preco)} / ${i.qtd}</td>
+                    <td class="px-6 py-4 text-brand-400">${formatMoney(i.custoUnit)}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="deleteInsumo('${i.id}')" class="text-gray-500 hover:text-red-500 transition">
+                            <i class="ph ph-trash text-lg"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            populateInsumosSelect();
+        }
+
+        function deleteInsumo(id) {
+            state.insumos = state.insumos.filter(i => i.id !== id);
+            saveData();
+            renderInsumos();
+        }
+
+        // ================= FICHAS TÉCNICAS =================
+        function populateInsumosSelect() {
+            const select = document.getElementById('ficha-insumo-select');
+            select.innerHTML = '<option value="" disabled selected>Escolha um insumo...</option>' + 
+                state.insumos.map(i => `<option value="${i.id}">${i.nome} (${i.und}) - ${formatMoney(i.custoUnit)}/u</option>`).join('');
+        }
+
+        function addInsumoToFichaTemp() {
+            const select = document.getElementById('ficha-insumo-select');
+            const qtdInput = document.getElementById('ficha-insumo-qtd');
+            const insumoId = select.value;
+            const qtd = parseFloat(qtdInput.value);
+
+            if (!insumoId || !qtd || qtd <= 0) {
+                showToast('Selecione o insumo e informe uma quantidade válida.', 'error');
+                return;
+            }
+
+            const insumo = state.insumos.find(i => i.id === insumoId);
+            const custo = insumo.custoUnit * qtd;
+
+            tempFichaItens.push({ id: insumo.id, nome: insumo.nome, und: insumo.und, qtd, custo });
+            renderFichaTemp();
+            qtdInput.value = '';
+            select.value = '';
+        }
+
+        function renderFichaTemp() {
+            const list = document.getElementById('ficha-temp-list');
+            const totalEl = document.getElementById('ficha-temp-total');
+            
+            list.innerHTML = tempFichaItens.map((item, index) => `
+                <li class="flex justify-between items-center bg-gray-900 p-2 rounded border border-gray-800">
+                    <div>
+                        <span class="text-white">${item.nome}</span>
+                        <span class="text-xs text-gray-500 ml-2">${item.qtd} ${item.und}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-brand-400 font-medium">${formatMoney(item.custo)}</span>
+                        <i class="ph ph-x text-red-500 cursor-pointer hover:text-red-400" onclick="removeInsumoTemp(${index})"></i>
+                    </div>
+                </li>
+            `).join('');
+
+            const total = tempFichaItens.reduce((acc, i) => acc + i.custo, 0);
+            totalEl.innerText = formatMoney(total);
+        }
+
+        function removeInsumoTemp(index) {
+            tempFichaItens.splice(index, 1);
+            renderFichaTemp();
+        }
+
+        function saveFicha() {
+            const nome = document.getElementById('ficha-nome').value;
+            if (!nome || tempFichaItens.length === 0) {
+                showToast('Preencha o nome e adicione insumos.', 'error');
+                return;
+            }
+
+            const custoTotal = tempFichaItens.reduce((acc, i) => acc + i.custo, 0);
+            
+            state.fichas.push({
+                id: generateId(),
+                nome,
+                itens: [...tempFichaItens],
+                custoTotal
+            });
+
+            saveData();
+            renderFichas();
+            
+            // Reset form
+            document.getElementById('ficha-nome').value = '';
+            tempFichaItens = [];
+            renderFichaTemp();
+            showToast('Ficha técnica salva!');
+        }
+
+        function renderFichas() {
+            const list = document.getElementById('lista-fichas');
+            list.innerHTML = state.fichas.map(f => `
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <h4 class="text-white font-bold text-lg flex items-center gap-2">
+                            <i class="ph-fill ph-hamburger text-brand-500"></i> ${f.nome}
+                        </h4>
+                        <p class="text-xs text-gray-400 mt-1">${f.itens.map(i => `${i.qtd}${i.und} ${i.nome}`).join(' • ')}</p>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <div class="text-right">
+                            <p class="text-xs text-gray-500">Custo Direto</p>
+                            <p class="text-lg font-bold text-brand-400">${formatMoney(f.custoTotal)}</p>
+                        </div>
+                        <button onclick="deleteFicha('${f.id}')" class="text-gray-600 hover:text-red-500 p-2 rounded-lg hover:bg-gray-800 transition">
+                            <i class="ph ph-trash text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            populateFichasSelect();
+        }
+
+        function deleteFicha(id) {
+            state.fichas = state.fichas.filter(f => f.id !== id);
+            saveData();
+            renderFichas();
+        }
+
+        // ================= COMBOS E PRECIFICACAO =================
+        function populateFichasSelect() {
+            const select = document.getElementById('combo-ficha-select');
+            select.innerHTML = '<option value="" disabled selected>Adicionar Ficha/Produto...</option>' + 
+                state.fichas.map(f => `<option value="${f.id}">${f.nome} - ${formatMoney(f.custoTotal)}</option>`).join('');
+        }
+
+        function addFichaToComboTemp() {
+            const select = document.getElementById('combo-ficha-select');
+            const fichaId = select.value;
+            
+            if (!fichaId) return;
+
+            const ficha = state.fichas.find(f => f.id === fichaId);
+            tempComboFichas.push({ id: ficha.id, nome: ficha.nome, custo: ficha.custoTotal });
+            
+            renderComboTemp();
+            calcPrecificacao();
+        }
+
+        function renderComboTemp() {
+            const list = document.getElementById('combo-temp-list');
+            list.innerHTML = tempComboFichas.map((f, i) => `
+                <li class="flex justify-between items-center py-1">
+                    <span class="text-gray-300"><i class="ph ph-check text-green-500 mr-2"></i>${f.nome}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-gray-400">${formatMoney(f.custo)}</span>
+                        <i class="ph ph-x text-red-500 cursor-pointer" onclick="removeFichaCombo(${i})"></i>
+                    </div>
+                </li>
+            `).join('');
+            
+            const total = tempComboFichas.reduce((acc, f) => acc + f.custo, 0);
+            document.getElementById('combo-custo-total').innerText = formatMoney(total);
+        }
+
+        function removeFichaCombo(index) {
+            tempComboFichas.splice(index, 1);
+            renderComboTemp();
+            calcPrecificacao();
+        }
+
+        // Listeners para recalcular em tempo real
+        document.getElementById('combo-margem').addEventListener('input', calcPrecificacao);
+        document.getElementById('combo-taxa').addEventListener('input', calcPrecificacao);
+        document.getElementById('combo-preco-real').addEventListener('input', calcPrecificacao);
+
+        function calcPrecificacao() {
+            const custoTotal = tempComboFichas.reduce((acc, f) => acc + f.custo, 0);
+            const margem = parseFloat(document.getElementById('combo-margem').value) || 0;
+            const taxa = parseFloat(document.getElementById('combo-taxa').value) || 0;
+            const cfPerc = state.fixedCosts.percentual || 0;
+
+            // Fórmula do Preço Sugerido (Markup/Margem por dentro)
+            // Preço = Custo / (1 - (Margem% + Taxas% + CustoFixo%) / 100)
+            const dedutores = (margem + taxa + cfPerc) / 100;
+            
+            let precoSugerido = 0;
+            if (dedutores >= 1) {
+                document.getElementById('combo-preco-sugerido').innerText = 'Erro: % >= 100';
+            } else if (custoTotal > 0) {
+                precoSugerido = custoTotal / (1 - dedutores);
+                document.getElementById('combo-preco-sugerido').innerText = formatMoney(precoSugerido);
+            } else {
+                document.getElementById('combo-preco-sugerido').innerText = 'R$ 0,00';
+            }
+
+            // Calculo de Lucro Real baseado no preço inserido
+            const precoRealInput = document.getElementById('combo-preco-real').value;
+            if (precoRealInput && custoTotal > 0) {
+                const pReal = parseFloat(precoRealInput);
+                // Lucro = Preco - CustoDireto - (Preco * Taxas%) - (Preco * CustoFixo%)
+                const deducoesValor = pReal * ((taxa + cfPerc) / 100);
+                const lucroReais = pReal - custoTotal - deducoesValor;
+                const lucroPerc = (lucroReais / pReal) * 100;
+
+                const lucroEl = document.getElementById('combo-lucro-real');
+                lucroEl.innerText = `${formatMoney(lucroReais)} (${lucroPerc.toFixed(1)}%)`;
+                lucroEl.className = `text-lg font-bold ${lucroReais >= 0 ? 'text-green-500' : 'text-red-500'}`;
+            } else {
+                document.getElementById('combo-lucro-real').innerText = 'R$ 0,00 (0%)';
+                document.getElementById('combo-lucro-real').className = 'text-lg font-bold text-gray-500';
+            }
+        }
+
+        function saveCombo() {
+            const nome = document.getElementById('combo-nome').value;
+            if (!nome || tempComboFichas.length === 0) {
+                showToast('Insira um nome e selecione itens para o combo.', 'error');
+                return;
+            }
+
+            const custoTotal = tempComboFichas.reduce((acc, f) => acc + f.custo, 0);
+            const margem = parseFloat(document.getElementById('combo-margem').value) || 0;
+            const taxa = parseFloat(document.getElementById('combo-taxa').value) || 0;
+            
+            const dedutores = (margem + taxa + state.fixedCosts.percentual) / 100;
+            const precoSugerido = dedutores < 1 ? custoTotal / (1 - dedutores) : 0;
+            
+            const precoReal = parseFloat(document.getElementById('combo-preco-real').value) || precoSugerido;
+            
+            const deducoesValor = precoReal * ((taxa + state.fixedCosts.percentual) / 100);
+            const lucroReal = precoReal - custoTotal - deducoesValor;
+            const lucroPerc = (lucroReal / precoReal) * 100;
+
+            state.combos.push({
+                id: generateId(),
+                nome,
+                fichas: [...tempComboFichas],
+                custoTotal,
+                margem,
+                taxa,
+                precoSugerido,
+                precoReal,
+                lucroReal,
+                lucroPerc
+            });
+
+            saveData();
+            renderCombos();
+
+            // Reset
+            document.getElementById('combo-nome').value = '';
+            document.getElementById('combo-preco-real').value = '';
+            tempComboFichas = [];
+            renderComboTemp();
+            calcPrecificacao();
+            showToast('Produto/Combo catalogado com sucesso!');
+        }
+
+        function renderCombos() {
+            const list = document.getElementById('lista-combos');
+            list.innerHTML = state.combos.map(c => `
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-sm relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <button onclick="deleteCombo('${c.id}')" class="text-gray-500 hover:text-red-500 transition">
+                            <i class="ph ph-trash text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <h4 class="text-white font-bold text-lg mb-2">${c.nome}</h4>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Custo Direto</p>
+                            <p class="text-sm font-medium text-gray-300">${formatMoney(c.custoTotal)}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Preço Sugerido</p>
+                            <p class="text-sm font-medium text-brand-400 line-through">${formatMoney(c.precoSugerido)}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Preço de Venda</p>
+                            <p class="text-lg font-bold text-white">${formatMoney(c.precoReal)}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Lucro Líquido</p>
+                            <p class="text-sm font-bold ${c.lucroReal >= 0 ? 'text-green-500' : 'text-red-500'}">
+                                ${formatMoney(c.lucroReal)} <span class="text-xs">(${c.lucroPerc.toFixed(1)}%)</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteCombo(id) {
+            state.combos = state.combos.filter(c => c.id !== id);
+            saveData();
+            renderCombos();
+        }
+
+        function recalcAllCombos() {
+            // Re-avalia o lucro de todos os combos baseados no novo Custo Fixo
+            state.combos = state.combos.map(c => {
+                const cfPerc = state.fixedCosts.percentual;
+                const dedutores = (c.margem + c.taxa + cfPerc) / 100;
+                const precoSugerido = dedutores < 1 ? c.custoTotal / (1 - dedutores) : 0;
+                
+                const deducoesValor = c.precoReal * ((c.taxa + cfPerc) / 100);
+                const lucroReal = c.precoReal - c.custoTotal - deducoesValor;
+                const lucroPerc = (lucroReal / c.precoReal) * 100;
+
+                return { ...c, precoSugerido, lucroReal, lucroPerc };
+            });
+            saveData();
+            renderCombos();
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            nav('dashboard'); // Initial view
+        });
+
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 
 import React, { useState, useId } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   BUILDER_INGREDIENTS,
   BURGER_PRESETS,
@@ -34,6 +35,7 @@ function createLayerInstance(ing: BuilderIngredient, suffix = ''): BurgerStackIt
 }
 
 export function BurgerBuilderComponent() {
+  const router = useRouter();
   const { addToCart, setIsCartOpen, showToast, triggerCartAnimation } = useCart();
 
   // Selected Category tab in Left Panel
@@ -180,7 +182,7 @@ export function BurgerBuilderComponent() {
 
     triggerCartAnimation();
     showToast('Hambúrguer personalizado adicionado ao banquete!');
-    setIsCartOpen(true);
+    router.push('/carinho');
   };
 
   // Count how many times an ingredient appears in the current burger
