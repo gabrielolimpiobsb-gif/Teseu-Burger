@@ -70,7 +70,7 @@ import {
 } from '@/components/AdminCalculosHub';
 
 export type AdminNavTab = 'dashboard' | 'orders' | 'calculos' | 'delivery' | 'settings';
-type PeriodFilter = 'today' | 'week' | 'month' | 'all';
+type PeriodFilter = 'today' | 'week' | 'month' | 'year' | 'all';
 
 interface OrderItem {
   id: string;
@@ -449,13 +449,14 @@ export function AdminDashboard({ initialTab = 'dashboard' }: { initialTab?: Admi
       const ordersInPeriod = allOrders.filter((o) => matchesPeriodFilter(o.createdAt, undefined, p)).length;
       const erpUnitsInPeriod = logs
         .filter((l) => matchesPeriodFilter(l.timestamp, l.dateKey, p))
-        .reduce((acc, l) => acc + Math.max(1, Number(l.qty || 1)), 0);
+        .reduce((acc, l) => acc + Math.max(1, Number(l.salesCount || 1)), 0);
       return ordersInPeriod + erpUnitsInPeriod;
     };
     return {
       today: countForPeriod('today'),
       week: countForPeriod('week'),
       month: countForPeriod('month'),
+      year: countForPeriod('year'),
       all: countForPeriod('all'),
     };
   }, [allOrders, erpState?.logs]);

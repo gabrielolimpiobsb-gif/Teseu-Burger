@@ -100,6 +100,7 @@ export interface KdsConsumptionLog {
   channel: string;
   channelType: SalesChannelType; // 'SITE' (0% taxa) | 'IFOOD' (26,2% taxa)
   salesCount: number; // Quantidade de vendas que este registro representa (ex: 1 pedido ou baixa de N vendas no dia)
+  qty?: number;
   dateKey: string; // YYYY-MM-DD
   timestamp: number;
   revenue: number; // Receita Bruta

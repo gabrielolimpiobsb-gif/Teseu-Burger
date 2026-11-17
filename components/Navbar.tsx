@@ -21,9 +21,14 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const isScrolled = window.scrollY > 40;
+      setScrolled(isScrolled);
+      if (!isScrolled) {
+        setMobileMenuOpen(false);
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -38,13 +43,25 @@ export function Navbar({ cartCount, cartTotal, onOpenCart, cartShake }: NavbarPr
 
   return (
     <>
-      {/* Top Floating Pill Container */}
-      <header className="fixed top-3 sm:top-4 left-0 right-0 z-40 px-2.5 sm:px-6 pointer-events-none w-full max-w-full">
-        <div className="max-w-4xl mx-auto flex items-center justify-between pointer-events-auto">
+      {/* Top Floating Pill Container - Hidden at top over Hero, reveals on scroll */}
+      <header
+        className={`fixed top-3 sm:top-4 left-0 right-0 z-40 px-2.5 sm:px-6 w-full max-w-full transition-all duration-300 pointer-events-none ${
+          scrolled
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 -translate-y-6'
+        }`}
+      >
+        <div
+          className={`max-w-4xl mx-auto flex items-center justify-between ${
+            scrolled ? 'pointer-events-auto' : 'pointer-events-none'
+          }`}
+        >
           {/* Pill Navbar with Roman Marble & Imperial Gold Styling */}
           <nav
             className={`w-full bg-white/95 text-[#1c1c1c] rounded-full px-3 sm:px-6 py-1.5 sm:py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-[#CD9C20]/40 flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 backdrop-blur-md ${
-              scrolled ? 'shadow-[0_12px_35px_rgba(0,0,0,0.12)] border-[#CD9C20]' : ''
+              scrolled
+                ? 'shadow-[0_12px_35px_rgba(0,0,0,0.12)] border-[#CD9C20]'
+                : 'pointer-events-none'
             }`}
           >
             {/* Left: Brand with Official Logo (Only logo.png, no redundant text) */}

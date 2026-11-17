@@ -38,8 +38,8 @@ export function HeroSection({ onExploreMenu, onExploreCombos }: HeroSectionProps
           sizes="100vw"
         />
 
-        {/* Top Celestial Open Area Content - lowered with pt-28 and larger typography */}
-        <div className="absolute inset-x-0 top-0 z-20 flex flex-col items-center text-center pt-28 px-5 pointer-events-auto">
+        {/* Top Celestial Open Area Content */}
+        <div className="absolute inset-x-0 top-0 z-20 flex flex-col items-center text-center pt-12 px-5 pointer-events-auto">
           {/* Subtle Greek laurel pill badge */}
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/85 backdrop-blur-xs border border-[#CD9C20]/45 shadow-xs mb-3">
             <LaurelWreathIcon size={15} color="#CD9C20" />
@@ -48,8 +48,19 @@ export function HeroSection({ onExploreMenu, onExploreCombos }: HeroSectionProps
             </span>
           </div>
 
-          <h1 className="font-display font-black text-3xl uppercase tracking-wider text-[#1c1c1c] drop-shadow-xs leading-[1.1]">
-            BEM-VINDO AO <span className="text-[#9A7314]">OLIMPO</span>
+          <h1 className="font-display font-black text-3xl uppercase tracking-wider text-[#1c1c1c] drop-shadow-xs leading-[1.1] flex flex-col items-center gap-1.5">
+            BEM-VINDO AO{' '}
+            <span className="inline-flex items-center justify-center">
+              <Image
+                src="/logo.png"
+                alt="Teseu Burger"
+                width={220}
+                height={68}
+                priority
+                referrerPolicy="no-referrer"
+                className="h-12 w-auto object-contain drop-shadow-xs"
+              />
+            </span>
           </h1>
 
           <p className="text-sm text-neutral-800 font-semibold mt-2 leading-relaxed max-w-xs">
@@ -92,8 +103,19 @@ export function HeroSection({ onExploreMenu, onExploreCombos }: HeroSectionProps
             </span>
           </div>
 
-          <h1 className="font-display font-black text-3xl md:text-5xl lg:text-6xl uppercase tracking-wider text-[#1c1c1c] drop-shadow-xs leading-[1.08]">
-            BEM-VINDO AO <span className="text-[#9A7314]">OLIMPO</span>
+          <h1 className="font-display font-black text-3xl md:text-5xl lg:text-6xl uppercase tracking-wider text-[#1c1c1c] drop-shadow-xs leading-[1.08] flex flex-col items-start gap-2">
+            BEM-VINDO AO{' '}
+            <span className="inline-flex items-center">
+              <Image
+                src="/logo.png"
+                alt="Teseu Burger"
+                width={340}
+                height={104}
+                priority
+                referrerPolicy="no-referrer"
+                className="h-14 md:h-20 lg:h-24 w-auto object-contain drop-shadow-xs"
+              />
+            </span>
           </h1>
 
           <p className="text-sm md:text-base lg:text-lg text-neutral-800 font-medium mt-3 leading-relaxed max-w-lg">
